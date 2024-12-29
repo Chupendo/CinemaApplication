@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_USER: db
+      MARIADB_PASSWORD: db
+      MARIADB_ROOT_PASSWORD: dbpw
+      MARIADB_DATABASE: film
+    ports:
+      - '3307:3306'
+    volumes:
+      - ../docker/working-mariadb:/var/lib/mysql
+  mongodb:
+    image: mongo:latest
+    container_name: mongdb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: dbpw
+      MONGO_INITDB_DATABASE: db
+    ports:
+      - "27017:27017"
+    volumes:
+      - ../docker/mongo-data:/data/db
