@@ -61,35 +61,6 @@
             </exclusions>
         </dependency>
 
-        <!-- dao module (contains domain)-->
-        <dependency>
-            <groupId>com.tokioschool.filmapp</groupId>
-            <artifactId>repository-module</artifactId>
-            <version>${version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-data-jpa</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-jdbc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-test</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>h2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.github.javafaker</groupId>
-                    <artifactId>javafaker</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
     </dependencies>
 
     <build>

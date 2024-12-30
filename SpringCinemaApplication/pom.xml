@@ -21,6 +21,7 @@
 		<module>repository-module</module>
 		<module>services-module</module>
 		<module>core-film</module>
+		<module>dto-module</module>
 	</modules>
 	<packaging>pom</packaging>
 
@@ -81,6 +82,12 @@
 			<dependency>
 				<groupId>com.tokioschool.filmapp</groupId>
 				<artifactId>domain-module</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>dto-module</artifactId>
 				<version>${version}</version>
 			</dependency>
 		</dependencies>
