@@ -7,14 +7,10 @@
         <groupId>com.tokioschool.filmapp</groupId>
         <artifactId>SpringCinemaApplication</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>repository-module</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>core-film</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <properties>
         <javafaker.version>1.0.2</javafaker.version>
