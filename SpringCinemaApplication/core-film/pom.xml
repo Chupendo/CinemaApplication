@@ -49,13 +49,6 @@
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
 
-        <!-- tools -->
-        <dependency>
-            <groupId>org.modelmapper</groupId>
-            <artifactId>modelmapper</artifactId>
-            <version>${modelmapper.version}</version>
-        </dependency>
-
         <!-- security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -80,33 +73,6 @@
         </dependency>
 
         <!-- internal modules -->
-        <dependency>
-            <groupId>com.tokioschool.filmapp</groupId>
-            <artifactId>services-module</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-test</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.tokioschool.filmapp</groupId>
-                    <artifactId>dto-module</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.tokioschool.filmapp</groupId>
-                    <artifactId>repository-module</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.tokioschool.filmapp</groupId>
-                    <artifactId>domain-module</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>com.tokioschool.filmapp</groupId>
             <artifactId>dto-module</artifactId>
