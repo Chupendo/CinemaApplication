@@ -54,10 +54,10 @@
 
     <changeSet id="2" author="andres.rpenuela" context="dev">
         <insert tableName="users">
-            <column name="ID" value="1" />
-            <column name="USERNAME" value="john_doe" />
-            <column name="PASSWORD" value="securepassword123" />
-            <column name="PASSWORD_BIS" value="securepassword123" />
+            <column name="ID" value="0AVRSA787897A" />
+            <column name="USERNAME" value="user" />
+            <column name="PASSWORD" value="$2a$12$lWqfNW9r93S7NnsOEBtMseFV.1Wn/S9qQ0o91ND0hd0xoEDEBGXLW" />
+            <column name="PASSWORD_BIS" value="$2a$12$lWqfNW9r93S7NnsOEBtMseFV.1Wn/S9qQ0o91ND0hd0xoEDEBGXLW" />
             <column name="EMAIL" value="john.doe@example.com" />
             <column name="NAME" value="John" />
             <column name="SURNAME" value="Doe" />
@@ -67,10 +67,10 @@
         </insert>
 
         <insert tableName="users">
-            <column name="ID" value="2" />
-            <column name="USERNAME" value="jane_smith" />
-            <column name="PASSWORD" value="anotherpassword456" />
-            <column name="PASSWORD_BIS" value="anotherpassword456" />
+            <column name="ID" value="0AVRSA787897B" />
+            <column name="USERNAME" value="admin" />
+            <column name="PASSWORD" value="$2a$12$5a6RB9Wu6Gw4V41h7x3PeuwKLwd29v/Vh6b2T.mDzqarTRurI9x2W" />
+            <column name="PASSWORD_BIS" value="$2a$12$5a6RB9Wu6Gw4V41h7x3PeuwKLwd29v/Vh6b2T.mDzqarTRurI9x2W" />
             <column name="EMAIL" value="jane.smith@example.com" />
             <column name="NAME" value="Jane" />
             <column name="SURNAME" value="Smith" />
