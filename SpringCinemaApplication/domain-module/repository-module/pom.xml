@@ -11,7 +11,10 @@
     </parent>
 
     <artifactId>repository-module</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+    <modules>
+        <module>core-film</module>
+    </modules>
 
     <properties>
         <javafaker.version>1.0.2</javafaker.version>

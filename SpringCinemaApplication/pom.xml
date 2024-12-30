@@ -63,6 +63,12 @@
 				<artifactId>repository-module</artifactId>
 				<version>${version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>core-film</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
