@@ -18,6 +18,7 @@
 		<module>liquibase-module</module>
 		<module>film-api</module>
 		<module>domain-module</module>
+		<module>domain-module/repository-module</module>
 	</modules>
 	<packaging>pom</packaging>
 
@@ -54,6 +55,12 @@
 			<dependency>
 				<groupId>com.tokioschool.filmapp</groupId>
 				<artifactId>film-api</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>repository-module</artifactId>
 				<version>${version}</version>
 			</dependency>
 		</dependencies>
