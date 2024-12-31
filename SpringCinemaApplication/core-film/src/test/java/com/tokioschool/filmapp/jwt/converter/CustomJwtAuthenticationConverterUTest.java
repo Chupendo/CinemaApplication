@@ -6,9 +6,11 @@ import org.mockito.Mockito;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
+@ActiveProfiles("test")
 class CustomJwtAuthenticationConverterUTest {
 
     private final CustomJwtAuthenticationConverter converter = new CustomJwtAuthenticationConverter();

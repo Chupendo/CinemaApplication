@@ -5,11 +5,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.modelmapper.spi.MappingContext;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Set;
 
-
+@ActiveProfiles("test")
 class RolesSetToStringListConverterUTest {
 
     private final RolesSetToStringListConverter converter = new RolesSetToStringListConverter();
