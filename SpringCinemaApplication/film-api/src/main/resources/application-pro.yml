@@ -1,0 +1,30 @@
+
+spring:
+  application:
+    name: liquibase-module
+  # Liguibase
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev
+    label-filter: dev
+  # maria db docker
+  datasource:
+    url: jdbc:mariadb://localhost:3307/film?createDatabaseIfNotExist=true
+    username: root
+    password: dbpw
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+    #validate, none, update, create-drop
+    hibernate:
+      ddl-auto: validate
+    # Debug queries
+    show-sql: true
+  test:
+    database:
+      replace: none
+server:
+  port: 9090
