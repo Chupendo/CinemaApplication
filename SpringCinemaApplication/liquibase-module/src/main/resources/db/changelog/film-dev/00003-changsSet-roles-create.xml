@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ChangeSet to create the USER table -->
+    <changeSet id="3" author="andres.rpenuela" context="dev">
+        <createTable tableName="roles">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false" />
+            </column>
+        </createTable>
+
+        <!-- Add a comment regarding additional validation rules -->
+        <comment>
+            Additional validations to be implemented at the application level:
+            1. NAME can't be NULL and your value can be unique
+        </comment>
+    </changeSet>
+
+    <changeSet id="4" author="andres.rpenuela" context="dev">
+        <insert tableName="roles">
+            <column name="ID" value="1" />
+            <column name="NAME" value="USER" />
+        </insert>
+
+        <insert tableName="roles">
+            <column name="ID" value="2" />
+            <column name="NAME" value="ADMIN" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>
