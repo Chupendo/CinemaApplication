@@ -29,22 +29,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationResponseDTO) {
-        // auntentica el usaurio en el sistema
+        // auntentica el usuario en el sistema meidnate par [user, pwd]
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         authenticationResponseDTO.getUsername(),
                         authenticationResponseDTO.getPassword());
 
+        // authentica al usuario usando el proveedor de spring
         Authentication authentication = authenticationManager
                 .authenticate( usernamePasswordAuthenticationToken  );
 
-        // se obitnete el usuario autenticado
+        // se obtinete el usuario autenticado
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        // generamos el token
+        // generamos el token usando el servicio
         Jwt jwt = jwtService.generateToken(userDetails);
 
-
+        // encapsula el token en uan resspeusta [token,expireIn]
         return AuthenticationResponseDTO.builder()
                 .accessToken(jwt.getTokenValue())
                 // +1 porque excluye el úlitmo digio del segunod y sea 3600 segundos

@@ -1,4 +1,4 @@
-package com.tokioschool.filmapp.services.user.impl;
+package com.tokioschool.filmapp.services.user.security;
 
 
 import com.tokioschool.filmapp.dto.user.UserDTO;
@@ -31,7 +31,7 @@ public class FilmUserDetailsService implements UserDetailsService {
     /**
      * Method for authorized the user register in film
      *
-     * @param username usernmae or email of user to authorized
+     * @param username username or email of user to authorized
      * @return an instance of user details de spring security
      *
      * @throws UsernameNotFoundException if the username don't exist in the system

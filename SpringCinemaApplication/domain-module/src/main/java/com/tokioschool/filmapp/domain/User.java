@@ -1,15 +1,13 @@
 package com.tokioschool.filmapp.domain;
 
 import com.tokioschool.filmapp.tsId.TSId;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -51,5 +49,11 @@ public class User {
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="users_roles",
+            joinColumns =  {@JoinColumn(name="user_id")},
+            inverseJoinColumns = { @JoinColumn(name="role_id")})
+    private Set<Role> roles;
 
 }
