@@ -22,6 +22,8 @@ public class FilmApiSecurityConfiguration {
                         //.requestMatchers("/store/api/auth","/store/api/auth/**")
                         .requestMatchers("/film/api/auth")
                         .permitAll()
+                        .requestMatchers("/film/api/auth/**")
+                        .authenticated()
                 )
                 // Gestion de session sin estado
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
