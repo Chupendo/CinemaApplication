@@ -28,12 +28,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
 
     @Override
-    public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationResponseDTO) {
+    public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationRequestDTO) {
         // auntentica el usuario en el sistema meidnate par [user, pwd]
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(
-                        authenticationResponseDTO.getUsername(),
-                        authenticationResponseDTO.getPassword());
+                        authenticationRequestDTO.getUsername(),
+                        authenticationRequestDTO.getPassword());
 
         // authentica al usuario usando el proveedor de spring
         Authentication authentication = authenticationManager
