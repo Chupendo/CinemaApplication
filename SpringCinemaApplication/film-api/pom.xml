@@ -61,6 +61,28 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.tokioschool.filmapp</groupId>
+            <artifactId>services-module</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.tokioschool.filmapp</groupId>
+                    <artifactId>core-film</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-jpa</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.javafaker</groupId>
+                    <artifactId>javafaker</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>

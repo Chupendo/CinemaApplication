@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.mapper;
 
+import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import org.assertj.core.api.Assertions;
@@ -13,17 +14,20 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ModelMapperConfiguration.class})
+@ContextConfiguration(classes = {ModelMapperConfiguration.class,UserToUserDtoMapper.class})
 @ActiveProfiles("test")
-class ModelMapperUTest {
+public class UserToUserDtoMapperUTest {
 
-    @Autowired  private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Test
     void givenUser_whenMapperToUserDto_whenUserDto(){
-        User user = User.builder()
+        final Role role = Role.builder().id(1L).name("ADMIN").build();
+        final User user = User.builder()
                 .name("andres")
                 .surname("ruiz peñuela")
                 .username("arp0001")
@@ -33,12 +37,17 @@ class ModelMapperUTest {
                 .password("123")
                 .passwordBis("123")
                 .email("test@test.com")
+                .roles(Set.of(role))
                 .build();
 
 
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 
         Assertions.assertThat(userDTO)
-                .returns(user.getName(),UserDTO::getName);
+                .returns(user.getName(),UserDTO::getName)
+                .returns(user.getEmail(),UserDTO::getEmail)
+                .returns(user.getBirthDate(),UserDTO::getBirthDate)
+                .satisfies(userDTO1 ->
+                        Assertions.assertThat(userDTO1.getRoles().contains( role.getName() )).isTrue() );
     }
 }

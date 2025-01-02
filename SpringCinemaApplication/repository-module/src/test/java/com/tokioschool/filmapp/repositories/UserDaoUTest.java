@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.repositories;
 
 import com.github.javafaker.Faker;
 import com.tokioschool.filmapp.domain.User;
+import com.tokioschool.filmapp.repositories.configuration.TestConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

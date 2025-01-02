@@ -11,24 +11,31 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import java.util.List;
 
 /**
- * Converter de Spring
+ * This need for mapper the roles and privileges of user to authenticate,
+ * and used the Convert of Spring
+ *
+ * @author andres.rpenuel.a
+ * @version 1.0
  */
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+
+    private static final String AUTHORITIES_KEY = "authorities";
 
     @Override
     public AbstractAuthenticationToken convert(Jwt source) {
         // Convert por defecto de Spring
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         // personalizamos los roles y permisos
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
-                // se obtiene el campo de "authorities" del payload del token que es un String[]
-                // y se convierte a un objeto de tipo "SimpleGrantedAuthoritiy" para adaptarlo
-                // a UserDetaisl
-                jwt -> ((List<String>) jwt.getClaim("authorities"))
-                        .stream().map(authority -> (GrantedAuthority) new SimpleGrantedAuthority(authority))
-                        .toList()
-        );
-
+        if( source.getClaims()!= null && source.getClaim(AUTHORITIES_KEY) != null ) {
+            jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+                    // se obtiene el campo de "authorities" del payload del token que es un String[]
+                    // y se convierte a un objeto de tipo "SimpleGrantedAuthoritiy" para adaptarlo
+                    // a UserDetails
+                    jwt -> ((List<String>) jwt.getClaim(AUTHORITIES_KEY))
+                            .stream().map(authority -> (GrantedAuthority) new SimpleGrantedAuthority(authority))
+                            .toList()
+            );
+        }
         // se convierte el resto de campos por defecto
         return jwtAuthenticationConverter.convert(source);
     }
