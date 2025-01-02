@@ -52,6 +52,6 @@ class FilmUserDetailsServiceUnitTest {
                 .returns(pwd,UserDetails::getPassword)
                 .satisfies(userDetails1 ->
                         Assertions.assertThat(userDetails1.getAuthorities()
-                                .contains(new SimpleGrantedAuthority(userDto.getRoles().getFirst()))).isTrue() );
+                                .contains(new SimpleGrantedAuthority("ROLE_".concat(userDto.getRoles().getFirst().toUpperCase())))).isTrue() );
     }
 }

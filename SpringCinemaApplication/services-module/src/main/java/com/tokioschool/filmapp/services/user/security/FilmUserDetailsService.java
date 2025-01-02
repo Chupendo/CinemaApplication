@@ -5,6 +5,7 @@ import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.services.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +71,19 @@ public class FilmUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 userDto.getEmail(), // identidad
                 password, // credenciales (encriptada)
-                simpleGrantedAuthorities// autoridades
+                getAuthoritiesUser(userDto)// autoridades
         );
+    }
+
+    private static List<SimpleGrantedAuthority> getAuthoritiesUser(UserDTO userDto) {
+
+        // roles
+        List<SimpleGrantedAuthority> roles = userDto.getRoles().stream()
+                .map(StringUtils::upperCase).map("ROLE_"::concat)
+                .map(SimpleGrantedAuthority::new) // Mapea cada String a SimpleGrantedAuthority
+                .toList();
+
+        return new ArrayList<>(roles);
+
     }
 }
