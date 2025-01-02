@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class AuthenticationApiController {
                     )
             }
     )
-    @PostMapping
+    @PostMapping(value = {"","/"},produces = "application/json",consumes = {MediaType.APPLICATION_JSON_VALUE} )
     public ResponseEntity<AuthenticationResponseDTO> postAuthenticated(@RequestBody AuthenticationRequestDTO authenticationRequestDTO) {
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDTO));
     }
