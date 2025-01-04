@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.mapper;
 
+import com.tokioschool.filmapp.domain.Authority;
 import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.user.UserDTO;
@@ -26,7 +27,12 @@ public class UserToUserDtoMapperUTest {
 
     @Test
     void givenUser_whenMapperToUserDto_whenUserDto(){
-        final Role role = Role.builder().id(1L).name("ADMIN").build();
+        final Role role = Role.builder()
+                .id(1L)
+                .name("ADMIN")
+                .authorities(Set.of(Authority.builder().id(1L).name("writer").build()))
+                .build();
+
         final User user = User.builder()
                 .name("andres")
                 .surname("ruiz peñuela")
@@ -48,6 +54,6 @@ public class UserToUserDtoMapperUTest {
                 .returns(user.getEmail(),UserDTO::getEmail)
                 .returns(user.getBirthDate(),UserDTO::getBirthDate)
                 .satisfies(userDTO1 ->
-                        Assertions.assertThat(userDTO1.getRoles().contains( role.getName() )).isTrue() );
+                        Assertions.assertThat(userDTO1.getRoles().getFirst().getAuthorities().contains( "writer" )).isTrue() );
     }
 }

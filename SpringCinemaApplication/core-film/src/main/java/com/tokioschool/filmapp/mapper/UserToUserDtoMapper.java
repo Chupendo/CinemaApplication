@@ -1,7 +1,10 @@
 package com.tokioschool.filmapp.mapper;
 
-import com.tokioschool.filmapp.converter.RolesSetToStringListConverter;
+import com.tokioschool.filmapp.converter.AuthoritySetToStringListConverter;
+import com.tokioschool.filmapp.converter.RolesSetToRolesDtoListConverter;
+import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
+import com.tokioschool.filmapp.dto.user.RoleDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +29,7 @@ public class UserToUserDtoMapper {
     private void configureUserDTOConverter(){
         modelMapper.typeMap(User.class, UserDTO.class)
                 .addMappings(mapping ->
-                        mapping.using(new RolesSetToStringListConverter() )
+                        mapping.using(new RolesSetToRolesDtoListConverter() )
                                 .map(User::getRoles,UserDTO::setRoles));
     }
 }
