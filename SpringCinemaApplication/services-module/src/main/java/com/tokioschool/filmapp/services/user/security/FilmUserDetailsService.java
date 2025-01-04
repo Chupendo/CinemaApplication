@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.services.user.security;
 
 
+import com.tokioschool.filmapp.dto.user.RoleDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.services.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Service for auth
@@ -60,14 +63,6 @@ public class FilmUserDetailsService implements UserDetailsService {
         // se puede considader un rol una autoridad, pero esto puede estar separado
         // List.of("ROLE_USER", "ROLE_ADMIN")
 
-        final List<SimpleGrantedAuthority> simpleGrantedAuthorities = Optional.ofNullable(userDto.getRoles())
-                .stream() // Convierte Optional<List<String>> en Stream<List<String>>
-                .flatMap(List::stream) // Convierte Stream<List<String>> en Stream<String>
-                .map(SimpleGrantedAuthority::new) // Mapea cada String a SimpleGrantedAuthority
-                .toList(); // Convierte el Stream a una Lista
-
-
-
         return new org.springframework.security.core.userdetails.User(
                 userDto.getEmail(), // identidad
                 password, // credenciales (encriptada)
@@ -79,11 +74,20 @@ public class FilmUserDetailsService implements UserDetailsService {
 
         // roles
         List<SimpleGrantedAuthority> roles = userDto.getRoles().stream()
+                .map(RoleDTO::getName)
                 .map(StringUtils::upperCase).map("ROLE_"::concat)
                 .map(SimpleGrantedAuthority::new) // Mapea cada String a SimpleGrantedAuthority
                 .toList();
+        // privileges
+        List<SimpleGrantedAuthority> privileges = userDto.getRoles().stream()
+                .map(RoleDTO::getAuthorities)
+                .flatMap(List::stream)
+                .map(StringUtils::upperCase)
+                .map(SimpleGrantedAuthority::new) // Mapea cada String a SimpleGrantedAuthority
+                .toList();
 
-        return new ArrayList<>(roles);
+        return Stream.concat(roles.stream(), privileges.stream())
+                .toList();
 
     }
 }

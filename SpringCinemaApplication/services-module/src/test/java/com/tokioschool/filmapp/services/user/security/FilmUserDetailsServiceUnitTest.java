@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.services.user.security;
 
+import com.tokioschool.filmapp.dto.user.RoleDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.services.user.UserService;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,12 +32,13 @@ class FilmUserDetailsServiceUnitTest {
 
     @Test
     void givenUserName_whenLoadUserByUsername_returnOk() {
+        final RoleDTO roleDTO = RoleDTO.builder().id(1L).name("USER").authorities(List.of("read")).build();
         final UserDTO userDto = UserDTO.builder()
                 .id("1234")
                 .name("consumer")
                 .username("username")
                 .email("email@bla.com")
-                .roles(List.of("ADMIN"))
+                .roles(List.of(roleDTO))
                 .birthDate(LocalDate.now().minusYears(20))
                 .created(LocalDateTime.now())
                 .build();
@@ -52,6 +54,11 @@ class FilmUserDetailsServiceUnitTest {
                 .returns(pwd,UserDetails::getPassword)
                 .satisfies(userDetails1 ->
                         Assertions.assertThat(userDetails1.getAuthorities()
-                                .contains(new SimpleGrantedAuthority("ROLE_".concat(userDto.getRoles().getFirst().toUpperCase())))).isTrue() );
+                                .contains(new SimpleGrantedAuthority("ROLE_"
+                                        .concat(userDto.getRoles().getFirst().getName().toUpperCase())))).isTrue() )
+        .satisfies(userDetails1 ->
+                Assertions.assertThat(userDetails1.getAuthorities()
+                        .contains(new SimpleGrantedAuthority(
+                                userDto.getRoles().getFirst().getAuthorities().getFirst().toUpperCase()))).isTrue() );
     }
 }

@@ -21,5 +21,5 @@ public class UserDTO {
     private LocalDate birthDate;
     private LocalDateTime lastLogin;
     private LocalDateTime created;
-    private List<String> roles;
+    private List<RoleDTO> roles;
 }
