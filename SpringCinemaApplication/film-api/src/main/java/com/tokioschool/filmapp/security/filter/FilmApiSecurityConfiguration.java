@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.security.filter;
 
+import com.tokioschool.filmapp.core.filter.LogRequestFilter;
 import com.tokioschool.filmapp.jwt.converter.CustomJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class FilmApiSecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final LogRequestFilter logRequestFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChainMainly(HttpSecurity httpSecurity) throws Exception {
@@ -45,7 +47,14 @@ public class FilmApiSecurityConfiguration {
                                 new CustomJwtAuthenticationConverter()
                         )
                 ))
+                // login and logout
+                .formLogin(httpSecurityFormLoginConfigurer ->
+                        httpSecurityFormLoginConfigurer.loginPage("/film/api/auth/login").permitAll())
+                .logout(httpSecurityFormLoginConfigurer ->
+                        httpSecurityFormLoginConfigurer.logoutUrl("/film/api/auth/logout").permitAll())
+                // filters
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(logRequestFilter,UsernamePasswordAuthenticationFilter.class)
          .build();
     }
 }

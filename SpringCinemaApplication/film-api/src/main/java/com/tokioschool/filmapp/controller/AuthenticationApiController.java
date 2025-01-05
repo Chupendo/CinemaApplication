@@ -114,28 +114,4 @@ public class AuthenticationApiController {
         }
         throw new BadCredentialsException("invalid token is black listed");
     }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(BadCredentialsException.class)
-    public Map<String, String> handleBadCredentialsExceptionError(BadCredentialsException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public Map<String, String> handleAuthenticationCredentialsNotFoundExceptionError(BadCredentialsException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(LoginException.class)
-    public Map<String, String> handleLoginExceptionError(BadCredentialsException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler
-    public Map<String, String> handleInternalServerError(Exception ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
 }
