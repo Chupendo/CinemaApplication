@@ -112,7 +112,7 @@ public class AuthenticationApiController {
             jwtBlacklistService.addToBlacklist(tokenAndExpiredAt.getLeft(),tokenAndExpiredAt.getRight());
             return ResponseEntity.ok().build();
         }
-        throw new LoginException("invalid token is black listed");
+        throw new BadCredentialsException("invalid token is black listed");
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -127,7 +127,7 @@ public class AuthenticationApiController {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(LoginException.class)
     public Map<String, String> handleLoginExceptionError(BadCredentialsException ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());

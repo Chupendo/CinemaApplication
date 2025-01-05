@@ -6,6 +6,8 @@ import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
 import com.tokioschool.redis.services.JwtBlacklistService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -83,4 +85,40 @@ class AuthenticationApiControllerWithSecurityDisableUTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0]").value("ROLE_USER")); // Verifica el rol
     }
 
+    @Test
+    @Order(3)
+    public void logoutHandler_ValidToken_ShouldReturnOk() throws Exception {
+        // Configurar el token y su tiempo de expiración
+        String token = "validToken";
+        Long expiryTime = System.currentTimeMillis() + 100000L;
+
+        // Simular la respuesta del servicio de autenticación
+        Mockito.when(authenticationService.getTokenAndExpiredAt(Mockito.any(HttpServletRequest.class)))
+                .thenReturn(Pair.of(token, expiryTime));
+
+        // Ejecutar la solicitud de logout
+        mockMvc.perform(MockMvcRequestBuilders.post("/film/api/auth/logout")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Verificar que el token se añadió a la lista negra
+        Mockito.verify(jwtBlacklistService, Mockito.times(1)).addToBlacklist(token, expiryTime);
+    }
+
+    @Test
+    @Order(4)
+    public void logoutHandler_InvalidToken_ShouldReturnUnauthorized() throws Exception {
+        // Simular que el servicio de autenticación devuelve null
+        Mockito.when(authenticationService.getTokenAndExpiredAt(Mockito.any(HttpServletRequest.class)))
+                .thenReturn(null);
+
+        // Ejecutar la solicitud de logout y esperar una excepción
+        mockMvc.perform(MockMvcRequestBuilders.post("/film/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+
+        // Verificar que el servicio de lista negra no se llamó
+        Mockito.verify(jwtBlacklistService, Mockito.never()).addToBlacklist(Mockito.anyString(), Mockito.anyLong());
+    }
 }
