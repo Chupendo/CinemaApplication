@@ -13,15 +13,11 @@ services:
       - '3307:3306'
     volumes:
       - ../docker/working-mariadb:/var/lib/mysql
-  mongodb:
-    image: mongo:latest
-    container_name: mongdb
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: dbpw
-      MONGO_INITDB_DATABASE: db
-    ports:
-      - "27017:27017"
-    volumes:
-      - ../docker/mongo-data:/data/db
+  redis:
+      image: redis:latest
+      container_name: my-redis
+      ports:
+        - "6379:6379"
+      volumes:
+        - ../docker/redis-test:/data
+      command: ["redis-server", "--appendonly", "yes"]

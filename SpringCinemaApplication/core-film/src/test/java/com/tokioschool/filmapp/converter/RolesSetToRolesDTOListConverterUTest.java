@@ -25,9 +25,8 @@ class RolesSetToRolesDTOListConverterUTest {
                 Role.builder().id(1L).name("USER").authorities( Set.of(Authority.builder().id(1L).name("read").build())).build(),
                 Role.builder().id(2L).name("EMPLOYEE").authorities( Set.of(Authority.builder().id(1L).name("read").build())).build(),
                 Role.builder().id(3L).name("ADMIN").authorities( Set.of(
-                        Authority.builder().id(1L).name("read").build(),
-                        Authority.builder().id(2L).name("write").build())
-                ).build()
+                        Authority.builder().id(1L).name("read").build()
+                )).build()
         );
 
         MappingContext<Set<Role>, List<RoleDTO>> context = Mockito.mock(MappingContext.class);

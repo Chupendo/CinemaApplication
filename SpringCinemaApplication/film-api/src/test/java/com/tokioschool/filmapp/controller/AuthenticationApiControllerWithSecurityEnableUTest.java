@@ -5,24 +5,20 @@ import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
-import com.tokioschool.filmapp.jwt.properties.JwtConfigurationProperty;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
+import com.tokioschool.redis.services.JwtBlacklistService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +42,7 @@ class AuthenticationApiControllerWithSecurityEnableUTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockitoBean  private AuthenticationService authenticationService; // Mock del servicio
+    @MockitoBean  private JwtBlacklistService jwtBlacklistService; // Mock del servicio redis
 
     @Test
     void givenUserLogin_whenPostAuthenticated_whenReturnOk () throws Exception {
