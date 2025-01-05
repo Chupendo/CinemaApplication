@@ -4,6 +4,7 @@ import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
+import com.tokioschool.redis.services.JwtBlacklistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class AuthenticationApiController {
 
     private final AuthenticationService authenticationService;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Operation(
             summary = "Post authenticated by authentication request dto",
@@ -48,7 +51,7 @@ public class AuthenticationApiController {
                     )
             }
     )
-    @PostMapping(value = {"","/"},produces = "application/json",consumes = {MediaType.APPLICATION_JSON_VALUE} )
+    @PostMapping(value = {"","/","/login"},produces = "application/json",consumes = {MediaType.APPLICATION_JSON_VALUE} )
     public ResponseEntity<AuthenticationResponseDTO> postAuthenticated(@RequestBody AuthenticationRequestDTO authenticationRequestDTO) {
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDTO));
     }
@@ -77,6 +80,16 @@ public class AuthenticationApiController {
     @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<AuthenticatedMeResponseDTO> getAuthenticatedMe() {
         return ResponseEntity.ok(authenticationService.getAuthenticated());
+    }
+
+    @RequestMapping(value = "/logout",method = {RequestMethod.GET,RequestMethod.POST})
+    public ResponseEntity<String> logoutHandler(HttpServletRequest request){
+        Pair<String,Long> tokenAndExpiredAt = authenticationService.getTokenAndExpiredAt(request);
+        if (tokenAndExpiredAt != null && tokenAndExpiredAt.getLeft() != null && tokenAndExpiredAt.getRight() != null) {
+            jwtBlacklistService.addToBlacklist(tokenAndExpiredAt.getLeft(),tokenAndExpiredAt.getRight());
+            return ResponseEntity.ok("Logged out successfully");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

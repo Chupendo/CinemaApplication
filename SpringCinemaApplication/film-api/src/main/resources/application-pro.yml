@@ -23,6 +23,11 @@ spring:
       ddl-auto: validate
     # Debug queries
     show-sql: true
+  # redis connection
+  data:
+    redis:
+      host: localhost
+      port: 6379
   test:
     database:
       replace: none

@@ -5,6 +5,7 @@ import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
+import com.tokioschool.redis.services.JwtBlacklistService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ class AuthenticationApiControllerWithSecurityDisableUTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockitoBean  private AuthenticationService authenticationService; // Mock del servicio
+    @MockitoBean  private JwtBlacklistService jwtBlacklistService; // Mock del servicio redis
 
     @Test
     @Order(1)

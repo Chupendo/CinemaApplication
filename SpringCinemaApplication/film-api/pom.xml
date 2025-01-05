@@ -83,6 +83,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>it.ozimov</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.7.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -99,7 +111,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.tokioschool.filmapp.FilmApiApplication</mainClass>
+                    <mainClass>com.tokioschool.FilmApiApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
