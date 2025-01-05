@@ -17,9 +17,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.LoginException;
 import java.util.Map;
 
 @RestController
@@ -82,14 +84,35 @@ public class AuthenticationApiController {
         return ResponseEntity.ok(authenticationService.getAuthenticated());
     }
 
+    @Operation(
+            summary = "Get or Post Logout the user of system",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "authentication me response dto",
+                            content = @Content(schema = @Schema(implementation = AuthenticatedMeResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "access denied or token invalid",
+                            content = @Content(schema = @Schema(implementation = Map.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "error internal",
+                            content = @Content(schema = @Schema(implementation = Map.class))
+                    )
+            }
+    )
     @RequestMapping(value = "/logout",method = {RequestMethod.GET,RequestMethod.POST})
-    public ResponseEntity<String> logoutHandler(HttpServletRequest request){
+    @SecurityRequirement(name = "auth-openapi")
+    public ResponseEntity<Void> logoutHandler(HttpServletRequest request) throws LoginException {
         Pair<String,Long> tokenAndExpiredAt = authenticationService.getTokenAndExpiredAt(request);
         if (tokenAndExpiredAt != null && tokenAndExpiredAt.getLeft() != null && tokenAndExpiredAt.getRight() != null) {
             jwtBlacklistService.addToBlacklist(tokenAndExpiredAt.getLeft(),tokenAndExpiredAt.getRight());
-            return ResponseEntity.ok("Logged out successfully");
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
+        throw new LoginException("invalid token is black listed");
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -97,6 +120,19 @@ public class AuthenticationApiController {
     public Map<String, String> handleBadCredentialsExceptionError(BadCredentialsException ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    public Map<String, String> handleAuthenticationCredentialsNotFoundExceptionError(BadCredentialsException ex, HttpServletRequest request) {
+        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(LoginException.class)
+    public Map<String, String> handleLoginExceptionError(BadCredentialsException ex, HttpServletRequest request) {
+        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public Map<String, String> handleInternalServerError(Exception ex, HttpServletRequest request) {

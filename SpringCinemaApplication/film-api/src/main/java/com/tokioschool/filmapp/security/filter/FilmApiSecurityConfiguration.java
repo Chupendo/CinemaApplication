@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.security.filter;
 
 import com.tokioschool.filmapp.jwt.converter.CustomJwtAuthenticationConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,9 +10,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class FilmApiSecurityConfiguration {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChainMainly(HttpSecurity httpSecurity) throws Exception {
@@ -22,8 +27,7 @@ public class FilmApiSecurityConfiguration {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.POST,"/film/api/auth","/film/api/auth/","/film/api/auth/login")
                                 .permitAll()
-                        .requestMatchers( "/film/api/auth/logout").permitAll()
-                        .requestMatchers("/film/api/auth/me")
+                        .requestMatchers("/film/api/auth/logout","/film/api/auth/me")
                         .authenticated()
                 )
                 // Gestion de session sin estado
@@ -41,6 +45,7 @@ public class FilmApiSecurityConfiguration {
                                 new CustomJwtAuthenticationConverter()
                         )
                 ))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
          .build();
     }
 }
