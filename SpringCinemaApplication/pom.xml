@@ -14,6 +14,15 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SpringCinemaApplication</name>
 	<description>SpringCinemaApplication</description>
+	<modules>
+		<module>liquibase-module</module>
+		<module>film-api</module>
+		<module>domain-module</module>
+		<module>repository-module</module>
+		<module>services-module</module>
+		<module>core-film</module>
+		<module>dto-module</module>
+	</modules>
 	<packaging>pom</packaging>
 
 
@@ -38,6 +47,48 @@
 				<version>${spring-modulith.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>liquibase-module</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>film-api</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>repository-module</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>core-film</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>services-module</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>domain-module</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>dto-module</artifactId>
+				<version>${version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  db:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_USER: db
+      MARIADB_PASSWORD: db
+      MARIADB_ROOT_PASSWORD: dbpw
+      MARIADB_DATABASE: film
+    ports:
+      - '3307:3306'
+    volumes:
+      - ../docker/working-mariadb:/var/lib/mysql
+  redis:
+      image: redis:latest
+      container_name: my-redis
+      ports:
+        - "6379:6379"
+      volumes:
+        - ../docker/redis-test:/data
+      command: ["redis-server", "--appendonly", "yes"]
