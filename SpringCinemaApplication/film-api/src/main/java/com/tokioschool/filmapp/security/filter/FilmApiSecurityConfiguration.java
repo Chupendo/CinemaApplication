@@ -29,7 +29,7 @@ public class FilmApiSecurityConfiguration {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.POST,"/film/api/auth","/film/api/auth/","/film/api/auth/login")
                                 .permitAll()
-                        .requestMatchers("/film/api/auth/logout","/film/api/auth/me")
+                        .anyRequest()
                         .authenticated()
                 )
                 // Gestion de session sin estado

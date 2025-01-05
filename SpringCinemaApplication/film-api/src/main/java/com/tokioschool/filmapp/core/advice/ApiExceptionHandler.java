@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.core.advice;
 
 
 import com.tokioschool.filmapp.core.exception.NotFoundException;
+import com.tokioschool.filmapp.core.exception.ValidacionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -81,6 +82,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(LoginException.class)
     public Map<String, String> handleLoginExceptionError(BadCredentialsException ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ExceptionHandler(ValidacionException.class)
+    public Map<String, String> handleErrorFormExceptionError(ValidacionException ex, HttpServletRequest request) {
+        return ex.getErrors();
     }
 
 }
