@@ -2,7 +2,9 @@ package com.tokioschool.filmapp.controller;
 
 import com.tokioschool.filmapp.core.exception.ValidacionException;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
+import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.services.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/film/api/users")
 @Tag(name="users", description= "users operations")
 public class UserApiController {
+
+    private final UserService userService;
 
     @Operation(
             summary = "Post register user in the system",
@@ -55,7 +60,8 @@ public class UserApiController {
     )
     @SecurityRequirement(name = "auth-openapi")
     @PostMapping(value = {"/register"},consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserFormDTO> registerUserHandler(@Valid @RequestBody UserFormDTO userFormDTO, BindingResult bindingResult){
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> registerUserHandler(@Valid @RequestBody UserFormDTO userFormDTO, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(
@@ -65,6 +71,7 @@ public class UserApiController {
            throw new ValidacionException("Errores de validación", errores);
         }
         // TODO create service
-        return ResponseEntity.ok(userFormDTO);
+        UserDTO userDTO = userService.registerUser(userFormDTO).orElseGet(()->null);
+        return ResponseEntity.ok(userDTO);
     }
 }

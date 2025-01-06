@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.services.user.impl;
 
 import com.tokioschool.filmapp.dto.user.UserDTO;
+import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.user.UserService;
 
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,5 +44,12 @@ public class UserServiceImpl implements UserService {
         // devuelve una tupa con el usuarioDTO o un optional vacio
         return userDao.findByEmailIgnoreCase(maybeEmail)
                 .map(user -> modelMapper.map(user, UserDTO.class));
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public Optional<UserDTO> registerUser(UserFormDTO userFormDTO) {
+        return Optional.empty();
     }
 }

@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.dto.user;
 
+import com.tokioschool.filmapp.validators.anotations.PasswordBis;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor @NoArgsConstructor
 @Builder
+@PasswordBis
 public class UserFormDTO {
     private String id;
     @NotBlank
@@ -22,6 +24,8 @@ public class UserFormDTO {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",message = "Password invalid")
     private String password;
 
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",message = "Password invalid")
+    private String passwordBis;
     @NotBlank
     private String username;
 
