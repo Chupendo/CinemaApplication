@@ -11,5 +11,5 @@ public interface UserService {
 
     Optional<Pair<UserDTO,String>> findUserAndPasswordByEmail(String mail);
     Optional<UserDTO> findByEmail(String email);
-    Optional<UserDTO> registerUser(UserFormDTO userFormDTO);
+    UserDTO registerUser(UserFormDTO userFormDTO) throws IllegalArgumentException;
 }

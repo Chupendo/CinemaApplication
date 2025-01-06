@@ -11,16 +11,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/film/api/users")
 @Tag(name="users", description= "users operations")
+@Slf4j
 public class UserApiController {
 
     private final UserService userService;
@@ -38,12 +42,17 @@ public class UserApiController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "authentication response dto",
+                            description = "register user",
                             content = @Content(schema = @Schema(implementation = AuthenticationResponseDTO.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "authentication failed",
+                            description = "register user failed",
+                            content = @Content(schema = @Schema(implementation = Map.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "request don't allow",
                             content = @Content(schema = @Schema(implementation = Map.class))
                     ),
                     @ApiResponse(
@@ -61,7 +70,7 @@ public class UserApiController {
     @SecurityRequirement(name = "auth-openapi")
     @PostMapping(value = {"/register"},consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(value = "hasRole('ADMIN')")
-    public ResponseEntity<UserDTO> registerUserHandler(@Valid @RequestBody UserFormDTO userFormDTO, BindingResult bindingResult){
+    public ResponseEntity<UserDTO> registerUserHandler(@Valid @RequestBody UserFormDTO userFormDTO, BindingResult bindingResult) throws BadRequestException {
         if(bindingResult.hasErrors()){
             Map<String, String> errores = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(
@@ -70,8 +79,13 @@ public class UserApiController {
                     ));
            throw new ValidacionException("Errores de validación", errores);
         }
-        // TODO create service
-        UserDTO userDTO = userService.registerUser(userFormDTO).orElseGet(()->null);
-        return ResponseEntity.ok(userDTO);
+
+        try {
+            UserDTO userDTO = userService.registerUser(userFormDTO);
+            return ResponseEntity.ok(userDTO);
+        }catch (Exception e){
+            log.error("User don't register because {}",e.getMessage(), e);
+            throw new BadRequestException("User don't register", e);
+        }
     }
 }

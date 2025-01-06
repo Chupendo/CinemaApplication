@@ -1,8 +1,12 @@
 package com.tokioschool.filmapp.services.user.impl;
 
 import com.github.javafaker.Faker;
+import com.tokioschool.filmapp.domain.Authority;
+import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.user.UserDTO;
+import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
@@ -22,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +38,9 @@ class UserServiceImpUTest {
 
     @Mock
     private UserDao userDao;
+
+    @Mock
+    private RoleDao roleDao;
 
     @Spy
     private ModelMapper  modelMapper;
@@ -118,5 +126,49 @@ class UserServiceImpUTest {
                 .returns(users.getFirst().getName(),UserDTO::getName)
                 .returns(users.getFirst().getBirthDate(),UserDTO::getBirthDate)
                 .returns(users.getFirst().getCreated(),UserDTO::getCreated);
+    }
+
+    @Test
+    void givenUserFormDto_whenRegister_thenReturnUserDto(){
+        // Arrange
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+        Role role = Role.builder().id(1L).name("user")
+                .authorities(Set.of(
+                                Authority.builder().id(1L).name("read").build()
+                        )
+                ).build();
+        User user = User.builder()
+                .id("0001AB")
+                .name("John")
+                .surname("Doe")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .roles(Set.of(role))
+                .build();
+
+        Mockito.when(roleDao.findByNameIgnoreCase("user")).thenReturn(role);
+        Mockito.when(userDao.save(Mockito.any(User.class))).thenReturn(user);
+
+
+        // Act
+        UserDTO reusltUserDto = userService.registerUser(userFormDTO);
+
+        // Assertions
+        Mockito.verify(modelMapper,Mockito.times(1)).map(user,UserDTO.class);
+
+        Assertions.assertThat(reusltUserDto).isNotNull()
+                .returns(userFormDTO.getName(),UserDTO::getName)
+                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
+                .returns(userFormDTO.getUsername(),UserDTO::getUsername)
+                .returns(userFormDTO.getRole(),userDto -> userDto.getRoles().getFirst().getName());
     }
 }

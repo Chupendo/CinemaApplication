@@ -1,7 +1,10 @@
 package com.tokioschool.filmapp.services.user.impl;
 
+import com.tokioschool.filmapp.domain.Role;
+import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.user.UserService;
 
@@ -13,13 +16,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
+    private final RoleDao roleDao;
     private final ModelMapper modelMapper;
 
     @Override
@@ -49,7 +55,42 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @PreAuthorize(value = "hasRole('ADMIN')")
-    public Optional<UserDTO> registerUser(UserFormDTO userFormDTO) {
-        return Optional.empty();
+    public UserDTO registerUser(UserFormDTO userFormDTO) {
+        User user = User.builder().build();
+        return populationCreateOrEditUser(user,userFormDTO);
+    }
+
+    /**
+     * Register or Updated the data user in the system
+     *
+     * @param user if empty is new, otherwise is updated
+     * @param userFormDTO data of user
+     * @return user to object
+     */
+    protected UserDTO populationCreateOrEditUser(User user,UserFormDTO userFormDTO){
+        if(userFormDTO == null){
+            throw new IllegalArgumentException("The data of user is null");
+        }
+        user.setId(userFormDTO.getId());
+        user.setName(userFormDTO.getName());
+        user.setSurname(userFormDTO.getSurname());
+        user.setEmail(userFormDTO.getEmail());
+        user.setPassword(userFormDTO.getPassword());
+        user.setPasswordBis(userFormDTO.getPasswordBis());
+        user.setUsername(userFormDTO.getUsername());
+        user.setBirthDate(userFormDTO.getBirthDate());
+
+        // roles
+        Role roleUser = Optional.ofNullable(userFormDTO.getRole())
+                .map(roleDao::findByNameIgnoreCase)
+                .orElseGet(() ->roleDao.findByNameIgnoreCase("user"));
+        user.setRoles(Set.of(roleUser));
+
+        user.setCreated(LocalDateTime.now());
+        user.setLastLoginAt(LocalDateTime.now());
+
+        user = userDao.save(user);
+
+        return modelMapper.map(user,UserDTO.class);
     }
 }
