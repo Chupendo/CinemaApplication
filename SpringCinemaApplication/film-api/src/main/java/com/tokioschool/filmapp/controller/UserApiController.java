@@ -66,7 +66,7 @@ public class UserApiController {
     )
     @SecurityRequirement(name = "auth-openapi")
     @PostMapping(value = {"/register"},consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize(value = "hasRole('ADMIN')")
+    //@PreAuthorize(value = "hasRole('ADMIN')")
     public ResponseEntity<UserDTO> registerUserHandler(@Valid @RequestBody UserFormDTO userFormDTO, BindingResult bindingResult) throws BadRequestException {
         if(bindingResult.hasErrors()){
             Map<String, String> errores = bindingResult.getFieldErrors().stream()

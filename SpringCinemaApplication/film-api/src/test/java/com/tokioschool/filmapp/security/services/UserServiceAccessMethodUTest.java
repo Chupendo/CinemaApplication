@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @WebMvcTest(controllers = UserApiController.class) // obtiente solo el contexto del contraldor especificado
 @ActiveProfiles("test")
@@ -54,12 +53,7 @@ public class UserServiceAccessMethodUTest {
 
     @Test
     @WithMockUser(username = "ADMIN",roles = "ADMIN")
-    void givenExistingResource_whenRegister_thenReturnResourceOk() throws Exception {
-        // Fases del test:
-        // Prepare: prearar aquello que es neceario para la llamada
-        // Execution: lo que llama para dar cobertura
-        // Assert: Lo que se comprueba
-
+    void givenAdmin_whenRegister_thenReturnOk() throws Exception {
         UserFormDTO userFormDTO = UserFormDTO.builder()
                 .name("John")
                 .surname("Doe")
@@ -94,7 +88,7 @@ public class UserServiceAccessMethodUTest {
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
-        UserDTO response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
+        //UserDTO response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
 
         // opcion 2: Lee la respeusta como un mapa de valores, cada atributo del objeto de la respuesta es añadio elemento de un mapa
         UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserDTO>() {});
@@ -107,37 +101,92 @@ public class UserServiceAccessMethodUTest {
 
     @Test
     @WithMockUser(username = "USER",roles = "USER")
-    void givenExistingResource_whenRegister_thenReturnUnauthorized() throws Exception {
+    void givenUser_whenRegister_thenReturnOk() throws Exception {
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
                 .name("John")
                 .surname("Doe")
-                .surname("johndoe")
+                .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
                 .roles(List.of(RoleDTO.builder().id(1L).name("user").authorities(List.of("read")).build()))
                 .build();
 
         // Convert UserFormDTO to JSON
-        String userDTOJson = objectMapper.writeValueAsString(userDTO);
+        String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);
+        Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
+                .thenReturn(userDTO);
 
 
         MvcResult mvcResult = this.mockMvc.perform(
                         MockMvcRequestBuilders.post("/film/api/users/register")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(userDTOJson)
-                ).andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                                .content(userFormDTOJson)
+                ).andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
-        UserDTO response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
+        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserDTO>() {});
 
-        // opcion 2: Lee la respeusta como un mapa de valores, cada atributo del objeto de la respuesta es añadio elemento de un mapa
-        Map<String,Object> values = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {});
+        Assertions.assertThat(resutlUserDto).isNotNull()
+                .returns(userFormDTO.getName(),UserDTO::getName)
+                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
+                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
+    }
 
-        Assertions.assertThat(values)
-                .satisfies(value -> Assertions.assertThat( value.containsKey("message") ).isTrue() )
-                .returns("Access Denied",value-> value.get("message"));
+    @Test
+    @WithAnonymousUser
+    void givenUserAnonymous_whenRegister_thenReturnOk() throws Exception {
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+
+        UserDTO userDTO = UserDTO.builder()
+                .id("00001ABC")
+                .name("John")
+                .surname("Doe")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .roles(List.of(RoleDTO.builder().id(1L).name("user").authorities(List.of("read")).build()))
+                .build();
+
+        // Convert UserFormDTO to JSON
+        String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);
+        Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
+                .thenReturn(userDTO);
+
+
+        MvcResult mvcResult = this.mockMvc.perform(
+                        MockMvcRequestBuilders.post("/film/api/users/register")
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(userFormDTOJson)
+                ).andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        // opcion 1: Lee la respeusta directamente como un objeto
+        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserDTO>() {});
+
+        Assertions.assertThat(resutlUserDto).isNotNull()
+                .returns(userFormDTO.getName(),UserDTO::getName)
+                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
+                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
     }
 
     @Test

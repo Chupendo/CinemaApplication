@@ -27,7 +27,7 @@ public class FilmApiSecurityConfiguration {
                 // gestion de securizar los endpoints
                 .securityMatcher("/film/api/**")
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.POST,"/film/api/auth","/film/api/auth/","/film/api/auth/login")
+                        .requestMatchers(HttpMethod.POST,"/film/api/auth","/film/api/auth/","/film/api/auth/login","/film/api/users/register")
                                 .permitAll()
                         .anyRequest()
                         .authenticated()

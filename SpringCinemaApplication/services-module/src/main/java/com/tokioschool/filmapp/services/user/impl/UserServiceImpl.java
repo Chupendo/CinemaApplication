@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @PreAuthorize(value = "hasRole('ADMIN')")
+    //@PreAuthorize(value = "hasRole('ADMIN')")
     public UserDTO registerUser(UserFormDTO userFormDTO) {
         User user = User.builder().build();
         return populationCreateOrEditUser(user,userFormDTO);
