@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -85,6 +85,22 @@ public class UserServiceImpl implements UserService {
         User user = userDao.findById(userId).orElseThrow(()-> new IllegalArgumentException("User don't found"));
 
         return populationCreateOrEditUser(user,userFormDTO);
+    }
+
+    @Override
+    @Transactional
+    public void updateLastLoginTime() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional.ofNullable(authentication)
+                .map(auth ->(UserDetails) auth.getPrincipal())
+                .map(UserDetails::getUsername)
+                .map(userDao::findByUsernameOrEmailIgnoreCase)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .ifPresent(user -> {
+                    user.setLastLoginAt(LocalDateTime.now());
+                    userDao.save(user);
+                });
     }
 
     /**
