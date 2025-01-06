@@ -33,6 +33,7 @@ public class PasswordBisImpl implements ConstraintValidator<PasswordBis, UserFor
     @Override
     public boolean isValid(UserFormDTO source, ConstraintValidatorContext constraintValidatorContext) {
         return Optional.ofNullable(source)
+                .filter(user -> user.getCreated() == null || user.isUpdatePassword())
                 .filter(user -> Objects.equals(user.getPassword(),user.getPasswordBis()))
                 .map(UserFormDTO::getPassword)
                 .map(password -> Pattern.matches(PASSWORD_PATTERN, password))

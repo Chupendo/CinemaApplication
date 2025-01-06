@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor @NoArgsConstructor
@@ -40,4 +41,7 @@ public class UserFormDTO {
 
     @EnumValid(target = RoleEnum.class,required = true,message = "Role don't allow")
     private String role;
+
+    private boolean updatePassword = false;
+    private LocalDateTime created;
 }

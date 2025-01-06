@@ -20,10 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +79,28 @@ public class UserApiController {
 
         try {
             UserDTO userDTO = userService.registerUser(userFormDTO);
+            return ResponseEntity.ok(userDTO);
+        }catch (Exception e){
+            log.error("User don't register because {}",e.getMessage(), e);
+            throw new BadRequestException("User don't register", e);
+        }
+    }
+
+    @PutMapping(value = {"/update/{userId}"},consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize(value = "isAuthenticated()")
+    public ResponseEntity<UserDTO> registerUserHandler(@PathVariable String userId,
+                                                       @Valid @RequestBody UserFormDTO userFormDTO, BindingResult bindingResult) throws BadRequestException {
+        if(bindingResult.hasErrors()){
+            Map<String, String> errores = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(
+                            FieldError::getField,
+                            FieldError::getDefaultMessage
+                    ));
+            throw new ValidacionException("Errores de validación", errores);
+        }
+
+        try {
+            UserDTO userDTO = userService.updateUser(userId,userFormDTO);
             return ResponseEntity.ok(userDTO);
         }catch (Exception e){
             log.error("User don't register because {}",e.getMessage(), e);

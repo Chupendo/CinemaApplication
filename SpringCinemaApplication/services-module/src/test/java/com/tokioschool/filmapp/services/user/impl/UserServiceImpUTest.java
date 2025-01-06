@@ -9,7 +9,7 @@ import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import org.apache.commons.lang3.tuple.Pair;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +19,12 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
@@ -28,6 +34,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -41,6 +50,9 @@ class UserServiceImpUTest {
 
     @Mock
     private RoleDao roleDao;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Spy
     private ModelMapper  modelMapper;
@@ -79,7 +91,7 @@ class UserServiceImpUTest {
 
         userService.findUserAndPasswordByEmail(users.getFirst().getEmail());
 
-        Assertions.assertThat(maybePairUserDTOPwd).isPresent()
+        assertThat(maybePairUserDTOPwd).isPresent()
                 .get()
                 .returns(users.getFirst().getPassword(), Pair::getRight)
                 .extracting(Pair::getLeft)
@@ -101,7 +113,7 @@ class UserServiceImpUTest {
 
         userService.findUserAndPasswordByEmail(users.getFirst().getUsername());
 
-        Assertions.assertThat(maybePairUserDTOPwd).isPresent()
+        assertThat(maybePairUserDTOPwd).isPresent()
                 .get()
                 .returns(users.getFirst().getPassword(), Pair::getRight)
                 .extracting(Pair::getLeft)
@@ -121,7 +133,7 @@ class UserServiceImpUTest {
 
         Mockito.verify(modelMapper,Mockito.times(1)).map(users.getFirst(), UserDTO.class);
 
-        Assertions.assertThat(maybeUserDTO).isPresent().get()
+        assertThat(maybeUserDTO).isPresent().get()
                 .returns(users.getFirst().getEmail(),UserDTO::getEmail)
                 .returns(users.getFirst().getName(),UserDTO::getName)
                 .returns(users.getFirst().getBirthDate(),UserDTO::getBirthDate)
@@ -156,6 +168,7 @@ class UserServiceImpUTest {
                 .build();
 
         Mockito.when(roleDao.findByNameIgnoreCase("user")).thenReturn(role);
+        Mockito.when(passwordEncoder.encode(userFormDTO.getPassword())).thenReturn("encryptedPassword");
         Mockito.when(userDao.save(Mockito.any(User.class))).thenReturn(user);
 
 
@@ -165,10 +178,152 @@ class UserServiceImpUTest {
         // Assertions
         Mockito.verify(modelMapper,Mockito.times(1)).map(user,UserDTO.class);
 
-        Assertions.assertThat(reusltUserDto).isNotNull()
+        assertThat(reusltUserDto).isNotNull()
                 .returns(userFormDTO.getName(),UserDTO::getName)
                 .returns(userFormDTO.getSurname(),UserDTO::getSurname)
                 .returns(userFormDTO.getUsername(),UserDTO::getUsername)
                 .returns(userFormDTO.getRole(),userDto -> userDto.getRoles().getFirst().getName());
+    }
+
+    @Test
+    void givenTokenNull_whenUpdated_thenReturnUserNoAuthenticated(){
+        // Crear una autenticación simulada
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(null, "USER");
+
+        // Crear un contexto de seguridad vacío
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+
+        // Establecer el contexto de seguridad en el SecurityContextHolder
+        SecurityContextHolder.setContext(context);
+
+        // Arrange
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+
+        // Act
+        AuthenticationException exception = assertThrows(AuthenticationException.class, () ->
+                userService.updateUser(userFormDTO.getId(), userFormDTO));
+
+        assertThat(exception).returns("User no authenticated",AuthenticationException::getMessage);
+    }
+
+    @Test
+    void givenUserAuthenticated_whenUpdatedOtherUser_thenReturnNoAuthorized(){
+        // Crear una autenticación simulada
+        Jwt jwt = Jwt.withTokenValue("asdfasdf").claim("sub","johndoe").header("a","a").build();
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(jwt, "USER");
+
+        // Crear un contexto de seguridad vacío
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+
+        // Establecer el contexto de seguridad en el SecurityContextHolder
+        SecurityContextHolder.setContext(context);
+
+        // Arrange
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .id("0002AB")
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+        Role role = Role.builder().id(1L).name("USER")
+                .authorities(Set.of(
+                                Authority.builder().id(1L).name("read").build()
+                        )
+                ).build();
+        // users with distinct id
+        User userAuth = User.builder()
+                .id("0001AB")
+                .name("John")
+                .surname("Doe")
+                .password("encrypt@")
+                .passwordBis("encrypt@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .roles(Set.of(role))
+                .build();
+
+        Mockito.when(userDao.findByUsernameOrEmailIgnoreCase("johndoe")).thenReturn(Optional.of(userAuth));
+
+        // Act
+        AuthenticationException exception = assertThrows(AuthenticationException.class, () ->
+                userService.updateUser(userFormDTO.getId(), userFormDTO));
+
+        assertThat(exception).returns("User no authenticated",AuthenticationException::getMessage);
+    }
+
+    @Test
+    void givenAdminAuthenticated_whenUpdatedOtherUser_thenReturnOk(){
+        // Crear una autenticación simulada
+        Jwt jwt = Jwt.withTokenValue("asdfasdf").claim("sub","ADMIN").header("a","a").build();
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(jwt, "ADMIN");
+
+        // Crear un contexto de seguridad vacío
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+
+        // Establecer el contexto de seguridad en el SecurityContextHolder
+        SecurityContextHolder.setContext(context);
+
+        // Arrange
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .id("0002AB")
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("ADMIN").build();
+
+        // users with distinct id
+        Role role = Role.builder().id(1L).name("ADMIN")
+                .authorities(Set.of(
+                                Authority.builder().id(2L).name("write").build()
+                        )
+                ).build();
+        User user = User.builder()
+                .id("0002AB")
+                .name("John")
+                .surname("Doe")
+                .password("encrypt@")
+                .passwordBis("encrypt@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .roles(Set.of(role))
+                .build();
+
+        Mockito.when(userDao.findByUsernameOrEmailIgnoreCase("ADMIN")).thenReturn(Optional.of(user));
+        Mockito.when(userDao.findById(userFormDTO.getId())).thenReturn(Optional.of(user));
+        Mockito.when(userDao.save(user)).thenReturn(user);
+
+        // Act
+        UserDTO userDTO = userService.updateUser(userFormDTO.getId(), userFormDTO);
+
+        assertThat(userDTO).isNotNull();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 }

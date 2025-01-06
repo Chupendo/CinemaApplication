@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -135,8 +136,82 @@ public class UserServiceAccessMethodUTest {
         Map<String,Object> values = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {});
 
         Assertions.assertThat(values)
-                        .satisfies(value -> Assertions.assertThat( value.containsKey("message") ).isTrue() )
-                                .returns("Access Denied",value-> value.get("message"));
+                .satisfies(value -> Assertions.assertThat( value.containsKey("message") ).isTrue() )
+                .returns("Access Denied",value-> value.get("message"));
+    }
+
+    @Test
+    @WithMockUser(username = "USER",roles = "USER")
+    void givenUserAuthenticated_whenUpdateUser_thenReturnOk() throws Exception {
+
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .id("00001ABC")
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+
+        UserDTO userDTO = UserDTO.builder()
+                .id("00001ABC")
+                .name("John")
+                .surname("Doe")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .roles(List.of(RoleDTO.builder().id(1L).name("user").authorities(List.of("read")).build()))
+                .build();
+
+        // Convert UserFormDTO to JSON
+        String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);
+
+        Mockito.when(userService.updateUser(userFormDTO.getId(),userFormDTO))
+                .thenReturn(userDTO);
+
+        MvcResult mvcResult = this.mockMvc.perform(
+                        MockMvcRequestBuilders.put("/film/api/users/update/{userId}",userFormDTO.getId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(userFormDTOJson)
+                ).andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        // opcion 1: Lee la respeusta directamente como un objeto
+        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
+
+        Assertions.assertThat(resutlUserDto).isNotNull()
+                .returns(userFormDTO.getName(),UserDTO::getName)
+                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
+                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void givenUserNoAuthenticated_whenUpdateUser_thenError() throws Exception {
+        UserFormDTO userFormDTO = UserFormDTO.builder()
+                .id("00001ABC")
+                .name("John")
+                .surname("Doe")
+                .password("Contraseña1@")
+                .passwordBis("Contraseña1@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .role("user").build();
+
+        // Convert UserFormDTO to JSON
+        String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);
+
+
+        this.mockMvc.perform(
+                        MockMvcRequestBuilders.put("/film/api/users/update/{userId}",userFormDTO.getId())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .content(userFormDTOJson)
+                )
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andReturn();
     }
 
     @TestConfiguration
