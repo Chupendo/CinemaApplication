@@ -14,8 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // authentica al usuario usando el proveedor de spring
         Authentication authentication = authenticationManager
                 .authenticate( usernamePasswordAuthenticationToken  );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // se obtinete el usuario autenticado
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

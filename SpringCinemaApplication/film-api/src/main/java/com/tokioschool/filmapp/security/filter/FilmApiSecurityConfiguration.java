@@ -27,9 +27,9 @@ public class FilmApiSecurityConfiguration {
                 // gestion de securizar los endpoints
                 .securityMatcher("/film/api/**")
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.POST,"/film/api/auth","/film/api/auth/","/film/api/auth/login")
+                        .requestMatchers(HttpMethod.POST,"/film/api/auth","/film/api/auth/","/film/api/auth/login","/film/api/users/register")
                                 .permitAll()
-                        .requestMatchers("/film/api/auth/logout","/film/api/auth/me")
+                        .anyRequest()
                         .authenticated()
                 )
                 // Gestion de session sin estado
@@ -50,8 +50,7 @@ public class FilmApiSecurityConfiguration {
                 // login and logout
                 .formLogin(httpSecurityFormLoginConfigurer ->
                         httpSecurityFormLoginConfigurer.loginPage("/film/api/auth/login").permitAll())
-                .logout(httpSecurityFormLoginConfigurer ->
-                        httpSecurityFormLoginConfigurer.logoutUrl("/film/api/auth/logout").permitAll())
+                //.logout(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer.logoutUrl("/film/api/auth/logout").permitAll())
                 // filters
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(logRequestFilter,UsernamePasswordAuthenticationFilter.class)
