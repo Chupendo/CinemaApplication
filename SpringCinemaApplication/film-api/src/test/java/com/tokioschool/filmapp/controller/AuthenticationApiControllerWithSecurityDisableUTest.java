@@ -5,6 +5,7 @@ import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
+import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.redis.services.JwtBlacklistService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -35,6 +36,9 @@ class AuthenticationApiControllerWithSecurityDisableUTest {
     @Autowired private ObjectMapper objectMapper;
     @MockitoBean  private AuthenticationService authenticationService; // Mock del servicio
     @MockitoBean  private JwtBlacklistService jwtBlacklistService; // Mock del servicio redis
+
+    // required for log filter
+    @MockitoBean    private UserService userService;
 
     @Test
     @Order(1)
