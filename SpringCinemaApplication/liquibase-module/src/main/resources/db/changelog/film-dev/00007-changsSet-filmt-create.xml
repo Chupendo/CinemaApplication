@@ -25,7 +25,7 @@
             </column>
 
             <!-- Columna para el director -->
-            <column name="director_id" type="BIGINT">
+            <column name="manager_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
 
@@ -48,10 +48,10 @@
 
     <changeSet id="add-foreing-key-movies" author="andres.rpenuela" context="dev">
         <addForeignKeyConstraint baseTableName="movies"
-                                 baseColumnNames="director_id"
+                                 baseColumnNames="manager_id"
                                  referencedTableName="artists"
                                  referencedColumnNames="id"
-                                 constraintName="fk_director"
+                                 constraintName="fk_manager"
                                  deferrable="false"
                                  initiallyDeferred="false"/>
 
@@ -78,7 +78,7 @@
             <column name="ID" value="1" />
             <column name="title" value="game of trons" />
             <column name="release_year" value="1992" />
-            <column name="director_id" value="2"/>
+            <column name="manager_id" value="2"/>
         </insert>
 
         <insert tableName="movies_artists">

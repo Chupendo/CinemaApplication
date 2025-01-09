@@ -23,8 +23,9 @@ public class Movie {
     @Column(name="release_year")
     private Integer releaseYear;
 
-    @JoinColumn(name="director_id",nullable = false)
+    @JoinColumn(name="manager_id",nullable = false/*, referencedColumnName = "id"*/)
     @OneToOne
+    @PrimaryKeyJoinColumn
     private Artist manager;
 
     @ManyToMany(fetch = FetchType.LAZY)
