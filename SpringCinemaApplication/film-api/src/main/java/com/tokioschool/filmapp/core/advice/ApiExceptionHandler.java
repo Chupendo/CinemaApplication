@@ -1,8 +1,8 @@
 package com.tokioschool.filmapp.core.advice;
 
 
-import com.tokioschool.filmapp.core.exception.NotFoundException;
-import com.tokioschool.filmapp.core.exception.ValidacionException;
+import com.tokioschool.core.exception.NotFoundException;
+import com.tokioschool.core.exception.ValidacionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.coyote.BadRequestException;
@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;

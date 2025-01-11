@@ -1,7 +1,7 @@
 package com.tokioschool.filmapp.controller;
 
 
-import com.tokioschool.filmapp.core.exception.ValidacionException;
+import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.services.artist.ArtistService;
@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +37,7 @@ public class ArtistApiController {
             summary = "Post register artist in the system",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
+                            responseCode = "201",
                             description = "register artist",
                             content = @Content(schema = @Schema(implementation = AuthenticationResponseDTO.class))
                     ),
@@ -75,7 +76,7 @@ public class ArtistApiController {
             throw new ValidacionException("Errores de validación", errores);
         }
 
-        return ResponseEntity.ok( artistService.registerArtist(artistDto) );
+        return ResponseEntity.status(HttpStatus.CREATED).body( artistService.registerArtist(artistDto) );
     }
 
     @Operation(

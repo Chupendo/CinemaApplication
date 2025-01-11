@@ -1,4 +1,4 @@
-package com.tokioschool.filmapp.core.exception;
+package com.tokioschool.core.exception;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(Throwable cause){super(cause);}

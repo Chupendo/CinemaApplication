@@ -7,6 +7,7 @@ import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
+import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.redis.services.JwtBlacklistService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ class AuthenticationApiControllerWithSecurityEnableUTest {
     @Autowired private ObjectMapper objectMapper;
     @MockitoBean  private AuthenticationService authenticationService; // Mock del servicio
     @MockitoBean  private JwtBlacklistService jwtBlacklistService; // Mock del servicio redis
+
+    // required for log filter
+    @MockitoBean private UserService userService;
 
     @Test
     void givenUserLogin_whenPostAuthenticated_whenReturnOk () throws Exception {

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- ChangeSet to create the users_roles table -->
+    <changeSet id="create-film-table" author="andres.rpenuela" context="dev">
+        <comment>Created table user_roles for relationship to users with roles</comment>
+        <createTable tableName="movies">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+
+            <!-- Columna para el título de la película -->
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Columna para el año de lanzamiento -->
+            <column name="release_year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Columna para el director -->
+            <column name="manager_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Columna para el póster -->
+            <column name="poster" type="UUID">
+                <constraints unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="movies_artists">
+            <column name="ARTIST_ID" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="MOVIE_ID" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="add-foreing-key-movies" author="andres.rpenuela" context="dev">
+        <addForeignKeyConstraint baseTableName="movies"
+                                 baseColumnNames="manager_id"
+                                 referencedTableName="artists"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_manager"
+                                 deferrable="false"
+                                 initiallyDeferred="false"/>
+
+        <addForeignKeyConstraint baseTableName="movies_artists"
+                                 baseColumnNames="MOVIE_ID"
+                                 referencedTableName="movies"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_movies"
+                                 deferrable="false"
+                                 initiallyDeferred="false"/>
+
+        <addForeignKeyConstraint baseTableName="movies_artists"
+                                 baseColumnNames="artist_id"
+                                 referencedTableName="artists"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_artist"
+                                 deferrable="false"
+                                 initiallyDeferred="false"/>
+    </changeSet>
+
+    <changeSet id="insert-data-movies" author="andres.rpenuela" context="dev">
+        <!-- privileges values -->
+        <insert tableName="movies">
+            <column name="ID" value="1" />
+            <column name="title" value="game of trons" />
+            <column name="release_year" value="1992" />
+            <column name="manager_id" value="2"/>
+        </insert>
+
+        <insert tableName="movies_artists">
+            <column name="ARTIST_ID" value="1" />
+            <column name="MOVIE_ID" value="1" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

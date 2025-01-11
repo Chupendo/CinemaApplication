@@ -1,6 +1,6 @@
 package com.tokioschool.filmapp.controller;
 
-import com.tokioschool.filmapp.core.exception.ValidacionException;
+import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +39,7 @@ public class UserApiController {
             summary = "Post register user in the system",
             responses = {
                     @ApiResponse(
-                            responseCode = "200",
+                            responseCode = "201",
                             description = "register user",
                             content = @Content(schema = @Schema(implementation = AuthenticationResponseDTO.class))
                     ),
@@ -101,7 +102,7 @@ public class UserApiController {
 
         try {
             UserDTO userDTO = userService.updateUser(userId,userFormDTO);
-            return ResponseEntity.ok(userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
         }catch (Exception e){
             log.error("User don't register because {}",e.getMessage(), e);
             throw new BadRequestException("User don't register", e);
