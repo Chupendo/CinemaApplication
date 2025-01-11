@@ -32,7 +32,8 @@ public class MovieServiceImpl implements MovieService {
     private final ModelMapper modelMapper;
 
     /**
-     * Search movie in the system apply a filter by default
+     * Search movie in the system apply a filter by default, also if page size is 0,
+     * then return all items filters and ignored the page or page number.
      *
      * @return page of result of search of movies in the system
      */
@@ -42,7 +43,8 @@ public class MovieServiceImpl implements MovieService {
     }
 
     /**
-     * Search movie in the system apply a filter of searched
+     * Search movie in the system apply a filter of searched, also if page size is 0,
+     * then return all items filters and ignored the page or page number.
      *
      * @param searchMovieRecord filter to apply
      * @return page of result of search of movies in the system

@@ -25,7 +25,7 @@ public class Movie {
 
     @JoinColumn(name="manager_id",nullable = false/*, referencedColumnName = "id"*/)
     @OneToOne
-    @PrimaryKeyJoinColumn
+    //@PrimaryKeyJoinColumn
     private Artist manager;
 
     @ManyToMany(fetch = FetchType.LAZY)
