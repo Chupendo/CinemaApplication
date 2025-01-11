@@ -31,28 +31,28 @@ class MovieDaoUTest {
     List<Artist> artists;
     @BeforeEach
     void init(){
-        // artist
-        TYPE_ARTIST[] types = TYPE_ARTIST.values();
-        artists = IntStream.range(0,10).mapToObj(i -> {
-            return Artist.builder()
-                    .name(faker.superhero().name())
-                    .surname(faker.superhero().prefix())
-                    .typeArtist(types[getRandom(0, types.length-1)])
-                    .build();
-        }).toList();
-
-        artistDao.saveAll(artists);
-
         // movies
         movies = IntStream.range(1980,1990).mapToObj(
-                i ->
-                    Movie.builder()
+                i ->{
+                    // artist
+                    TYPE_ARTIST[] types = TYPE_ARTIST.values();
+                    artists = IntStream.range(1,3).mapToObj(j ->
+                         Artist.builder()
+                                .name(faker.superhero().name())
+                                .surname(faker.superhero().prefix())
+                            .typeArtist(types[getRandom(0, types.length-1)])
+                                .build()
+                    ).toList();
+
+                    artistDao.saveAll(artists);
+
+                    return Movie.builder()
                             .title(faker.pokemon().name())
                             .releaseYear(i)
                             .manager(artists.getFirst())
                             .artists(artists)
-                            .build()
-
+                            .build();
+                }
         ).toList();
 
         movieDao.saveAll(movies);
