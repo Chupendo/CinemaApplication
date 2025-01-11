@@ -1,4 +1,7 @@
 package com.tokioschool.filmapp.records;
 
-public record SearchMovieRecord(String title,RangeReleaseYear rangeReleaseYear){
+import lombok.Builder;
+
+@Builder
+public record SearchMovieRecord(String title,RangeReleaseYear rangeReleaseYear,int page, int pageSize){
 }
