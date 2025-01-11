@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.controller;
 
+import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.FilterMovie;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/film/api/movies")
 @Tag(name="movies", description= "movies operations")
+@Slf4j
 public class MovieApiController {
 
     private final MovieService movieService;
@@ -100,5 +104,55 @@ public class MovieApiController {
                 .build();
 
         return ResponseEntity.ok( movieService.searchMovie(searchMovieRecord) );
+    }
+
+    @Operation(
+            summary = "Get search by filter title or/and range release year",
+            description = "Search for movies by providing a title and/or a range of release years. You can also define pagination parameters. If \"pageSize\" is 0, then return all movies filters in a page.",
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            description = "Identification movie in the system (default: 0)",
+                            required = true,
+                            example = "1"
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Successful retrieval of movie search results",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = PageDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid request (e.g., malformed filter)",
+                            content = @Content(mediaType = "application/json")
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized access (user not authenticated)",
+                            content = @Content(mediaType = "application/json")
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content(mediaType = "application/json")
+                    )
+            }
+    )
+    @SecurityRequirement(name = "auth-openapi")
+    @GetMapping(value={"/{id}","/view/{id}",}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MovieDto> getMovieByIdHandler(
+            @PathVariable(value = "id") Long movieId){
+        try {
+            return ResponseEntity.ok(movieService.getMovieById(movieId));
+        }catch (InvalidDataAccessApiUsageException danseuse){
+            log.error(danseuse.getMessage(),danseuse);
+            throw new NotFoundException("Movie don't found, because %s".formatted(danseuse.getMessage()),danseuse);
+        }
     }
 }

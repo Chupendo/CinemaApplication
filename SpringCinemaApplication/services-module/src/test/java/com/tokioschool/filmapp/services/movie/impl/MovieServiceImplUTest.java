@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.services.movie.impl;
 
 import com.github.javafaker.Faker;
+import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.common.PageDTO;
@@ -18,6 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -72,13 +74,15 @@ class MovieServiceImplUTest {
 
     @BeforeEach
     public void initEach(){
-        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
     }
 
 
     @Test
     @Order(1)
     void givenPageGreaterThatMoviesSize_whenSearchMovie_thenReturnPageWithListEmpty() {
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
         SearchMovieRecord searchMovieRecord = SearchMovieRecord.builder()
                 .page(movies.size())
                 .pageSize(MovieService.PAGE_SIZE_DEFAULT)
@@ -98,6 +102,8 @@ class MovieServiceImplUTest {
     @Test
     @Order(2)
     void givenSearchPageOneWithTwoItems_whenSearchMovie_thenReturnPage() {
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
         SearchMovieRecord searchMovieRecord = SearchMovieRecord.builder()
                 .page(1)
                 .pageSize(2)
@@ -120,6 +126,8 @@ class MovieServiceImplUTest {
     @Test
     @Order(3)
     void givenSearchPageGreaterThatItems_whenSearchMovie_thenReturnPageWitOutItems() {
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
         SearchMovieRecord searchMovieRecord = SearchMovieRecord.builder()
                 .page(8) // overwritten
                 .pageSize(2)
@@ -141,6 +149,8 @@ class MovieServiceImplUTest {
     @Test
     @Order(4)
     void givenSearchByTitle_whenSearchMovie_thenReturnPage() {
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
         SearchMovieRecord searchMovieRecord = SearchMovieRecord.builder()
                 .title(movies.getFirst().getTitle())
                 .page(0) // overwritten
@@ -165,22 +175,26 @@ class MovieServiceImplUTest {
     @Test
     @Order(5)
     void whenSearchMovieWithOutFilter_thenReturnPageDefault() {
-            PageDTO<MovieDto> resultMoviePageDTO = movieService.searchMovie();
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
 
-            Assertions.assertThat(resultMoviePageDTO)
-                    .isNotNull()
-                    .returns(MovieService.PAGE_DEFAULT,PageDTO::getPageNumber)
-                    .returns(MovieService.PAGE_SIZE_DEFAULT,PageDTO::getPageSize)
-                    .returns((int) Math.ceil(movies.size()/(double)MovieService.PAGE_SIZE_DEFAULT),PageDTO::getTotalPages);
+        PageDTO<MovieDto> resultMoviePageDTO = movieService.searchMovie();
+
+        Assertions.assertThat(resultMoviePageDTO)
+                .isNotNull()
+                .returns(MovieService.PAGE_DEFAULT,PageDTO::getPageNumber)
+                .returns(MovieService.PAGE_SIZE_DEFAULT,PageDTO::getPageSize)
+                .returns((int) Math.ceil(movies.size()/(double)MovieService.PAGE_SIZE_DEFAULT),PageDTO::getTotalPages);
 
 
         Mockito.verify(modelMapper,Mockito.times(resultMoviePageDTO.getPageSize()))
-                    .map(Mockito.any(Movie.class),Mockito.eq(MovieDto.class));
+                .map(Mockito.any(Movie.class),Mockito.eq(MovieDto.class));
     }
 
     @Test
     @Order(6)
     void givenSearchWitchPageSizeZero_whenSearchMovie_thenReturnAllItemsInPage() {
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
         SearchMovieRecord searchMovieRecord = SearchMovieRecord.builder()
                 .page(0) // overwritten
                 .pageSize(0)
@@ -201,8 +215,10 @@ class MovieServiceImplUTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void givenSearchWitchPageSizeZeroAndFilter_whenSearchMovie_thenReturnAllItemsInPage() {
+        Mockito.when(movieDao.findAll()).thenReturn(movies);
+
         SearchMovieRecord searchMovieRecord = SearchMovieRecord.builder()
                 .title("l")
                 .page(0) // overwritten
@@ -231,4 +247,13 @@ class MovieServiceImplUTest {
                 .map(Mockito.any(Movie.class),Mockito.eq(MovieDto.class));
     }
 
+
+    @Test
+    @Order(8)
+    void givenIdNull_whenSearchMovie_thenNotFoundException() {
+        Mockito.when(movieDao.findById(null)).thenThrow(new InvalidDataAccessApiUsageException("Movie don't found in the system"));
+
+        Assertions.assertThatThrownBy(()-> movieService.getMovieById(null))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
+    }
 }

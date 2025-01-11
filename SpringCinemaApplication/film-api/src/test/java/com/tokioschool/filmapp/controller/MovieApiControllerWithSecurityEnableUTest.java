@@ -66,4 +66,18 @@ class MovieApiControllerWithSecurityEnableUTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
     }
+
+    @Test
+    @Order(2)
+    @WithMockUser(username = "user",roles = "user")
+    void givenRequest_whenFindMovieByIdHandler_returnOk() throws Exception {
+        // Mockear el servicio
+        Mockito.when(movieService.getMovieById(1L)).thenReturn(MovieDto.builder().build());
+
+        // Realizar la solicitud POST y verificar la respuesta
+        mockMvc.perform(MockMvcRequestBuilders.get("/film/api/movies/{id}",1L) // Ajusta el endpoint si es necesario
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+    }
 }

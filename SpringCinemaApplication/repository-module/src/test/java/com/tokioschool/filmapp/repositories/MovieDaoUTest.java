@@ -10,11 +10,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 @DataJpaTest
@@ -103,6 +103,14 @@ class MovieDaoUTest {
         Assertions.assertThat(resultMovies)
                 .isNotEmpty()
                 .hasSize(1 );
+    }
+
+    @Test
+    @Order(5)
+    void givenIdNul_whenFindMovieById_thenReturnInvalidDataAccessApiUsageException() {
+
+        Assertions.assertThatThrownBy(()->movieDao.findById(null))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
     /**

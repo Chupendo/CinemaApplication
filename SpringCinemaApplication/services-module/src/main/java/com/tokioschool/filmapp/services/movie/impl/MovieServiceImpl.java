@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.services.movie.impl;
 
+import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
@@ -10,6 +11,7 @@ import com.tokioschool.filmapp.services.movie.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -97,6 +99,30 @@ public class MovieServiceImpl implements MovieService {
         }
     }
 
+    /**
+     * Find the movie given it's identifier in the system
+     *
+     * @param movieId identification of the movie
+     * @return the movie which identification in the system is the given
+     * @throws NotFoundException if there aren't a movie with this identification
+     *  @throws NotFoundException if the id given is null
+     */
+    @Override
+    public MovieDto getMovieById(Long movieId) throws InvalidDataAccessApiUsageException,NotFoundException {
+        return movieDao.findById(movieId)
+                .map(movie -> modelMapper.map(movie, MovieDto.class))
+                .orElseThrow(() -> new NotFoundException("The movie is not found in the system"));
+    }
+
+    /**
+     * Copy a collection in other collection deterministic where your size is range
+     * between [star,end]
+     *
+     * @param movies collection with data source
+     * @param star position where start to copy the source collection
+     * @param end position where finished of copy the source collection
+     * @return a new collection with tha data of collection given, and are hosting in the position [star,end]
+     */
     private List<MovieDto> getMovieDtoPageDTO(List<Movie> movies, int star, int end ) {
         return IntStream.range(star, end)
                 .mapToObj(movies::get)
