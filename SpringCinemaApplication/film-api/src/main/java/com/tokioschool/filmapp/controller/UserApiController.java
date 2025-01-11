@@ -1,6 +1,6 @@
 package com.tokioschool.filmapp.controller;
 
-import com.tokioschool.filmapp.core.exception.ValidacionException;
+import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
