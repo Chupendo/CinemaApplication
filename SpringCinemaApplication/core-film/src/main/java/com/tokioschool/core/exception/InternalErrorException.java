@@ -1,4 +1,4 @@
-package com.tokioschool.filmapp.core.exception;
+package com.tokioschool.core.exception;
 
 public class InternalErrorException extends RuntimeException {
   public InternalErrorException(String message) {super(message); }

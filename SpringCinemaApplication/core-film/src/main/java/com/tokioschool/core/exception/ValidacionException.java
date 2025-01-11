@@ -1,4 +1,4 @@
-package com.tokioschool.filmapp.core.exception;
+package com.tokioschool.core.exception;
 
 import java.util.Map;
 
