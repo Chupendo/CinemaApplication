@@ -84,7 +84,7 @@ public class UserServiceAccessMethodUTest {
                         MockMvcRequestBuilders.post("/film/api/users/register")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(userFormDTOJson)
-                ).andExpect(MockMvcResultMatchers.status().isOk())
+                ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
@@ -132,7 +132,7 @@ public class UserServiceAccessMethodUTest {
                         MockMvcRequestBuilders.post("/film/api/users/register")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(userFormDTOJson)
-                ).andExpect(MockMvcResultMatchers.status().isOk())
+                ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
@@ -177,7 +177,7 @@ public class UserServiceAccessMethodUTest {
                         MockMvcRequestBuilders.post("/film/api/users/register")
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(userFormDTOJson)
-                ).andExpect(MockMvcResultMatchers.status().isOk())
+                ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
@@ -224,7 +224,7 @@ public class UserServiceAccessMethodUTest {
                         MockMvcRequestBuilders.put("/film/api/users/update/{userId}",userFormDTO.getId())
                                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                                 .content(userFormDTOJson)
-                ).andExpect(MockMvcResultMatchers.status().isOk())
+                ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto

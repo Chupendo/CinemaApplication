@@ -111,7 +111,7 @@ class ArtistApiControllerWithSecurityEnableUTest {
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/film/api/artists") // Ajusta el endpoint si es necesario
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(artistDtoJson))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 

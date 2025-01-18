@@ -80,7 +80,7 @@ public class UserApiController {
 
         try {
             UserDTO userDTO = userService.registerUser(userFormDTO);
-            return ResponseEntity.ok(userDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
         }catch (Exception e){
             log.error("User don't register because {}",e.getMessage(), e);
             throw new BadRequestException("User don't register", e);
