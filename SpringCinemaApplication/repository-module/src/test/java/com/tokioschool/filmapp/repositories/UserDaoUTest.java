@@ -37,7 +37,7 @@ class UserDaoUTest {
             return User.builder()
                     .email("%s@.%s.com".formatted(name,faker.company().suffix()))
                     .name(name)
-                    .surname(faker.name().lastName())
+                    .surname(faker.name().lastName()+i)
                     .username(faker.dragonBall().character())
                     .birthDate(LocalDate.now().minusYears(random.nextLong(10,40)))
                     .created(LocalDateTime.now())
