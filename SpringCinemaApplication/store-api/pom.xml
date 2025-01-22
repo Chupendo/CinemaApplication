@@ -45,6 +45,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
         </dependency>
+
         <!-- jwt token -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -54,6 +55,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-resource-server</artifactId>
         </dependency>
+
         <!-- spring tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -78,6 +80,18 @@
             <groupId>org.springframework.modulith</groupId>
             <artifactId>spring-modulith-observability</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>it.ozimov</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.7.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
