@@ -39,10 +39,11 @@ application:
   jwt:
     secret: 1r9yBxxxPu/H6tfN+V58+qfBXIdNwRiJLgbQo6NU8IyzkmTUzwbjW19fYkvFDZHTETCKdGPlsl8KLXlDJLe6czQphUHkZsyDSbErmmqxrwSbkM4IWZ1GsX2HznDuffz5y7T+O9rUrX9rmIKTIW2PEOrn5YSW7fqypLBN9ru8ttzphF+8Oe97SmxyCUCMvM0WyeF3aW9RV9PY2ga695vr62OV3Hs9Nq52kzZN0Q/R+LwMNsHzeuWdE9Bb7kmcbPUrTI08bJJ6YzFXbehb8V3unZy9KRz8VRj89TL3gE/+EVnrDskTDUDteJCDp2/8tQXbheg37g54/n72Q/e2+kXjC5whLbT7LHEtRZGSe1nB9k583pRw5D9f5ksyvIdLdcbvBnyAVXzmqsOROwVlkwaNQL707OHpxM77RWdHObXUSLI=
     expiration: PT1H
-
-loggin:
+logging:
   level:
     org:
       springframework:
         security: DEBUG
         oauth2: DEBUG
+        web: DEBUG
+    com.tokioschool.storeapp.security.filter.JwtBlackListFilter: DEBUG

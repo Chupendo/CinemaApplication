@@ -1,18 +1,21 @@
 package com.tokioschool.storeapp.security.filter;
 
 import com.tokioschool.storeapp.security.jwt.converter.CustomJwtAuthenticationConverter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity
+@RequiredArgsConstructor
 public class StoreApiSecurityConfiguration {
+
+    public final JwtBlackListFilter jwtBlackListFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChainMainly(HttpSecurity httpSecurity) throws Exception {
@@ -24,6 +27,7 @@ public class StoreApiSecurityConfiguration {
                         //.requestMatchers("/store/api/auth","/store/api/auth/**")
                         .requestMatchers("/store/api/auth")
                         .permitAll()
+                        .requestMatchers("/store/api/auth/me").hasRole("ADMIN")
                         .requestMatchers("/store/api/**")
                         .authenticated()
                 )
@@ -41,6 +45,8 @@ public class StoreApiSecurityConfiguration {
                                 new CustomJwtAuthenticationConverter()
                         )
                 ))
+                // add filter before authentication
+                .addFilterBefore(jwtBlackListFilter, UsernamePasswordAuthenticationFilter.class)
          .build();
     }
 }

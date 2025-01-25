@@ -7,6 +7,8 @@ import com.tokioschool.storeapp.security.jwt.service.JwtService;
 import com.tokioschool.storeapp.service.impl.AuthenticationServiceImpl;
 import com.tokioschool.storeapp.userdetails.dto.UserDto;
 import com.tokioschool.storeapp.userdetails.service.StoreUserService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,12 +27,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.security.auth.login.CredentialException;
 import javax.security.auth.login.LoginException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -46,6 +50,9 @@ class AuthenticationServiceImpUTest {
 
     @Mock
     private StoreUserService storeUserService;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
 
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
@@ -147,6 +154,35 @@ class AuthenticationServiceImpUTest {
             authenticationService.getAuthenticated();
         });
     }
+
+
+    @Test
+    void givenRequestWithToken_whenGetTokenAndExpiredAt_thenReturn(){
+        final String keyAuth = "Authorization";
+        final String starJwtToken = "Bearer ";
+        final String tokenValue = "124abc";
+        Mockito.when(httpServletRequest.getHeader(keyAuth)).thenReturn("%s%s".formatted(starJwtToken,tokenValue));
+
+        // Create a mock Authentication object as Jwt token
+        Jwt  mockJwt = Mockito.mock(Jwt.class);
+        Mockito.when(mockJwt.getTokenValue()).thenReturn(tokenValue);
+        Mockito.when(mockJwt.getExpiresAt()).thenReturn(Instant.ofEpochSecond(1700000000L));
+        //Mockito.when(mockJwt.getClaims()).thenReturn(Map.of("sub", "testUser", "roles", "ADMIN"));
+
+        // Mock authentication and security context
+        Authentication authentication = new JwtAuthenticationToken(mockJwt);
+        // Create a mock SecurityContext
+        SecurityContext mockSecurityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(mockSecurityContext.getAuthentication()).thenReturn(authentication);
+
+        // Set the SecurityContextHolder to use the mock SecurityContext
+        SecurityContextHolder.setContext(mockSecurityContext);
+
+        Pair<String, Long> result =authenticationService.getTokenAndExpiredAt(httpServletRequest);
+
+        Assertions.assertNotNull(result);
+    }
+
     @AfterAll
     static void endTest(){
         // Clearing Security Context

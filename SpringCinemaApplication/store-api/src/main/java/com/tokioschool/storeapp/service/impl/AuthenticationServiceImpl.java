@@ -7,8 +7,10 @@ import com.tokioschool.storeapp.security.jwt.service.JwtService;
 import com.tokioschool.storeapp.service.AuthenticationService;
 import com.tokioschool.storeapp.userdetails.dto.UserDto;
 import com.tokioschool.storeapp.userdetails.service.StoreUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +30,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final StoreUserService storeUserService;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     *
+     * Method that authenticated a user in the system by user nad password
+     *
+     * @param authenticationRequestDTO username and password plain
+     * @return token and expired at
+     *
+     * @throws UsernameNotFoundException the user don't found in the system
+     * @throws BadCredentialsException if the password has error
+     */
     @Override
     public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationRequestDTO) throws UsernameNotFoundException, BadCredentialsException {
         final UserDto userDto = storeUserService.findByUserName(authenticationRequestDTO.getUsername());
@@ -65,6 +79,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    /**
+     * Get data about user with role 'ADMIN'
+     *
+     * @return data user authenticated
+     * @throws LoginException if there is not authenticated
+     */
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public AuthenticatedMeResponseDTO getAuthenticated() throws LoginException { // para saber quin hizo la petición
@@ -85,6 +105,41 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                 .filter(value -> value.toUpperCase().startsWith("ROLE_"))
                                 .toList()
                 ).build();
+    }
+
+    /**+
+     * Method that token value and expired of request http
+     *
+     * @param request information of authentication in headers request http
+     * @return token value and expired time of the same
+     */
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Pair<String, Long> getTokenAndExpiredAt(HttpServletRequest request) {
+        final String keyAuth = "Authorization";
+        final String starJwtToken = "Bearer ";
+        String tokenRequest = Optional.ofNullable(request)
+                .map(r -> r.getHeader(keyAuth))
+                .filter(auth -> auth.startsWith(starJwtToken))
+                .map(token -> token.substring(starJwtToken.length()))
+                .orElseGet(() -> null );
+
+        String tokenAuthenticated = null;
+        Instant expiresAt = null;
+        Authentication authenticated = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authenticated != null && authenticated.getPrincipal() instanceof Jwt jwtToken) {
+            tokenAuthenticated = jwtToken.getTokenValue();
+            expiresAt =  jwtToken.getExpiresAt();
+        }
+
+        if(tokenRequest!=null && tokenAuthenticated!=null
+                && Objects.equals(tokenRequest,tokenAuthenticated)
+                &&  expiresAt != null){
+            return Pair.of(tokenRequest,expiresAt.getEpochSecond());
+        }
+
+        return null;
     }
 
 

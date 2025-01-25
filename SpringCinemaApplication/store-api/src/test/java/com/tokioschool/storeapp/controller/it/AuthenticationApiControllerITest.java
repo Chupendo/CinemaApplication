@@ -5,9 +5,12 @@ import com.tokioschool.storeapp.controller.AuthenticationApiController;
 import com.tokioschool.storeapp.dto.authentication.AuthenticatedMeResponseDTO;
 import com.tokioschool.storeapp.dto.authentication.AuthenticationRequestDTO;
 import com.tokioschool.storeapp.dto.authentication.AuthenticationResponseDTO;
+import com.tokioschool.storeapp.redis.service.RedisJwtBlackListService;
 import com.tokioschool.storeapp.security.filter.StoreApiSecurityConfiguration;
 import com.tokioschool.storeapp.security.jwt.configuration.JwtConfiguration;
 import com.tokioschool.storeapp.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -43,8 +46,12 @@ class AuthenticationApiControllerITest {
     @MockitoBean
     private AuthenticationService authenticationService;
 
+    @MockitoBean
+    private RedisJwtBlackListService jwtBlackListService;
+
+
     @Test
-    void givenAuthUserDto_whenPostAuthenticated_returnOk() throws Exception {
+    void givenAuthUserDto_whenPostAuthenticatedEndpoint_returnOk() throws Exception {
 
         AuthenticationRequestDTO authenticationRequestDTO = AuthenticationRequestDTO.builder()
                 .username("consumer")
@@ -66,7 +73,7 @@ class AuthenticationApiControllerITest {
 
     @Test
     @WithAnonymousUser
-    void givenAnonymousUser_whenGetAuthenticatedMe_thenReturnAccessDined() throws Exception {
+    void givenAnonymousUser_whenGetAuthenticatedMeEndpoint_thenReturnAccessDined() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/store/api/auth/me"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
@@ -74,16 +81,15 @@ class AuthenticationApiControllerITest {
 
 
     @Test
-    @WithMockUser(username = "john",roles = "USER")
-    void givenUserAuthenticated_whenGetAuthenticatedMe_thenReturnAccessDined() throws Exception {
-
+    @WithMockUser(username = "user", roles = {"USER"})
+    void givenUserWithoutAdminRole_whenAccessMeEndpoint_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/store/api/auth/me"))
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "john",roles = "ADMIN")
-    void givenAdminAuthenticated_whenGetAuthenticatedMe_thenReturnOk() throws Exception {
+    void givenAdminAuthenticated_whenGetAuthenticatedMeEndpoint_thenReturnOk() throws Exception {
 
         Mockito.when(authenticationService.getAuthenticated())
                         .thenReturn(AuthenticatedMeResponseDTO
@@ -96,4 +102,61 @@ class AuthenticationApiControllerITest {
         mockMvc.perform(MockMvcRequestBuilders.get("/store/api/auth/me"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    @Test
+    @WithMockUser(username = "test-user", roles = {"USER"})
+    void givenUserAuthenticated_whenLogoutEndpoint_thenReturnsOk() throws Exception {
+        // Arrange
+        String validJwt = "Bearer valid.jwt.token";
+        long expirationTime = 1700000000L; // Epoch time for expiration
+
+        Pair<String, Long> tokenAndExpiration = Pair.of(validJwt, expirationTime);
+
+        // Mock the behavior of the authentication service
+        Mockito.when(authenticationService.getTokenAndExpiredAt(Mockito.any(HttpServletRequest.class)))
+                .thenReturn(tokenAndExpiration);
+
+        // Act and Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/store/api/auth/logout"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Verify that the token was added to the blacklist
+        Mockito.verify(jwtBlackListService, Mockito.times(1))
+                .addToBlacklist(validJwt, expirationTime);
+    }
+
+    @Test
+    @WithAnonymousUser
+    void givenAnonymousUser_whenLogoutEndpoint_thenReturnsUnauthorized() throws Exception {
+        // Act and Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/store/api/auth/logout"))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+
+        // Verify that the request was cancelled before arriving of filter that check the token in black list
+        // and method handler
+        Mockito.verify(jwtBlackListService, Mockito.times(0))
+              .isBlacklisted(Mockito.any(String.class));
+    }
+
+    @Test
+    @WithMockUser(username = "test-user", roles = {"USER"})
+    void givenUserLogout_whenLogoutEndpoint_thenReturnsUnauthorized() throws Exception {
+        // Arrange
+        String validJwt = "Bearer valid.jwt.token";
+        long expirationTime = 1700000000L; // Epoch time for expiration
+
+        Pair<String, Long> tokenAndExpiration = Pair.of(validJwt, expirationTime);
+
+        // Mock the behavior of the authentication service
+        Mockito.when(jwtBlackListService.isBlacklisted(Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+        Mockito.when(authenticationService.getTokenAndExpiredAt(Mockito.any(HttpServletRequest.class)))
+                .thenReturn(tokenAndExpiration);
+
+        // Act and Assert
+        mockMvc.perform(MockMvcRequestBuilders.post("/store/api/auth/logout")
+                        .header("Authorization",validJwt))
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
 }
