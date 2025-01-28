@@ -28,6 +28,50 @@ class ArtistDaoUTest {
     @Autowired private Faker faker;
 
     private static List<Artist> artists;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @BeforeEach
     void init(){
         TYPE_ARTIST[] types = TYPE_ARTIST.values();
@@ -45,9 +89,9 @@ class ArtistDaoUTest {
     @Test
     void givenTypeActor_whenGetArtistsByTypeArtist_thenReturnOk() {
 
-        List<Artist> actores = artistDao.getArtistsByTypeArtist(TYPE_ARTIST.ACTOR);
+        List<Artist> actors = artistDao.getArtistsByTypeArtist(TYPE_ARTIST.ACTOR);
 
-        Assertions.assertThat(actores)
+        Assertions.assertThat(actors)
                 .isNotEmpty();
     }
 
