@@ -2,11 +2,13 @@ package com.tokioschool.storeapp.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokioschool.storeapp.configuration.properties.StoreConfigurationProperties;
+import com.tokioschool.storeapp.core.helper.FileHelper;
 import com.tokioschool.storeapp.domain.ResourceDescription;
 import com.tokioschool.storeapp.dto.store.ResourceContentDto;
 import com.tokioschool.storeapp.dto.store.ResourceIdDto;
 import com.tokioschool.storeapp.service.StoreService;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,6 +30,11 @@ public class StoreServiceImpl implements StoreService {
 
     private final StoreConfigurationProperties storeConfigurationProperties;
     private final ObjectMapper  objectMapper;
+
+    @PostConstruct
+    public void init() throws IOException {
+        FileHelper.createWorkIfNotExists(Path.of(storeConfigurationProperties.relativePath()));
+    }
 
     /**
      * Upload a resource in the system, as file json and your content with name UUID
@@ -66,7 +72,7 @@ public class StoreServiceImpl implements StoreService {
             Files.write(pathResourceToContent,multipartFile.getBytes());
 
         } catch (IOException e) {
-            log.error("Don't save content resource, cause: %s".formatted(e));
+            log.error("Don't save content resource, cause: %s".formatted(e),e);
             return Optional.empty();
         }
 

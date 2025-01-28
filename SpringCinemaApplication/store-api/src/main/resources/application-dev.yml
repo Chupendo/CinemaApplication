@@ -26,7 +26,7 @@ application:
   store:
     # Dinamic resource path
     absolute-path: C:\Users\andre\Documents\SourceTree\SpringCinemaApplication\resources\dev
-    relative-path: ..\..\resources\dev
+    relative-path: ..\resources\dev
     # User in memory
     login:
       users:

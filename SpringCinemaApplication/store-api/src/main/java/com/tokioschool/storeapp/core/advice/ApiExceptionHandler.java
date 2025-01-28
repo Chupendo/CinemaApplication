@@ -1,6 +1,7 @@
 package com.tokioschool.storeapp.core.advice;
 
 
+import com.tokioschool.storeapp.core.exception.InternalErrorException;
 import com.tokioschool.storeapp.core.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -25,6 +26,7 @@ public class ApiExceptionHandler {
     public Map<String, String> handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
+
     /**
      * Endpoint para caso de error en el objeto de validacion en el metodo post
      * y no tiene el BindingResutl en el argumento del metodo handler
@@ -43,7 +45,6 @@ public class ApiExceptionHandler {
                         .collect(Collectors.joining(". "));
         return Map.of("message", message);
     }
-
 
     /**
      * Endpoint para caso de error en el objeto de validacion en el metodo get
@@ -78,8 +79,14 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(InternalErrorException.class)
+    public Map<String, String> handleInternalServerError(InternalErrorException ex, HttpServletRequest request) {
+        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
-    public Map<String, String> handleInternalServerError(Exception ex, HttpServletRequest request) {
+    public Map<String, String> handleExceptionError(Exception ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 
