@@ -42,7 +42,7 @@ import java.util.List;
         "application.jwt.expiration=PT1H"
 })
 @Import({FilmApiSecurityConfiguration.class, JwtConfiguration.class,}) // Importa la configuración de seguridad
-public class UserServiceAccessMethodUTest {
+public class UserStoreServiceAccessMethodUTest {
 
     @Autowired
     private MockMvc mockMvc;
