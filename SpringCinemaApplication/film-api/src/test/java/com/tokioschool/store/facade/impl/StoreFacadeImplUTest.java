@@ -2,9 +2,7 @@ package com.tokioschool.store.facade.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tokioschool.store.authentications.impl.StoreAuthenticationServiceImpl;
 import com.tokioschool.store.dto.ResourceIdDto;
-import com.tokioschool.store.properties.StoreProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +15,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -117,14 +118,6 @@ class StoreFacadeImplUTest {
         Optional<ResourceIdDto> result = storeFacade.saveResource(multipartFile, "test description");
 
         assertFalse(result.isPresent());
-    }
-
-    @Test
-    void findResource() {
-    }
-
-    @Test
-    void deleteResource() {
     }
 
     /**

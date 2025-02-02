@@ -84,12 +84,28 @@ public class StoreFacadeImpl implements StoreFacade {
 
     @Override
     public Optional<ResourceContentDto> findResource(UUID resourceId) {
+        final String uri = "%s/{resourceId}".formatted(RESOURCE_URL);
+        try{
+            ResourceContentDto resourceContentDto = restClient.get()
+                    .uri(uri,resourceId)
+                    .retrieve()
+                    .body(ResourceContentDto.class);
+
+            return Optional.ofNullable(resourceContentDto);
+        }catch (Exception e){
+            log.error("Exception in findResource",e);
+        }
+
         return Optional.empty();
     }
 
     @Override
     public void deleteResource(UUID resourceId) {
+        final String uri = "%s/{resourceId}".formatted(RESOURCE_URL);
 
+        restClient.delete().uri(uri,resourceId)
+                .retrieve()
+                .toBodilessEntity();
     }
 
 

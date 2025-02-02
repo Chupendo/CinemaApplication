@@ -1,6 +1,6 @@
 package com.tokioschool.store.authentications.impl;
 
-import com.tokioschool.store.properties.StoreProperties;
+import com.tokioschool.store.properties.StorePropertiesFilm;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StoreAuthenticationServiceImplUTest {
 
     @Mock
-    public StoreProperties storeProperties;
+    public StorePropertiesFilm storePropertiesFilm;
 
     @Mock
     public RestClient restClient;
@@ -149,10 +149,10 @@ class StoreAuthenticationServiceImplUTest {
      */
     private void configurationMockGetTokenW() {
         // mock properties
-        StoreProperties.UserStore userStoreTest = new StoreProperties.UserStore("test", "passwordEncoded");
-        StoreProperties.UserStore userStoreDefault = new StoreProperties.UserStore(USERNAME_LOGIN_DEFAULT, "passwordEncoded");
-        Mockito.when(storeProperties.login()).thenReturn(new StoreProperties.Login(List.of(userStoreTest,userStoreDefault)));
-        Mockito.when(storeProperties.baseUrl()).thenReturn(RESOURCE_PATH);
+        StorePropertiesFilm.UserStore userStoreTest = new StorePropertiesFilm.UserStore("test", "passwordEncoded");
+        StorePropertiesFilm.UserStore userStoreDefault = new StorePropertiesFilm.UserStore(USERNAME_LOGIN_DEFAULT, "passwordEncoded");
+        Mockito.when(storePropertiesFilm.login()).thenReturn(new StorePropertiesFilm.Login(List.of(userStoreTest,userStoreDefault)));
+        Mockito.when(storePropertiesFilm.baseUrl()).thenReturn(RESOURCE_PATH);
 
         //mock rest client
         Mockito.when(restClient.post()).thenReturn(requestBodyUriSpec);

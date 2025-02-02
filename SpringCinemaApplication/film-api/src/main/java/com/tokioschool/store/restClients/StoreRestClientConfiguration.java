@@ -1,7 +1,7 @@
 package com.tokioschool.store.restClients;
 
 import com.tokioschool.store.authentications.StoreAuthenticationService;
-import com.tokioschool.store.properties.StoreProperties;
+import com.tokioschool.store.properties.StorePropertiesFilm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +17,8 @@ import org.springframework.web.client.RestClient;
 @Slf4j
 public class StoreRestClientConfiguration {
 
-    private final StoreProperties storeProperties;
+    private final StorePropertiesFilm storePropertiesFilm;
+
     private final StoreAuthenticationService storeAuthenticationService;
 
     @Value("${application.store.login.users[0].username}")
@@ -31,7 +32,7 @@ public class StoreRestClientConfiguration {
     @Qualifier("restClientConsumer")
     public RestClient restConsumerClient(){
         return RestClient.builder()
-                .baseUrl(storeProperties.baseUrl())
+                .baseUrl(storePropertiesFilm.baseUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .requestInitializer(request -> {
                     log.info("Adding token to request as {}",consumer);
@@ -44,7 +45,7 @@ public class StoreRestClientConfiguration {
     @Qualifier("restClientProducer")
     public RestClient restProducerClient(){
         return RestClient.builder()
-                .baseUrl(storeProperties.baseUrl())
+                .baseUrl(storePropertiesFilm.baseUrl())
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .requestInitializer(request -> {
                     log.info("Adding token to request as {}",producer);

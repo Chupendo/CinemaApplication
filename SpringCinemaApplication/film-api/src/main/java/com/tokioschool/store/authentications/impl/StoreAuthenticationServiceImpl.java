@@ -1,7 +1,7 @@
 package com.tokioschool.store.authentications.impl;
 
 import com.tokioschool.store.authentications.StoreAuthenticationService;
-import com.tokioschool.store.properties.StoreProperties;
+import com.tokioschool.store.properties.StorePropertiesFilm;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Slf4j
 public class StoreAuthenticationServiceImpl implements StoreAuthenticationService {
 
-    private final StoreProperties storeProperties;
+    private final StorePropertiesFilm storePropertiesFilm;
 
     @Qualifier("restClientEmpty")
     private final RestClient restClient;
@@ -48,7 +48,7 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
             return accessToken;
         }
 
-        StoreProperties.UserStore userStore = storeProperties.login().users()
+        StorePropertiesFilm.UserStore userStore = storePropertiesFilm.login().users()
                 .stream()
                 .filter(usr -> Objects.equals(usr.username().toLowerCase(),filterUserName))
                 .findFirst().orElseThrow(() -> new RuntimeException("No user found"));
@@ -61,7 +61,7 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
 
         try{
             AuthResponseDTO authResponseDTO = restClient.post()
-                    .uri(("%s%s").formatted(storeProperties.baseUrl(),RESOURCE_PATH))
+                    .uri(("%s%s").formatted(storePropertiesFilm.baseUrl(),RESOURCE_PATH))
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(authRequest)
                     .retrieve()

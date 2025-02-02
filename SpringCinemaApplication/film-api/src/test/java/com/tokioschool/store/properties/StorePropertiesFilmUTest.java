@@ -1,6 +1,6 @@
 package com.tokioschool.store.properties;
 
-import com.tokioschool.store.configs.StoreConfiguration;
+import com.tokioschool.store.configs.StoreConfigurationFilm;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,20 +20,20 @@ import static org.assertj.core.api.Assertions.assertThat;
         "application.store.login.users[1].password=pass2"
 })
 @ActiveProfiles("test")
-@ContextConfiguration(classes = {StoreConfiguration.class})
+@ContextConfiguration(classes = {StoreConfigurationFilm.class})
 //@EnableConfigurationProperties(StoreProperties.class)
-class StorePropertiesUTest {
+class StorePropertiesFilmUTest {
 
     @Autowired
-    private StoreProperties storeProperties;
+    private StorePropertiesFilm storePropertiesFilm;
 
     @Test
     void whenPropertiesLoaded_thenValuesAreCorrect() {
-        assertThat(storeProperties.baseUrl()).isEqualTo("http://example.com");
-        assertThat(storeProperties.login().users()).hasSize(2);
-        assertThat(storeProperties.login().users().get(0).username()).isEqualTo("user1");
-        assertThat(storeProperties.login().users().get(0).password()).isEqualTo("pass1");
-        assertThat(storeProperties.login().users().get(1).username()).isEqualTo("user2");
-        assertThat(storeProperties.login().users().get(1).password()).isEqualTo("pass2");
+        assertThat(storePropertiesFilm.baseUrl()).isEqualTo("http://example.com");
+        assertThat(storePropertiesFilm.login().users()).hasSize(2);
+        assertThat(storePropertiesFilm.login().users().get(0).username()).isEqualTo("user1");
+        assertThat(storePropertiesFilm.login().users().get(0).password()).isEqualTo("pass1");
+        assertThat(storePropertiesFilm.login().users().get(1).username()).isEqualTo("user2");
+        assertThat(storePropertiesFilm.login().users().get(1).password()).isEqualTo("pass2");
     }
 }
