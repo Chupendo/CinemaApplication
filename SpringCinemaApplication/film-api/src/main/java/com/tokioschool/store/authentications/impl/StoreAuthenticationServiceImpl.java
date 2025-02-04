@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class StoreAuthenticationServiceImpl implements StoreAuthenticationService {
 
     private final StorePropertiesFilm storePropertiesFilm;
+    private final PasswordEncoder passwordEncoder;
 
     @Qualifier("restClientEmpty")
     private final RestClient restClient;
@@ -54,9 +57,12 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
                 .findFirst().orElseThrow(() -> new RuntimeException("No user found"));
 
         // realiza la peticion
+        // Decodificar de Base64
+        byte[] decodedBytes = Base64.getDecoder().decode(userStore.password());
+
         Map<String,String> authRequest = Map.of(
                 "username",userStore.username(),
-                "password",userStore.password()
+                "password",new String(decodedBytes)
         );
 
         try{

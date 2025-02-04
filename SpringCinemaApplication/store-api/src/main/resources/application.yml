@@ -3,7 +3,7 @@ spring:
     name: file-store-api
 
 server:
-  port: 9091
+  port: 9090
 
 # Actuator:
 # Activar endpoints predefinidos: management.endpoints.web.exposure.include= .....

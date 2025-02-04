@@ -41,20 +41,16 @@ application:
     expiration: PT1H
   # Store
   store:
-    base-url: http://localhost:8081
+    base-url: http://localhost:9090
     # User in memory
     login:
       users:
         - username: consumer
           # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
           password: "$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
-          authorities: read-resource
-          roles: USER
         - username: producer
           # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
           password: "$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
-          authorities: read-resource, write-resource
-          roles: USER, ADMIN
 
 # log console
 logging:
