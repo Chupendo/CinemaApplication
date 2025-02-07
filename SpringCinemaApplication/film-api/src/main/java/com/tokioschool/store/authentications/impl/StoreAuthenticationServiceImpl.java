@@ -85,7 +85,7 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
     }
 
     @Builder
-    protected record AuthResponseDTO(String accessToken, long expiresIn) {
+    public record AuthResponseDTO(String accessToken, long expiresIn) {
         public long getExpiresAt() {
             // expiresIn se pasa a segundos y se resta 5 segudnos para que no pille en medio de una peticion
             return System.currentTimeMillis() + expiresIn * 1000L - 5*1000L;

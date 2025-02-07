@@ -2,6 +2,7 @@ package com.tokioschool.store.facade;
 
 import com.tokioschool.store.dto.ResourceContentDto;
 import com.tokioschool.store.dto.ResourceIdDto;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -13,7 +14,12 @@ import java.util.UUID;
  */
 public interface StoreFacade {
 
+    @PreAuthorize("isAuthenticated()")
     Optional<ResourceIdDto> saveResource(MultipartFile multipartFile, String description);
+
+    @PreAuthorize("isAuthenticated()")
     Optional<ResourceContentDto> findResource(UUID resourceId);
+
+    @PreAuthorize("isAuthenticated()")
     void deleteResource(UUID resourceId);
 }
