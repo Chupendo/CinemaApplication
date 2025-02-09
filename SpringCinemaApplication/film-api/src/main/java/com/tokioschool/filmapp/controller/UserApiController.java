@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.controller;
 
 import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
+import com.tokioschool.filmapp.dto.user.RoleDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.filmapp.services.user.UserService;
@@ -151,7 +152,7 @@ public class UserApiController {
                     .id(userDTO.getId())
                     .name(userDTO.getName())
                     .surname(userDTO.getSurname())
-                    .role(userDTO.getRoles().getFirst().getName())
+                    .role(userDTO.getRoles().stream().map(RoleDTO::getName).toList())
                     .birthDate(userDTO.getBirthDate())
                     .email(userDTO.getEmail())
                     .created(userDTO.getCreated())

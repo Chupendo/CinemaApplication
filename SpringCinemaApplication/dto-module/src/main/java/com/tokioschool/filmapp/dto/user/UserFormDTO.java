@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor @NoArgsConstructor
@@ -41,7 +42,7 @@ public class UserFormDTO {
     private LocalDate birthDate;
 
     @EnumValid(target = RoleEnum.class,required = true,message = "Role don't allow")
-    private String role;
+    private List<String> role;
 
     private boolean updatePassword = false;
     private LocalDateTime created;

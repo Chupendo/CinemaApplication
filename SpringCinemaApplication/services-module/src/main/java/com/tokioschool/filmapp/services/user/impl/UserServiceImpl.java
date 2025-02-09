@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         user.setBirthDate(userFormDTO.getBirthDate());
 
         // roles
-        user.setRoles(getRolesByName(userFormDTO.getRole()));
+        user.setRoles(getRolesByName(userFormDTO.getRole().toArray(new String[0]) ) );
 
         // images
         if(userFormDTO.getImage() != null){
@@ -167,6 +167,7 @@ public class UserServiceImpl implements UserService {
      * @param roleNames
      * @return
      */
+
     private Set<Role> getRolesByName(String... roleNames){
         Set<Role> roles = new HashSet<>();
 

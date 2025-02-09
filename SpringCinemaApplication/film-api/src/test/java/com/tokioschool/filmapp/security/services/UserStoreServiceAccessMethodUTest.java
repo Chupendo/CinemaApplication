@@ -62,7 +62,7 @@ public class UserStoreServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .role(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -110,7 +110,7 @@ public class UserStoreServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .role(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -155,7 +155,7 @@ public class UserStoreServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .role(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -202,7 +202,7 @@ public class UserStoreServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .role(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -248,7 +248,7 @@ public class UserStoreServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .role(List.of("user")).build();
 
         // Convert UserFormDTO to JSON
         String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);

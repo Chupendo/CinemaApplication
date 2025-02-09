@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.annotation.Annotation;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -60,13 +61,13 @@ class EnumValidImplUTest {
     @Test
     void givenRoleNameValid_whenValidated_thenReturnTrue() {
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        assertTrue(validator.isValid("USER", context));
+        assertTrue(validator.isValid(List.of("USER"), context));
     }
 
     @Test
     void givenRoleNameInvalid_whenValidated_thenReturnFalse() {
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        assertFalse(validator.isValid("YELLOW", context));
+        assertFalse(validator.isValid(List.of("YELLOW"), context));
     }
 
     @Test
