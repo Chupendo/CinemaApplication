@@ -22,4 +22,7 @@ public interface StoreFacade {
 
     @PreAuthorize("isAuthenticated()")
     void deleteResource(UUID resourceId);
+
+    @PreAuthorize("isAuthenticated()")
+    Optional<ResourceIdDto> updateResource(UUID resourceIdOld, MultipartFile multipartFile, String description);
 }

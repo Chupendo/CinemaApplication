@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ModelMapperConfiguration.class,UserToUserDtoMapper.class})
@@ -27,6 +28,8 @@ public class UserToUserDtoMapperUTest {
 
     @Test
     void givenUser_whenMapperToUserDto_whenUserDto(){
+        final UUID resourceId = UUID.randomUUID();
+
         final Role role = Role.builder()
                 .id(1L)
                 .name("ADMIN")
@@ -44,6 +47,7 @@ public class UserToUserDtoMapperUTest {
                 .passwordBis("123")
                 .email("test@test.com")
                 .roles(Set.of(role))
+                .image(resourceId)
                 .build();
 
 
@@ -53,6 +57,11 @@ public class UserToUserDtoMapperUTest {
                 .returns(user.getName(),UserDTO::getName)
                 .returns(user.getEmail(),UserDTO::getEmail)
                 .returns(user.getBirthDate(),UserDTO::getBirthDate)
+                .returns(user.getLastLoginAt(),UserDTO::getLastLogin)
+                .returns(user.getCreated(),UserDTO::getCreated)
+                .returns(user.getUsername(),UserDTO::getUsername)
+                .returns(user.getSurname(),UserDTO::getSurname)
+                .returns(user.getImage().toString(),UserDTO::getResourceId)
                 .satisfies(userDTO1 ->
                         Assertions.assertThat(userDTO1.getRoles().getFirst().getAuthorities().contains( "writer" )).isTrue() );
     }

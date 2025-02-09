@@ -3,10 +3,7 @@ package com.tokioschool.filmapp.dto.user;
 import com.tokioschool.filmapp.enums.RoleEnum;
 import com.tokioschool.filmapp.validators.anotations.EnumValid;
 import com.tokioschool.filmapp.validators.anotations.PasswordBis;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -29,11 +26,15 @@ public class UserFormDTO {
 
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",message = "Password invalid")
     private String passwordBis;
+
     @NotBlank
     private String username;
 
     @Email
     private String email;
+
+    @Size(min=36,max = 36)
+    private String image;
 
     @NonNull
     @Past

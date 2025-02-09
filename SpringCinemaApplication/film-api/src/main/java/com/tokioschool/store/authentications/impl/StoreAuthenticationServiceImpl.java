@@ -1,5 +1,7 @@
 package com.tokioschool.store.authentications.impl;
 
+import com.tokioschool.filmapp.dto.user.UserDTO;
+import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.store.authentications.StoreAuthenticationService;
 import com.tokioschool.store.properties.StorePropertiesFilm;
 import lombok.Builder;

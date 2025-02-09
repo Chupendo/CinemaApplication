@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -106,6 +107,21 @@ public class StoreFacadeImpl implements StoreFacade {
         restClient.delete().uri(uri,resourceId)
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Optional<ResourceIdDto> updateResource(UUID resourceIdOld, MultipartFile multipartFile, String description) {
+        Optional<ResourceIdDto> resourceIdDtoOptional = saveResource(multipartFile,description);
+
+        if(resourceIdDtoOptional.isEmpty())
+            return Optional.empty();
+
+        if(resourceIdOld!=null){
+            deleteResource(resourceIdOld);
+        }
+
+        return resourceIdDtoOptional;
     }
 
 
