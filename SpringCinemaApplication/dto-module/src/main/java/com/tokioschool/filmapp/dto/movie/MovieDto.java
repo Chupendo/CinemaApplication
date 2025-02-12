@@ -1,10 +1,7 @@
 package com.tokioschool.filmapp.dto.movie;
 
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,4 +26,7 @@ public class MovieDto {
     private ArtistDto managerDtoId;
 
     private List<ArtistDto> artistDtos;
+
+    @Size(min=36,max = 36)
+    private String resourceId;
 }

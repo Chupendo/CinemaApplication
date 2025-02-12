@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.mapper;
 
 import com.tokioschool.filmapp.converter.ArtistListToArtistDtoListConverter;
 import com.tokioschool.filmapp.converter.ArtistToArtistDtoConverter;
+import com.tokioschool.filmapp.converter.UUIDToStringConverter;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
 import org.modelmapper.ModelMapper;
@@ -23,7 +24,9 @@ public class MovieToMovieDtoMapper {
                 .addMappings(mapping -> mapping.using(new ArtistToArtistDtoConverter())
                         .map(Movie::getManager,MovieDto::setManagerDtoId))
                 .addMappings(mapping -> mapping.using(new ArtistListToArtistDtoListConverter())
-                        .map(Movie::getArtists,MovieDto::setArtistDtos));
+                        .map(Movie::getArtists,MovieDto::setArtistDtos))
+                .addMappings(mapping -> mapping.using(new UUIDToStringConverter())
+                        .map(Movie::getImage,MovieDto::setResourceId));
     }
 
 }
