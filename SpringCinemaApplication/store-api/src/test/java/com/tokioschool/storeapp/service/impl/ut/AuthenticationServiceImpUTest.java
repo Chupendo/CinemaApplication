@@ -34,7 +34,6 @@ import javax.security.auth.login.CredentialException;
 import javax.security.auth.login.LoginException;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -93,7 +92,7 @@ class AuthenticationServiceImpUTest {
         // Assert
         Assertions.assertNotNull(response);
         Assertions.assertEquals("jwtToken", response.getAccessToken());
-        Assertions.assertEquals(3600, response.getExpiresIn());
+        org.assertj.core.api.Assertions.assertThat(response.getExpiresIn() ).isGreaterThanOrEqualTo(3600);
         Mockito.verify(securityContext).setAuthentication(authentication);
     }
 

@@ -10,6 +10,7 @@ import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.redis.services.JwtBlacklistService;
+import com.tokioschool.store.facade.StoreFacade;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -42,12 +44,13 @@ import java.util.List;
         "application.jwt.expiration=PT1H"
 })
 @Import({FilmApiSecurityConfiguration.class, JwtConfiguration.class,}) // Importa la configuración de seguridad
-public class UserServiceAccessMethodUTest {
+public class UserStoreServiceAccessMethodUTest {
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper; // objeto de serizalizcion, includio en el context de WebMvcTest
 
+    @MockitoBean private StoreFacade storeFacade;
     @MockitoBean private UserService userService;
     @MockitoBean private JwtBlacklistService jwtBlacklistService; // Mock del servicio redis
 
@@ -62,7 +65,7 @@ public class UserServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .roles(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -80,23 +83,31 @@ public class UserServiceAccessMethodUTest {
         Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
                 .thenReturn(userDTO);
 
+        // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
+        MockMultipartFile userPart = new MockMultipartFile(
+                "userFormDto",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                userFormDTOJson.getBytes()
+        );
+
         MvcResult mvcResult = this.mockMvc.perform(
-                        MockMvcRequestBuilders.post("/film/api/users/register")
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(userFormDTOJson)
+                        MockMvcRequestBuilders.multipart("/film/api/users/register")
+                                .file(userPart)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
-        //UserDTO response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
+        //UserFormDTO response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserFormDTO.class);
 
         // opcion 2: Lee la respeusta como un mapa de valores, cada atributo del objeto de la respuesta es añadio elemento de un mapa
-        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserDTO>() {});
+        UserFormDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
 
         Assertions.assertThat(resutlUserDto).isNotNull()
-                .returns(userFormDTO.getName(),UserDTO::getName)
-                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
-                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
+                .returns(userFormDTO.getName(),UserFormDTO::getName)
+                .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
+                .returns(userFormDTO.getRoles().getFirst(), userFormDTO1 -> userFormDTO1.getRoles().getFirst());
     }
 
     @Test
@@ -110,7 +121,7 @@ public class UserServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .roles(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -127,21 +138,27 @@ public class UserServiceAccessMethodUTest {
         Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
                 .thenReturn(userDTO);
 
+        // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
+        MockMultipartFile userPart = new MockMultipartFile(
+                "userFormDto",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                userFormDTOJson.getBytes()
+        );
 
         MvcResult mvcResult = this.mockMvc.perform(
-                        MockMvcRequestBuilders.post("/film/api/users/register")
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(userFormDTOJson)
+                        MockMvcRequestBuilders.multipart("/film/api/users/register")
+                                .file(userPart)
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
-        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserDTO>() {});
+        UserFormDTO resultUserFormDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
 
-        Assertions.assertThat(resutlUserDto).isNotNull()
-                .returns(userFormDTO.getName(),UserDTO::getName)
-                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
-                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
+        Assertions.assertThat(resultUserFormDto).isNotNull()
+                .returns(userFormDTO.getName(),UserFormDTO::getName)
+                .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
+                .returns(userFormDTO.getRoles().getFirst(), userDTO1 -> userDTO1.getRoles().getFirst());
     }
 
     @Test
@@ -155,7 +172,7 @@ public class UserServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .roles(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -169,24 +186,32 @@ public class UserServiceAccessMethodUTest {
 
         // Convert UserFormDTO to JSON
         String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);
+
         Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
                 .thenReturn(userDTO);
 
+        // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
+        MockMultipartFile userPart = new MockMultipartFile(
+                "userFormDto",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                userFormDTOJson.getBytes()
+        );
 
         MvcResult mvcResult = this.mockMvc.perform(
-                        MockMvcRequestBuilders.post("/film/api/users/register")
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(userFormDTOJson)
+                        MockMvcRequestBuilders.multipart("/film/api/users/register")
+                                .file(userPart)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
-        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserDTO>() {});
+        UserFormDTO resultUserFormDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
 
-        Assertions.assertThat(resutlUserDto).isNotNull()
-                .returns(userFormDTO.getName(),UserDTO::getName)
-                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
-                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
+        Assertions.assertThat(resultUserFormDto).isNotNull()
+                .returns(userFormDTO.getName(),UserFormDTO::getName)
+                .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
+                .returns(userFormDTO.getRoles().getFirst(), userFormDTO1 -> userFormDTO1.getRoles().getFirst());
     }
 
     @Test
@@ -202,7 +227,7 @@ public class UserServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .roles(List.of("user")).build();
 
         UserDTO userDTO = UserDTO.builder()
                 .id("00001ABC")
@@ -220,20 +245,40 @@ public class UserServiceAccessMethodUTest {
         Mockito.when(userService.updateUser(userFormDTO.getId(),userFormDTO))
                 .thenReturn(userDTO);
 
+        // Mock file
+        MockMultipartFile file = new MockMultipartFile(
+                "file",                      // Part name
+                "test-file.txt",             // Original file name
+                MediaType.TEXT_PLAIN_VALUE,  // Content type
+                "Sample file content".getBytes() // File content
+        );
+
+        // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
+        MockMultipartFile userPart = new MockMultipartFile(
+                "userFormDto",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                userFormDTOJson.getBytes()
+        );
+
         MvcResult mvcResult = this.mockMvc.perform(
-                        MockMvcRequestBuilders.put("/film/api/users/update/{userId}",userFormDTO.getId())
-                                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                                .content(userFormDTOJson)
-                ).andExpect(MockMvcResultMatchers.status().isCreated())
+                        MockMvcRequestBuilders.multipart("/film/api/users/update/{userId}",userFormDTO.getId())
+                                .file(file)
+                                .file(userPart)
+                                .with(request -> {
+                                    request.setMethod("PUT"); // Override to PUT since multipart defaults to POST
+                                    return request;
+                                }))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
         // opcion 1: Lee la respeusta directamente como un objeto
-        UserDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserDTO.class);
+        UserFormDTO resultUserFormDTO = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserFormDTO.class);
 
-        Assertions.assertThat(resutlUserDto).isNotNull()
-                .returns(userFormDTO.getName(),UserDTO::getName)
-                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
-                .returns(userFormDTO.getRole(),userDTO1 -> userDTO1.getRoles().getFirst().getName());
+        Assertions.assertThat(resultUserFormDTO).isNotNull()
+                .returns(userFormDTO.getName(),UserFormDTO::getName)
+                .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
+                .returns(userFormDTO.getRoles().getFirst(), userFormDTO1 -> userFormDTO1.getRoles().getFirst());
     }
 
     @Test
@@ -248,11 +293,10 @@ public class UserServiceAccessMethodUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role("user").build();
+                .roles(List.of("user")).build();
 
         // Convert UserFormDTO to JSON
         String userFormDTOJson = objectMapper.writeValueAsString(userFormDTO);
-
 
         this.mockMvc.perform(
                         MockMvcRequestBuilders.put("/film/api/users/update/{userId}",userFormDTO.getId())

@@ -44,6 +44,7 @@ class UserDaoUTest {
                     .lastLoginAt(LocalDateTime.now())
                     .password("123")
                     .passwordBis("123")
+                    .image(null)
                     .build();
         }).toList();
 

@@ -4,10 +4,13 @@ import com.tokioschool.filmapp.tsId.TSId;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -50,10 +53,15 @@ public class User {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    @Column(name="resource_id",unique = true)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID image;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="users_roles",
             joinColumns =  {@JoinColumn(name="user_id")},
             inverseJoinColumns = { @JoinColumn(name="role_id")})
+
     private Set<Role> roles;
 
 }

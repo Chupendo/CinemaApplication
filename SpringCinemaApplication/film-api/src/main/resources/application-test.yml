@@ -1,26 +1,23 @@
 
 spring:
   application:
-    name: liquibase-module
-  # Liguibase
+    name: film-api
+# Liguibase
   liquibase:
-    enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.xml
-    contexts: dev
-    label-filter: dev
-  # maria db docker
+    enabled: false
+  # maria db d
   datasource:
-    url: jdbc:mariadb://localhost:3307/film?createDatabaseIfNotExist=true
-    username: root
-    password: dbpw
-    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:h2:mem:test_mail_db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MariaDBDialect
+        dialect: org.hibernate.dialect.H2Dialect
     #validate, none, update, create-drop
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     # Debug queries
     show-sql: true
   # redis connection
@@ -41,16 +38,18 @@ application:
     expiration: PT1H
   # Store
   store:
-    base-url: http://localhost:9090
+    base-url: http://localhost:9091
     # User in memory
     login:
       users:
         - username: consumer
           # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
-          password: "$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
+          # "password" in base64:: cGFzc3dvcmQ=
+          password: cGFzc3dvcmQ=
         - username: producer
           # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
-          password: "$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
+          # "password" in base64:: cGFzc3dvcmQ=
+          password: cGFzc3dvcmQ=
 
 # log console
 logging:

@@ -8,7 +8,7 @@ spring:
       port: 6379
 
 server:
-  port: 9091
+  port: 9092
 
 # Actuator:
 # Activar endpoints predefinidos: management.endpoints.web.exposure.include= .....

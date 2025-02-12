@@ -22,4 +22,5 @@ public class UserDTO {
     private LocalDateTime lastLogin;
     private LocalDateTime created;
     private List<RoleDTO> roles;
+    private String resourceId;
 }

@@ -2,8 +2,11 @@ package com.tokioschool.filmapp.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -27,6 +30,10 @@ public class Movie {
     @OneToOne
     //@PrimaryKeyJoinColumn
     private Artist manager;
+
+    @Column(name="resource_id",unique = true)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID image;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="movies_artists",

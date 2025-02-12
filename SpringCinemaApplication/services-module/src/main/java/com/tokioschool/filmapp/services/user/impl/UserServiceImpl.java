@@ -24,10 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -129,8 +126,12 @@ public class UserServiceImpl implements UserService {
         user.setBirthDate(userFormDTO.getBirthDate());
 
         // roles
-        user.setRoles(getRolesByName(userFormDTO.getRole()));
+        user.setRoles(getRolesByName(userFormDTO.getRoles().toArray(new String[0]) ) );
 
+        // images
+        if(userFormDTO.getImage() != null){
+            user.setImage(UUID.fromString(userFormDTO.getImage()));
+        }
         user = userDao.save(user);
 
         return modelMapper.map(user,UserDTO.class);
@@ -166,6 +167,7 @@ public class UserServiceImpl implements UserService {
      * @param roleNames
      * @return
      */
+
     private Set<Role> getRolesByName(String... roleNames){
         Set<Role> roles = new HashSet<>();
 
