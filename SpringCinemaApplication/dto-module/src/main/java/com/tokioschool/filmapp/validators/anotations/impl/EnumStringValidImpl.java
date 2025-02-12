@@ -1,14 +1,14 @@
 package com.tokioschool.filmapp.validators.anotations.impl;
 
+import com.tokioschool.filmapp.validators.anotations.EnumListValid;
 import com.tokioschool.filmapp.validators.anotations.EnumValid;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class EnumValidImpl implements ConstraintValidator<EnumValid,List<String>> {
+public class EnumStringValidImpl implements ConstraintValidator<EnumValid,String> {
     private List<String> entries;
     private boolean required;
 
@@ -26,24 +26,24 @@ public class EnumValidImpl implements ConstraintValidator<EnumValid,List<String>
     }
 
     @Override
-    public boolean isValid(List<String> sources, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(String source, ConstraintValidatorContext constraintValidatorContext) {
         // Validation
-        final List<String> trimmedList = sources.stream()
-                .map(StringUtils::stripToNull)
-                .map(String::toUpperCase)
-                .toList();
+        String trimmed = Optional.ofNullable(source)
+                .map(StringUtils::stripToNull)    // Trim and convert blanks to null
+                .filter(Objects::nonNull)         // Filter out null values
+                .map(String::toUpperCase)         // Convert to uppercase
+                .orElseGet(() -> null);    // Collect as List
 
-        if(!this.required){ // no valida, por lo que es true
-            return true;
-        }
 
         // comprueba que el valor este dentro del enum a validar
-        int count = 0;
-        for (String strValue : trimmedList) {
-            if(this.entries.contains(strValue)){
-                count++;
-            }
+        boolean isValid = this.entries.contains(trimmed);
+
+        if( this.required ){
+            // es valido
+            return isValid;
+        }else {
+            // no es valido
+            return trimmed == null || isValid;
         }
-        return count == sources.size();
     }
 }

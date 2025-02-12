@@ -2,7 +2,6 @@ package com.tokioschool.filmapp.validators.anotations.impl;
 
 import com.tokioschool.filmapp.enums.RoleEnum;
 import com.tokioschool.filmapp.validators.anotations.EnumListValid;
-import com.tokioschool.filmapp.validators.anotations.EnumValid;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
-class EnumValidImplUTest {
+class EnumListValidImplUTest {
 
-    private EnumStringValidImpl validator;
+    private EnumListStringValidImpl validator;
 
     @BeforeEach
     void init(){
-        validator = new EnumStringValidImpl();
-        EnumValid annotation = new EnumValid() {
+        validator = new EnumListStringValidImpl();
+        EnumListValid annotation = new EnumListValid() {
 
             @Override
             public Class<? extends Annotation> annotationType() {
@@ -62,13 +61,13 @@ class EnumValidImplUTest {
     @Test
     void givenRoleNameValid_whenValidated_thenReturnTrue() {
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        assertTrue(validator.isValid("USER", context));
+        assertTrue(validator.isValid(List.of("USER"), context));
     }
 
     @Test
     void givenRoleNameInvalid_whenValidated_thenReturnFalse() {
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        assertFalse(validator.isValid("YELLOW", context));
+        assertFalse(validator.isValid(List.of("YELLOW"), context));
     }
 
     @Test
@@ -79,7 +78,7 @@ class EnumValidImplUTest {
     @Test
     void givenRoleNameNull_whenValidatedDontRequired_thenReturnTrue() {
         ConstraintValidatorContext context = Mockito.mock(ConstraintValidatorContext.class);
-        validator.initialize(new EnumValid() {
+        validator.initialize(new EnumListValid() {
             @Override
             public Class<? extends Enum<?>> target() {
                 return RoleEnum.class;
@@ -107,7 +106,7 @@ class EnumValidImplUTest {
 
             @Override
             public Class<? extends Annotation> annotationType() {
-                return EnumValid.class;
+                return EnumListValid.class;
             }
         });
         assertTrue(validator.isValid(null, context));

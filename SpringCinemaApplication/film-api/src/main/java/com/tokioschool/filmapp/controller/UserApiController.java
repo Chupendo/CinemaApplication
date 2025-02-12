@@ -82,7 +82,7 @@ public class UserApiController {
     @PostMapping(value = {"/register","/register/"},consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     //@PreAuthorize(value = "hasRole('ADMIN')")
     public ResponseEntity<UserFormDTO> registerUserHandler(@RequestPart(value = "image", required = false) MultipartFile multipartFile, // campo del from
-                                                       @Valid @RequestPart(value  = "userFromDto") UserFormDTO userFormDTO, BindingResult bindingResult, // del modelo se coge el objeto que se llame userDto
+                                                       @Valid @RequestPart(value  = "userFormDto") UserFormDTO userFormDTO, BindingResult bindingResult, // del modelo se coge el objeto que se llame userDto
                                                        @Valid @RequestPart(value  = "description" , required = false) String description
     ) throws ValidacionException, BadRequestException {
         if(bindingResult.hasErrors()){
@@ -113,7 +113,7 @@ public class UserApiController {
     @PreAuthorize(value = "isAuthenticated()")
     public ResponseEntity<UserFormDTO> updateUserHandler(@PathVariable(value = "id") String userId,
                                                      @RequestPart(value = "image", required = false) MultipartFile multipartFile, // campo del from
-                                                     @Valid @RequestPart(value  = "userFromDto") UserFormDTO userFormDTO, BindingResult bindingResult) throws BadRequestException {
+                                                     @Valid @RequestPart(value  = "userFormDto") UserFormDTO userFormDTO, BindingResult bindingResult) throws BadRequestException {
         if(bindingResult.hasErrors()){
             Map<String, String> errores = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(
@@ -152,7 +152,7 @@ public class UserApiController {
                     .id(userDTO.getId())
                     .name(userDTO.getName())
                     .surname(userDTO.getSurname())
-                    .role(userDTO.getRoles().stream().map(RoleDTO::getName).toList())
+                    .roles(userDTO.getRoles().stream().map(RoleDTO::getName).toList())
                     .birthDate(userDTO.getBirthDate())
                     .email(userDTO.getEmail())
                     .created(userDTO.getCreated())

@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         user.setBirthDate(userFormDTO.getBirthDate());
 
         // roles
-        user.setRoles(getRolesByName(userFormDTO.getRole().toArray(new String[0]) ) );
+        user.setRoles(getRolesByName(userFormDTO.getRoles().toArray(new String[0]) ) );
 
         // images
         if(userFormDTO.getImage() != null){

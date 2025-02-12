@@ -151,7 +151,7 @@ class UserServiceImpUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role(List.of("user")).build();
+                .roles(List.of("user")).build();
         Role role = Role.builder().id(1L).name("user")
                 .authorities(Set.of(
                                 Authority.builder().id(1L).name("read").build()
@@ -182,7 +182,7 @@ class UserServiceImpUTest {
                 .returns(userFormDTO.getName(),UserDTO::getName)
                 .returns(userFormDTO.getSurname(),UserDTO::getSurname)
                 .returns(userFormDTO.getUsername(),UserDTO::getUsername)
-                .returns(userFormDTO.getRole(),userDto -> userDto.getRoles().getFirst().getName());
+                .returns(userFormDTO.getRoles().getFirst(), userDto -> userDto.getRoles().getFirst().getName());
     }
 
     @Test
@@ -207,7 +207,7 @@ class UserServiceImpUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role(List.of("user")).build();
+                .roles(List.of("user")).build();
 
         // Act
         AuthenticationException exception = assertThrows(AuthenticationException.class, () ->
@@ -240,7 +240,7 @@ class UserServiceImpUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role(List.of("user")).build();
+                .roles(List.of("user")).build();
         Role role = Role.builder().id(1L).name("USER")
                 .authorities(Set.of(
                                 Authority.builder().id(1L).name("read").build()
@@ -292,7 +292,7 @@ class UserServiceImpUTest {
                 .username("johndoe")
                 .email("johndoe@example.com")
                 .birthDate(LocalDate.now().minusYears(30))
-                .role(List.of("ADMIN")).build();
+                .roles(List.of("ADMIN")).build();
 
         // users with distinct id
         Role role = Role.builder().id(1L).name("ADMIN")

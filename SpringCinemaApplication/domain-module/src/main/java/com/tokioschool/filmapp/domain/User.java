@@ -53,7 +53,7 @@ public class User {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    @Column(name="resource_id", nullable = false)
+    @Column(name="resource_id",unique = true)
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID image;
 

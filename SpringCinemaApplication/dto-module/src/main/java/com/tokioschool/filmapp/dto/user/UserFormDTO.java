@@ -1,7 +1,7 @@
 package com.tokioschool.filmapp.dto.user;
 
 import com.tokioschool.filmapp.enums.RoleEnum;
-import com.tokioschool.filmapp.validators.anotations.EnumValid;
+import com.tokioschool.filmapp.validators.anotations.EnumListValid;
 import com.tokioschool.filmapp.validators.anotations.PasswordBis;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -41,8 +41,8 @@ public class UserFormDTO {
     @Past
     private LocalDate birthDate;
 
-    @EnumValid(target = RoleEnum.class,required = true,message = "Role don't allow")
-    private List<String> role;
+    @EnumListValid(target = RoleEnum.class,required = true,message = "Role don't allow")
+    private List<String> roles;
 
     private boolean updatePassword = false;
     private LocalDateTime created;
