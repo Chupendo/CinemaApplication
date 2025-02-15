@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.services.artist.impl;
 
+import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +34,14 @@ public class ArtistServiceImpl implements ArtistService {
         Artist artist = Artist.builder().build();
         
         return populationCreateOrEditArtist(artist,artistDto);
+    }
+
+    @Override
+    public ArtistDto findById(Long artistId) throws NotFoundException {
+        return Optional.ofNullable(artistId)
+                .map(artistDao::findById)
+                .map(artist -> modelMapper.map(artist,ArtistDto.class))
+                .orElseThrow(()->new NotFoundException("Artist with id: %d not found".formatted(artistId)));
     }
 
     protected ArtistDto populationCreateOrEditArtist(Artist artist, ArtistDto artistDto) throws IllegalArgumentException {

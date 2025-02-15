@@ -23,7 +23,7 @@ public class MovieDto {
     @Digits(integer = 4,fraction = 0)
     private Integer releaseYear;
 
-    private ArtistDto managerDtoId;
+    private ArtistDto managerDto;
 
     private List<ArtistDto> artistDtos;
 

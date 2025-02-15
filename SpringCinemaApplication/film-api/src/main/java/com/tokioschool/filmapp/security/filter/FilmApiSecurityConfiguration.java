@@ -48,8 +48,7 @@ public class FilmApiSecurityConfiguration {
                         )
                 ))
                 // login and logout
-                .formLogin(httpSecurityFormLoginConfigurer ->
-                        httpSecurityFormLoginConfigurer.loginPage("/film/api/auth/login").permitAll())
+                .formLogin(AbstractHttpConfigurer::disable)
                 //.logout(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer.logoutUrl("/film/api/auth/logout").permitAll())
                 // filters
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

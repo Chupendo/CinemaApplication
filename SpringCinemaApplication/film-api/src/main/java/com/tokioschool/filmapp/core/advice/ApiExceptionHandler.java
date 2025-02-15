@@ -5,6 +5,7 @@ import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.core.exception.ValidacionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice(annotations = RestController.class)
+@Slf4j
 public class ApiExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -101,6 +103,7 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public Map<String, String> handlerInternalServerError(Exception ex, HttpServletRequest request) {
+        log.error("Error %s".formatted(ex.getMessage()),ex);
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 

@@ -1,13 +1,18 @@
 package com.tokioschool.filmapp.services.movie.impl;
 
 import com.tokioschool.core.exception.NotFoundException;
+import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
+import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
+import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.RangeReleaseYear;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import com.tokioschool.filmapp.repositories.MovieDao;
+import com.tokioschool.filmapp.services.artist.ArtistService;
 import com.tokioschool.filmapp.services.movie.MovieService;
+import com.tokioschool.helpers.UUIDHelper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -15,9 +20,11 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 /**
@@ -32,6 +39,8 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieDao movieDao;
     private final ModelMapper modelMapper;
+
+    private final ArtistService artistService;
 
     /**
      * Search movie in the system apply a filter by default, also if page size is 0,
@@ -112,6 +121,19 @@ public class MovieServiceImpl implements MovieService {
         return movieDao.findById(movieId)
                 .map(movie -> modelMapper.map(movie, MovieDto.class))
                 .orElseThrow(() -> new NotFoundException("The movie is not found in the system"));
+    }
+
+    @Override
+    @Transactional(rollbackFor = IllegalArgumentException.class)
+    public MovieDto createMovie(MovieDto movieDto) throws InvalidDataAccessApiUsageException {
+        Movie movie = createOrUpdateMovie(new Movie(),movieDto);
+        return modelMapper.map(movie, MovieDto.class);
+    }
+
+    @Override
+    public MovieDto updateMovie(Long movieId, MovieDto movieDto) throws InvalidDataAccessApiUsageException, NotFoundException {
+        // TODO
+        return null;
     }
 
     /**
@@ -212,5 +234,56 @@ public class MovieServiceImpl implements MovieService {
             }
         }
 
+    }
+
+    /**
+     * Create or update a movie in the system
+     *
+     * @param movie movie to update, if is empty then create a new movie, otherwise update the movie
+     * @param movieDto data to update or create the movie
+     * @return the movie updated or created
+     *
+     * @throws NotFoundException if the data of movie is null
+     */
+
+    @Transactional(rollbackFor = NotFoundException.class)
+    protected Movie createOrUpdateMovie(Movie movie, MovieDto movieDto) throws NotFoundException{
+        if(movieDto == null){
+            throw new IllegalArgumentException("The data of movie is null");
+        }
+        movie.setTitle(movieDto.getTitle());
+
+        movie.setManager(getArtistById(movieDto.getManagerDto().getId()));
+        movie.setArtists(movieDto.getArtistDtos().stream()
+                .map(artistDto -> getArtistById(artistDto.getId()))
+                .toList()
+        );
+        movie.setReleaseYear(movieDto.getReleaseYear());
+
+        final Optional<UUID> maybeUUID = UUIDHelper.mapStringToUUID( movieDto.getResourceId() );
+        maybeUUID.ifPresent(movie::setImage);
+
+        return movieDao.save(movie);
+    }
+
+    /**
+     * Find the Artist given you id
+     *
+     * @see {@link ArtistService::findById(Long) }
+     *
+     * @param artistId identification of artist
+     * @return the artis with the identification given
+     * @throws NotFoundException if the artis with id given is null
+     */
+    @Transactional(readOnly = true)
+    protected Artist getArtistById(Long artistId) throws NotFoundException {
+        final ArtistDto artistDto = artistService.findById(artistId);
+        final Artist artist = Artist.builder()
+                .id(artistDto.getId())
+                .name(artistDto.getName())
+                .surname(artistDto.getSurname())
+                .typeArtist(TYPE_ARTIST.valueOf(artistDto.getTypeArtist()))
+                .build();
+        return artist;
     }
 }
