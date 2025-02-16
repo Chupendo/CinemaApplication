@@ -99,7 +99,7 @@ public class ArtistApiController {
                     )
             }
     )
-    @GetMapping(value={"/find-all"},consumes = {MediaType.APPLICATION_JSON_VALUE},produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value={"/find-all"},produces = {MediaType.APPLICATION_JSON_VALUE})
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ArtistDto>> findAllArtists(){
 
