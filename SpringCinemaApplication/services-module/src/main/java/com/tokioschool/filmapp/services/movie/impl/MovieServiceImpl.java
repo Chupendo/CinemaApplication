@@ -20,11 +20,13 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -123,6 +125,13 @@ public class MovieServiceImpl implements MovieService {
                 .orElseThrow(() -> new NotFoundException("The movie is not found in the system"));
     }
 
+    /**
+     * Created a new Movie in the system
+     * @param movieDto data to persists in bbdd
+     * @return movie register in the system
+     *
+     * @throws InvalidDataAccessApiUsageException error to persist the data
+     */
     @Override
     @Transactional(rollbackFor = IllegalArgumentException.class)
     public MovieDto createMovie(MovieDto movieDto) throws InvalidDataAccessApiUsageException {
@@ -130,10 +139,21 @@ public class MovieServiceImpl implements MovieService {
         return modelMapper.map(movie, MovieDto.class);
     }
 
+    /**
+     * Updated movie
+     * @param movieId identificaiton of movie to updated
+     * @param movieDto data to updated
+     * @return movie with updated information
+     *
+     * @throws InvalidDataAccessApiUsageException error to persist the data
+     * @throws NotFoundException if the movie to updated is don't found in the system
+     */
     @Override
     public MovieDto updateMovie(Long movieId, MovieDto movieDto) throws InvalidDataAccessApiUsageException, NotFoundException {
-        // TODO
-        return null;
+        Movie movie = movieDao.findById(movieId).orElseThrow(() -> new NotFoundException("Movie with %d don't found. The image maybe be updated".formatted(movieId)));
+        movieDao.flush();
+        movie = createOrUpdateMovie( movie,movieDto);
+        return modelMapper.map(movie, MovieDto.class);
     }
 
     /**
@@ -246,7 +266,7 @@ public class MovieServiceImpl implements MovieService {
      * @throws NotFoundException if the data of movie is null
      */
 
-    @Transactional(rollbackFor = NotFoundException.class)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = NotFoundException.class)
     protected Movie createOrUpdateMovie(Movie movie, MovieDto movieDto) throws NotFoundException{
         if(movieDto == null){
             throw new IllegalArgumentException("The data of movie is null");
@@ -254,16 +274,19 @@ public class MovieServiceImpl implements MovieService {
         movie.setTitle(movieDto.getTitle());
 
         movie.setManager(getArtistById(movieDto.getManagerDto().getId()));
-        movie.setArtists(movieDto.getArtistDtos().stream()
+
+        // collection mutable
+        List<Artist> artists = movieDto.getArtistDtos().stream()
                 .map(artistDto -> getArtistById(artistDto.getId()))
-                .toList()
-        );
+                .collect(Collectors.toList());
+        movie.setArtists(artists);
+
         movie.setReleaseYear(movieDto.getReleaseYear());
 
         final Optional<UUID> maybeUUID = UUIDHelper.mapStringToUUID( movieDto.getResourceId() );
         maybeUUID.ifPresent(movie::setImage);
 
-        return movieDao.save(movie);
+        return movieDao.saveAndFlush(movie);
     }
 
     /**

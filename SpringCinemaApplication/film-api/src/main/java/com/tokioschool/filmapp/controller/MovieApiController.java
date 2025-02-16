@@ -193,9 +193,8 @@ public class MovieApiController {
     public ResponseEntity<MovieDto> createMovieHandler(
             @RequestPart(value = "image", required = false) MultipartFile multipartFile,
             @RequestPart(value = "description", required = false) String description,
-            @Valid @RequestPart(value = "movieFormDto") MovieDto movieDto,
+            @Valid @RequestPart(value = "movieFormDto") MovieDto movieDto, BindingResult bindingResult) {
 
-            BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             Map<String, String> errores = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(
@@ -205,7 +204,7 @@ public class MovieApiController {
             throw new ValidacionException("Errores de validación", errores);
         }
 
-        if( !multipartFile.isEmpty() ){
+        if( multipartFile != null && !multipartFile.isEmpty() ){
             Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(multipartFile,description);
             resourceIdDtoOptional.ifPresent(resourceIdDto -> {
                 UUIDHelper.mapStringToUUID(  movieDto.getResourceId() ).ifPresent(storeFacade::deleteResource);
@@ -213,5 +212,59 @@ public class MovieApiController {
             });
         }
         return ResponseEntity.ok(movieService.createMovie(movieDto));
+    }
+
+    @SecurityRequirement(name = "auth-openapi")
+    @Operation(
+            summary = "Update an existing movie",
+            description = "This endpoint allows updating a movie with an image, description, and general data. Requires authentication.",
+            parameters = {
+                    @Parameter(
+                            name = "movieId",
+                            description = "Identification movie in the system (default: 0)",
+                            required = true,
+                            example = "1"
+                    )
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE, schema = @Schema(implementation = MovieFormRequestSchema.class, contentMediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+                    )
+            ),
+            method = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Movie updated successfully", content = @Content(schema = @Schema(implementation = MovieDto.class))),
+            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta o datos inválidos"),
+            @ApiResponse(responseCode = "401", description = "No autorizado - se requiere autenticación"),
+            @ApiResponse(responseCode = "415", description = "Tipo de contenido no soportado (verificar multipart/form-data)"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping(value="/updated/{movieId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MovieDto> updatedMovieHandler(
+            @PathVariable(value="movieId") Long movieId,
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile,
+            @RequestPart(value = "description", required = false) String description,
+            @Valid @RequestPart(value = "movieFormDto") MovieDto movieDto, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()){
+            Map<String, String> errores = bindingResult.getFieldErrors().stream()
+                    .collect(Collectors.toMap(
+                            FieldError::getField,
+                            FieldError::getDefaultMessage
+                    ));
+            throw new ValidacionException("Errores de validación", errores);
+        }
+
+        if( multipartFile != null && !multipartFile.isEmpty() ){
+            Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(multipartFile,description);
+            resourceIdDtoOptional.ifPresent(resourceIdDto -> {
+                UUIDHelper.mapStringToUUID(  movieDto.getResourceId() ).ifPresent(storeFacade::deleteResource);
+                movieDto.setResourceId( resourceIdDto.resourceId().toString() );
+            });
+        }
+
+        return ResponseEntity.ok(movieService.updateMovie(movieId,movieDto));
     }
 }
