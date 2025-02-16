@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.services.movie.impl;
 
 import com.tokioschool.core.exception.NotFoundException;
+import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -92,7 +91,7 @@ public class MovieServiceImpl implements MovieService {
             List<MovieDto> items;
 
             if(searchMovieRecord.pageSize() ==  0){
-                 items = getMovieDtoPageDTO(movies, star, movies.size());
+                items = getMovieDtoPageDTO(movies, star, movies.size());
             }else{
                 int end = Math.min(star + searchMovieRecord.pageSize(),movies.size());
                 items = getMovieDtoPageDTO(movies, star, end);
@@ -133,8 +132,13 @@ public class MovieServiceImpl implements MovieService {
      * @throws InvalidDataAccessApiUsageException error to persist the data
      */
     @Override
-    @Transactional(rollbackFor = IllegalArgumentException.class)
+    @Transactional(rollbackFor = {IllegalArgumentException.class,ValidacionException.class})
     public MovieDto createMovie(MovieDto movieDto) throws InvalidDataAccessApiUsageException {
+        if( movieDto == null || StringUtils.stripToNull( movieDto.getResourceId() ) == null){
+            Map<String,String> errors = Collections.singletonMap("image","Resource in movie is required");
+            throw new ValidacionException("movie don't create",errors);
+        }
+
         Movie movie = createOrUpdateMovie(new Movie(),movieDto);
         return modelMapper.map(movie, MovieDto.class);
     }
@@ -149,6 +153,7 @@ public class MovieServiceImpl implements MovieService {
      * @throws NotFoundException if the movie to updated is don't found in the system
      */
     @Override
+    @Transactional(rollbackFor = {IllegalArgumentException.class,ValidacionException.class})
     public MovieDto updateMovie(Long movieId, MovieDto movieDto) throws InvalidDataAccessApiUsageException, NotFoundException {
         Movie movie = movieDao.findById(movieId).orElseThrow(() -> new NotFoundException("Movie with %d don't found. The image maybe be updated".formatted(movieId)));
         movieDao.flush();
@@ -273,12 +278,23 @@ public class MovieServiceImpl implements MovieService {
         }
         movie.setTitle(movieDto.getTitle());
 
-        movie.setManager(getArtistById(movieDto.getManagerDto().getId()));
+        // get manager of system more validation
+        Artist manger = Optional.of(movieDto.getManagerDto() )
+                .map(ArtistDto::getId)
+                .map(artisId -> getArtistById(artisId))
+                .filter(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR))
+                .orElseThrow(() -> new NotFoundException("The manger is strong"));
+        movie.setManager( manger );
 
-        // collection mutable
+        // collection mutable, get list of artists
         List<Artist> artists = movieDto.getArtistDtos().stream()
                 .map(artistDto -> getArtistById(artistDto.getId()))
                 .collect(Collectors.toList());
+
+        // validation
+        if ( artists.stream().anyMatch(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR)) ){
+            throw new NotFoundException("The artis list is strong");
+        }
         movie.setArtists(artists);
 
         movie.setReleaseYear(movieDto.getReleaseYear());

@@ -7,7 +7,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <!-- ChangeSet to create the USER table -->
-    <changeSet id="3" author="andres.rpenuela" context="dev">
+    <changeSet id="roles-create-table" author="andres.rpenuela" context="dev">
         <createTable tableName="roles">
             <column name="ID" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
@@ -24,7 +24,7 @@
         </comment>
     </changeSet>
 
-    <changeSet id="4" author="andres.rpenuela" context="dev">
+    <changeSet id="roles-insert-data" author="andres.rpenuela" context="dev">
         <insert tableName="roles">
             <column name="ID" value="1" />
             <column name="NAME" value="USER" />
