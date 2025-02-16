@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import javax.security.auth.login.LoginException;
 import java.util.Map;
@@ -97,6 +98,12 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
     public Map<String, String> handlerBadRequestExceptionError(BadRequestException ex, HttpServletRequest request) {
+        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public Map<String, String> handlerBadRequestExceptionError(MissingServletRequestPartException ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 

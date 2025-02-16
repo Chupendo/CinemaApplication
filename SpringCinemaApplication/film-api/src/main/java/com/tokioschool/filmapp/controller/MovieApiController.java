@@ -32,6 +32,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -191,26 +192,32 @@ public class MovieApiController {
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MovieDto> createMovieHandler(
-            @RequestPart(value = "image", required = false) MultipartFile multipartFile,
+            @RequestPart(value = "image") MultipartFile multipartFile,
             @RequestPart(value = "description", required = false) String description,
             @Valid @RequestPart(value = "movieFormDto") MovieDto movieDto, BindingResult bindingResult) {
 
+        if(multipartFile == null || multipartFile.isEmpty()){
+            Map<String, String> errors = Collections.singletonMap("image","Image is required");
+            throw new ValidacionException("Errores de validación", errors);
+        }
+
         if(bindingResult.hasErrors()){
-            Map<String, String> errores = bindingResult.getFieldErrors().stream()
+            Map<String, String> errors = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(
                             FieldError::getField,
                             FieldError::getDefaultMessage
                     ));
-            throw new ValidacionException("Errores de validación", errores);
+            throw new ValidacionException("Errores de validación", errors);
         }
 
-        if( multipartFile != null && !multipartFile.isEmpty() ){
-            Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(multipartFile,description);
-            resourceIdDtoOptional.ifPresent(resourceIdDto -> {
-                UUIDHelper.mapStringToUUID(  movieDto.getResourceId() ).ifPresent(storeFacade::deleteResource);
-                movieDto.setResourceId( resourceIdDto.resourceId().toString() );
-            });
-        }
+        // save image and setting to image
+        Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(multipartFile,description);
+        resourceIdDtoOptional.ifPresent(resourceIdDto -> {
+            UUIDHelper.mapStringToUUID(  movieDto.getResourceId() ).ifPresent(storeFacade::deleteResource);
+            movieDto.setResourceId( resourceIdDto.resourceId().toString() );
+        });
+
+        // create movie
         return ResponseEntity.ok(movieService.createMovie(movieDto));
     }
 
