@@ -248,7 +248,7 @@ public class MovieApiController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PutMapping(value="/updated/{movieId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MovieDto> updatedMovieHandler(
             @PathVariable(value="movieId") Long movieId,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile,
