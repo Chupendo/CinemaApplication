@@ -5,6 +5,7 @@ import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.core.exception.ValidacionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import javax.security.auth.login.LoginException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice(annotations = RestController.class)
+@Slf4j
 public class ApiExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -98,9 +101,16 @@ public class ApiExceptionHandler {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public Map<String, String> handlerBadRequestExceptionError(MissingServletRequestPartException ex, HttpServletRequest request) {
+        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public Map<String, String> handlerInternalServerError(Exception ex, HttpServletRequest request) {
+        log.error("Error %s".formatted(ex.getMessage()),ex);
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 

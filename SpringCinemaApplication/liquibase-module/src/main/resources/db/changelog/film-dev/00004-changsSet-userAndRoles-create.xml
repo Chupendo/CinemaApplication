@@ -36,7 +36,7 @@
                 constraintName="fk_user_roles_role_id" />
     </changeSet>
 
-    <changeSet id="4" author="andres.rpenuela" context="dev">
+    <changeSet id="user-with-roles-insert-data" author="andres.rpenuela" context="dev">
         <insert tableName="users_roles">
             <column name="USER_ID" value="0AVRSA787897A" />
             <column name="ROLE_ID" value="1" />

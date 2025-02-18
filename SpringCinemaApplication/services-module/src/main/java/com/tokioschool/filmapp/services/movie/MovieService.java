@@ -14,4 +14,7 @@ public interface MovieService {
     PageDTO<MovieDto> searchMovie(SearchMovieRecord searchMovieRecord);
 
     MovieDto getMovieById(Long movieId) throws InvalidDataAccessApiUsageException,NotFoundException;
+
+    MovieDto createMovie(MovieDto movieDto) throws InvalidDataAccessApiUsageException;
+    MovieDto updateMovie(Long movieId, MovieDto movieDto) throws InvalidDataAccessApiUsageException,NotFoundException;
 }

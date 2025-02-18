@@ -45,7 +45,7 @@
                 constraintName="fk_roles_authorities_authority_id" />
     </changeSet>
 
-    <changeSet id="5" author="andres.rpenuela" context="dev">
+    <changeSet id="roles-with-authorities-insert-data" author="andres.rpenuela" context="dev">
         <!-- privileges values -->
         <insert tableName="authorities">
             <column name="ID" value="1" />

@@ -11,7 +11,7 @@
         <comment>Add column image to users table</comment>
         <addColumn tableName="movies">
             <column name="RESOURCE_ID" type="VARCHAR(36)">
-                <constraints unique="true" />
+                <constraints unique="true" nullable="false"/>
             </column>
         </addColumn>
 

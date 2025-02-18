@@ -71,9 +71,9 @@
                                  deferrable="false"
                                  initiallyDeferred="false"/>
     </changeSet>
+    <!--
+        <changeSet id="insert-data-movies" author="andres.rpenuela" context="dev">
 
-    <changeSet id="insert-data-movies" author="andres.rpenuela" context="dev">
-        <!-- privileges values -->
         <insert tableName="movies">
             <column name="ID" value="1" />
             <column name="title" value="game of trons" />
@@ -86,4 +86,5 @@
             <column name="MOVIE_ID" value="1" />
         </insert>
     </changeSet>
+    -->
 </databaseChangeLog>

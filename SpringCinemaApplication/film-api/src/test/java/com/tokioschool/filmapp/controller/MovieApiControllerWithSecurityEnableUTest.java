@@ -9,6 +9,7 @@ import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.movie.MovieService;
 import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.redis.services.JwtBlacklistService;
+import com.tokioschool.store.facade.StoreFacade;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,8 @@ class MovieApiControllerWithSecurityEnableUTest {
     private ObjectMapper objectMapper;
     @MockitoBean
     private MovieService movieService;
+    @MockitoBean
+    private StoreFacade storeFacade;
 
     // dependencies required for be used in filters chains
     @MockitoBean    private UserService userService;

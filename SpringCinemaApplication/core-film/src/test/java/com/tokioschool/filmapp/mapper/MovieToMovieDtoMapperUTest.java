@@ -55,7 +55,7 @@ public class MovieToMovieDtoMapperUTest {
                 .returns(movie.getTitle(),MovieDto::getTitle)
                 .returns(movie.getReleaseYear(),MovieDto::getReleaseYear)
                 .returns(movie.getArtists().getFirst().getName(),movieDto1 -> movieDto1.getArtistDtos().getFirst().getName())
-                .returns(movie.getManager().getName(),movieDto1 -> movieDto1.getManagerDtoId().getName());
+                .returns(movie.getManager().getName(),movieDto1 -> movieDto1.getManagerDto().getName());
     }
 }
 

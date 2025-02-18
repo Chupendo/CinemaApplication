@@ -22,7 +22,7 @@ public class MovieToMovieDtoMapper {
     private void init(){
         this.modelMapper.typeMap(Movie.class, MovieDto.class)
                 .addMappings(mapping -> mapping.using(new ArtistToArtistDtoConverter())
-                        .map(Movie::getManager,MovieDto::setManagerDtoId))
+                        .map(Movie::getManager,MovieDto::setManagerDto))
                 .addMappings(mapping -> mapping.using(new ArtistListToArtistDtoListConverter())
                         .map(Movie::getArtists,MovieDto::setArtistDtos))
                 .addMappings(mapping -> mapping.using(new UUIDToStringConverter())

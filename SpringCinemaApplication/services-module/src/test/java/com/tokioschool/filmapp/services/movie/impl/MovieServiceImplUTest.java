@@ -4,11 +4,13 @@ import com.github.javafaker.Faker;
 import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
+import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import com.tokioschool.filmapp.repositories.MovieDao;
+import com.tokioschool.filmapp.services.artist.impl.ArtistServiceImpl;
 import com.tokioschool.filmapp.services.movie.MovieService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -24,6 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +36,9 @@ class MovieServiceImplUTest {
 
     @Mock
     private MovieDao movieDao;
+    @Mock
+    private ArtistServiceImpl artistService;
+
     @Spy
     private ModelMapper modelMapper;
 
@@ -255,5 +261,63 @@ class MovieServiceImplUTest {
 
         Assertions.assertThatThrownBy(()-> movieService.getMovieById(null))
                 .isInstanceOf(InvalidDataAccessApiUsageException.class);
+    }
+
+    @Test
+    @Order(9)
+    void givenValidMovieDto_whenCreateMovie_thenReturnMovieDto() {
+        MovieDto movieDto = new MovieDto();
+        movieDto.setTitle("Test Movie");
+        movieDto.setManagerDto(new ArtistDto(1L, "Manager", "Surname", "DIRECTOR"));
+        movieDto.setArtistDtos(List.of(new ArtistDto(2L, "Actor", "Surname", "ACTOR")));
+        movieDto.setReleaseYear(2020);
+        movieDto.setResourceId("123e4567-e89b-12d3-a456-426614174000");
+
+        Movie movie = new Movie();
+        movie.setId(1L);
+        movie.setTitle("Test Movie");
+        movie.setManager(new Artist(1L, "Manager", "Surname", TYPE_ARTIST.DIRECTOR));
+        movie.setArtists(List.of(new Artist(2L, "Actor", "Surname", TYPE_ARTIST.ACTOR)));
+        movie.setReleaseYear(2020);
+        movie.setImage(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
+
+        Mockito.when(movieDao.save(Mockito.any(Movie.class))).thenReturn(movie);
+        //Mockito.when(modelMapper.map(Mockito.any(Movie.class), Mockito.eq(MovieDto.class))).thenReturn(movieDto);
+        Mockito.when(artistService.findById(1L)).thenReturn(new ArtistDto(1L, "Manager", "Surname", "DIRECTOR"));
+        Mockito.when(artistService.findById(2L)).thenReturn(new ArtistDto(2L, "Actor", "Surname", "ACTOR"));
+
+        MovieDto result = movieService.createMovie(movieDto);
+
+        Assertions.assertThat(result).isNotNull()
+                .returns(movieDto.getTitle(), MovieDto::getTitle)
+                .returns(movieDto.getReleaseYear(), MovieDto::getReleaseYear);
+
+        Mockito.verify(modelMapper,Mockito.times(1))
+                .map(Mockito.any(Movie.class),Mockito.eq(MovieDto.class));
+    }
+
+    @Test
+    @Order(10)
+    void givenNullMovieDto_whenCreateMovie_thenThrowIllegalArgumentException() {
+        Assertions.assertThatThrownBy(() -> movieService.createMovie(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The data of movie is null");
+    }
+
+    @Test
+    @Order(11)
+    void givenMovieDtoWithInvalidArtistId_whenCreateMovie_thenThrowNotFoundException() {
+        MovieDto movieDto = new MovieDto();
+        movieDto.setTitle("Test Movie");
+        movieDto.setManagerDto(new ArtistDto(1L, "Manager", "Surname", "DIRECTOR"));
+        movieDto.setArtistDtos(List.of(new ArtistDto(999L, "Actor", "Surname", "ACTOR")));
+        movieDto.setReleaseYear(2020);
+        movieDto.setResourceId("123e4567-e89b-12d3-a456-426614174000");
+
+        Mockito.when(artistService.findById(Mockito.anyLong())).thenThrow(new NotFoundException("Artist not found"));
+
+        Assertions.assertThatThrownBy(() -> movieService.createMovie(movieDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Artist not found");
     }
 }
