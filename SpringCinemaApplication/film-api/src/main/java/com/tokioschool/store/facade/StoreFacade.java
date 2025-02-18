@@ -14,6 +14,8 @@ import java.util.UUID;
  */
 public interface StoreFacade {
 
+    Optional<ResourceIdDto> registerResource(MultipartFile multipartFile, String description);
+
     @PreAuthorize("isAuthenticated()")
     Optional<ResourceIdDto> saveResource(MultipartFile multipartFile, String description);
 
