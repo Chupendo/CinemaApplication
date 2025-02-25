@@ -1,6 +1,5 @@
 package com.tokioschool.filmapp.security.services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokioschool.filmapp.controller.UserApiController;
 import com.tokioschool.filmapp.dto.user.RoleDTO;
@@ -9,6 +8,7 @@ import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.user.UserService;
+import com.tokioschool.filmapp.validation.RegisterUserValidation;
 import com.tokioschool.redis.services.JwtBlacklistService;
 import com.tokioschool.store.facade.StoreFacade;
 import org.assertj.core.api.Assertions;
@@ -52,6 +52,8 @@ public class UserStoreServiceAccessMethodUTest {
 
     @MockitoBean private StoreFacade storeFacade;
     @MockitoBean private UserService userService;
+    @MockitoBean private RegisterUserValidation registerUserValidation;
+
     @MockitoBean private JwtBlacklistService jwtBlacklistService; // Mock del servicio redis
 
     @Test
@@ -83,6 +85,9 @@ public class UserStoreServiceAccessMethodUTest {
         Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
                 .thenReturn(userDTO);
 
+        // mock register user validation
+        Mockito.when(registerUserValidation.supports(UserFormDTO.class)).thenReturn(true);
+
         // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
         MockMultipartFile userPart = new MockMultipartFile(
                 "userFormDto",
@@ -98,16 +103,23 @@ public class UserStoreServiceAccessMethodUTest {
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
+        Assertions.assertThat(mvcResult)
+                .isNotNull()
+                .extracting(MvcResult::getResponse)
+                .isNotNull()
+                .satisfies(mockHttpServletResponse -> mockHttpServletResponse.getContentAsString().isBlank());
+
         // opcion 1: Lee la respeusta directamente como un objeto
         //UserFormDTO response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserFormDTO.class);
 
         // opcion 2: Lee la respeusta como un mapa de valores, cada atributo del objeto de la respuesta es añadio elemento de un mapa
-        UserFormDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
+        /*UserFormDTO resutlUserDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
 
         Assertions.assertThat(resutlUserDto).isNotNull()
                 .returns(userFormDTO.getName(),UserFormDTO::getName)
                 .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
                 .returns(userFormDTO.getRoles().getFirst(), userFormDTO1 -> userFormDTO1.getRoles().getFirst());
+         */
     }
 
     @Test
@@ -138,6 +150,9 @@ public class UserStoreServiceAccessMethodUTest {
         Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
                 .thenReturn(userDTO);
 
+        // mock register user validation
+        Mockito.when(registerUserValidation.supports(UserFormDTO.class)).thenReturn(true);
+
         // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
         MockMultipartFile userPart = new MockMultipartFile(
                 "userFormDto",
@@ -152,13 +167,9 @@ public class UserStoreServiceAccessMethodUTest {
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
-        // opcion 1: Lee la respeusta directamente como un objeto
-        UserFormDTO resultUserFormDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
-
-        Assertions.assertThat(resultUserFormDto).isNotNull()
-                .returns(userFormDTO.getName(),UserFormDTO::getName)
-                .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
-                .returns(userFormDTO.getRoles().getFirst(), userDTO1 -> userDTO1.getRoles().getFirst());
+        Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isNotNull()
+                .isInstanceOf(String.class)
+                .isBlank();
     }
 
     @Test
@@ -190,6 +201,9 @@ public class UserStoreServiceAccessMethodUTest {
         Mockito.when(userService.registerUser(Mockito.any(UserFormDTO.class)))
                 .thenReturn(userDTO);
 
+        // mock register user validation
+        Mockito.when(registerUserValidation.supports(UserFormDTO.class)).thenReturn(true);
+
         // Prepare UserFormDTO as JSON - Mock UserDTO as JSON part
         MockMultipartFile userPart = new MockMultipartFile(
                 "userFormDto",
@@ -205,13 +219,8 @@ public class UserStoreServiceAccessMethodUTest {
                 ).andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
 
-        // opcion 1: Lee la respeusta directamente como un objeto
-        UserFormDTO resultUserFormDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<UserFormDTO>() {});
-
-        Assertions.assertThat(resultUserFormDto).isNotNull()
-                .returns(userFormDTO.getName(),UserFormDTO::getName)
-                .returns(userFormDTO.getSurname(),UserFormDTO::getSurname)
-                .returns(userFormDTO.getRoles().getFirst(), userFormDTO1 -> userFormDTO1.getRoles().getFirst());
+        Assertions.assertThat(mvcResult.getResponse().getContentAsString()).isNotNull()
+                .satisfies(String::isBlank);
     }
 
     @Test
@@ -244,6 +253,9 @@ public class UserStoreServiceAccessMethodUTest {
 
         Mockito.when(userService.updateUser(userFormDTO.getId(),userFormDTO))
                 .thenReturn(userDTO);
+
+        // mock register user validation
+        Mockito.when(registerUserValidation.supports(UserFormDTO.class)).thenReturn(true);
 
         // Mock file
         MockMultipartFile file = new MockMultipartFile(

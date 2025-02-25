@@ -25,14 +25,13 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,6 +73,7 @@ class UserServiceImpUTest {
                     .birthDate(LocalDate.now().minusYears(random.nextLong(10,40)))
                     .created(LocalDateTime.now())
                     .lastLoginAt(LocalDateTime.now())
+                    .roles(Set.of(Role.builder().name("ROLE_ADMIN").build()))
                     .password("123")
                     .passwordBis("123")
                     .build();
@@ -129,15 +129,37 @@ class UserServiceImpUTest {
         Mockito.when(userDao.findByEmailIgnoreCase(users.getFirst().getEmail()))
                 .thenReturn(Optional.of(users.getFirst()));
 
+        Mockito.when(userDao.findByUsernameOrEmailIgnoreCase(users.getFirst().getEmail()))
+                .thenReturn(Optional.of(users.getFirst()));
+
+        // Simulate a JWT with a token value and expiration date
+        Instant expirationTime = Instant.now().plusSeconds(3600);
+        Jwt jwt = Jwt.withTokenValue("mocked-jwt-token")
+                .header("alg", "HS256")
+                .claim("sub", users.getFirst().getEmail())
+                .claim("authorities", users.getFirst().getRoles())
+                .expiresAt(expirationTime)
+                .build();
+
+        // Create the authentication token with the mocked JWT
+        JwtAuthenticationToken jwtAuthToken = new JwtAuthenticationToken(jwt, Collections.emptyList());
+
+        // Mock the security context to set the authenticated user
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(jwtAuthToken);
+        SecurityContextHolder.setContext(securityContext);
+
         Optional<UserDTO> maybeUserDTO = userService.findByEmail(users.getFirst().getEmail());
 
-        Mockito.verify(modelMapper,Mockito.times(1)).map(users.getFirst(), UserDTO.class);
+        Mockito.verify(modelMapper, Mockito.times(1)).map(users.getFirst(), UserDTO.class);
 
         assertThat(maybeUserDTO).isPresent().get()
-                .returns(users.getFirst().getEmail(),UserDTO::getEmail)
-                .returns(users.getFirst().getName(),UserDTO::getName)
-                .returns(users.getFirst().getBirthDate(),UserDTO::getBirthDate)
-                .returns(users.getFirst().getCreated(),UserDTO::getCreated);
+                .returns(users.getFirst().getEmail(), UserDTO::getEmail)
+                .returns(users.getFirst().getName(), UserDTO::getName)
+                .returns(users.getFirst().getBirthDate(), UserDTO::getBirthDate)
+                .returns(users.getFirst().getCreated(), UserDTO::getCreated);
+
+        SecurityContextHolder.clearContext();
     }
 
     @Test

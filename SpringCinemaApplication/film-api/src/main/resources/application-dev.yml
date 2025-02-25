@@ -66,3 +66,18 @@ logging:
         oauth2: WARN
         web: WARN
     com.tokioschool.storeapp: WARN
+    com.tokioschool.filmapp.validation: DEBUG
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true

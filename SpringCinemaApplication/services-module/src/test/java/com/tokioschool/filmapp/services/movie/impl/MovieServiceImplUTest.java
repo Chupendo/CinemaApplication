@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.services.movie.impl;
 
 import com.github.javafaker.Faker;
 import com.tokioschool.core.exception.NotFoundException;
+import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
@@ -281,7 +282,7 @@ class MovieServiceImplUTest {
         movie.setReleaseYear(2020);
         movie.setImage(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
 
-        Mockito.when(movieDao.save(Mockito.any(Movie.class))).thenReturn(movie);
+        Mockito.when(movieDao.saveAndFlush(Mockito.any(Movie.class))).thenReturn(movie);
         //Mockito.when(modelMapper.map(Mockito.any(Movie.class), Mockito.eq(MovieDto.class))).thenReturn(movieDto);
         Mockito.when(artistService.findById(1L)).thenReturn(new ArtistDto(1L, "Manager", "Surname", "DIRECTOR"));
         Mockito.when(artistService.findById(2L)).thenReturn(new ArtistDto(2L, "Actor", "Surname", "ACTOR"));
@@ -298,10 +299,10 @@ class MovieServiceImplUTest {
 
     @Test
     @Order(10)
-    void givenNullMovieDto_whenCreateMovie_thenThrowIllegalArgumentException() {
+    void givenNullMovieDto_whenCreateMovie_thenThrowValidationException() {
         Assertions.assertThatThrownBy(() -> movieService.createMovie(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The data of movie is null");
+                .isInstanceOf(ValidacionException.class)
+                .hasMessage("movie don't create");
     }
 
     @Test

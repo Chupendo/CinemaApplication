@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -50,19 +51,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
     public Optional<UserDTO> findByEmail(String email) {
         final String maybeEmail = Optional.ofNullable(email)
                 .map(StringUtils::stripToNull)
                 .orElseThrow(()->new IllegalArgumentException("Email not allow"));
 
-        // devuelve una tupa con el usuarioDTO o un optional vacio
-        return userDao.findByEmailIgnoreCase(maybeEmail)
+        final Optional<UserDTO> maybeUserDTO = userDao.findByEmailIgnoreCase(maybeEmail)
                 .map(user -> modelMapper.map(user, UserDTO.class));
+
+        // get user auth
+        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login") );
+
+        // verify if the user auth is admin, and case if not be, if the id user request is same to auth
+        if(!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals( userAuth.getId() ) ){
+            throw new AccessDeniedException("You don't authorized to information of user");
+        }
+
+        // devuelve una tupa con el usuarioDTO o un optional vacio
+        return maybeUserDTO;
     }
 
     @Override
     @Transactional
-    //@PreAuthorize(value = "hasRole('ADMIN')")
     public UserDTO registerUser(UserFormDTO userFormDTO) {
         User user = User.builder().build();
         return populationCreateOrEditUser(user,userFormDTO);
@@ -98,6 +110,31 @@ public class UserServiceImpl implements UserService {
                     user.setLastLoginAt(LocalDateTime.now());
                     userDao.save(user);
                 });
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public Optional<UserDTO> findById(String userId) throws AccessDeniedException{
+        // get user request by id
+        final Optional<UserDTO> maybeUserDTO = userId!=null ? userDao.findById(userId).map(user -> modelMapper.map(user,UserDTO.class)) : Optional.empty();
+
+        // get user auth
+        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login") );
+
+        // verify if the user auth is admin, and case if not be, if the id user request is same to auth
+        if(!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals( userAuth.getId() ) ){
+            throw new AccessDeniedException("You don't authorized to information of user");
+        }
+
+        return maybeUserDTO;
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public Optional<UserDTO> findUserAuthenticated() {
+        return whoAuthenticated().map(user -> modelMapper.map(user,UserDTO.class));
     }
 
     /**
@@ -188,5 +225,15 @@ public class UserServiceImpl implements UserService {
             }
         }
         return roles;
+    }
+
+    /**
+     * Given user, verify if the user has role ADMIN
+     *
+     * @param user information full user data
+     * @return true is the user contains the rol ADMIN, otherwise false
+     */
+    private boolean userIsAdmin(User user) {
+        return user.getRoles().stream().anyMatch(role -> role.getName().toUpperCase().contains("ADMIN"));
     }
 }

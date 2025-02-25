@@ -4,6 +4,7 @@ package com.tokioschool.filmapp.services.user;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Optional;
 
@@ -14,4 +15,7 @@ public interface UserService {
     UserDTO registerUser(UserFormDTO userFormDTO) throws IllegalArgumentException;
     UserDTO updateUser(String userId,UserFormDTO userFormDTO);
     void updateLastLoginTime();
+
+    Optional<UserDTO> findById(String userId) throws AccessDeniedException;
+    Optional<UserDTO> findUserAuthenticated();
 }

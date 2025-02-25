@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -66,28 +67,15 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(BadCredentialsException.class)
-    public Map<String, String> handlerBadCredentialsExceptionError(BadCredentialsException ex, HttpServletRequest request) {
+    @ExceptionHandler({AuthenticationCredentialsNotFoundException.class,
+            AuthorizationDeniedException.class,
+            AccessDeniedException.class,
+            LoginException.class,
+            BadCredentialsException.class})
+    public Map<String, String> handlerAuthorizationDeniedExceptionError(Exception ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public Map<String, String> handlerAuthenticationCredentialsNotFoundExceptionError(BadCredentialsException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(AuthorizationDeniedException.class)
-    public Map<String, String> handlerAuthorizationDeniedExceptionError(AuthorizationDeniedException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(LoginException.class)
-    public Map<String, String> handlerLoginExceptionError(BadCredentialsException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
-    }
 
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     @ExceptionHandler(ValidacionException.class)
@@ -113,5 +101,4 @@ public class ApiExceptionHandler {
         log.error("Error %s".formatted(ex.getMessage()),ex);
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
-
 }
