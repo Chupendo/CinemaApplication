@@ -2,16 +2,22 @@ package com.tokioschool.filmapp.services.user.impl;
 
 import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
+import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.filmapp.enums.RoleEnum;
+import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.user.UserService;
+import com.tokioschool.filmapp.specifications.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -25,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -50,19 +57,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
     public Optional<UserDTO> findByEmail(String email) {
         final String maybeEmail = Optional.ofNullable(email)
                 .map(StringUtils::stripToNull)
                 .orElseThrow(()->new IllegalArgumentException("Email not allow"));
 
-        // devuelve una tupa con el usuarioDTO o un optional vacio
-        return userDao.findByEmailIgnoreCase(maybeEmail)
+        final Optional<UserDTO> maybeUserDTO = userDao.findByEmailIgnoreCase(maybeEmail)
                 .map(user -> modelMapper.map(user, UserDTO.class));
+
+        // get user auth
+        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login") );
+
+        // verify if the user auth is admin, and case if not be, if the id user request is same to auth
+        if(!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals( userAuth.getId() ) ){
+            throw new AccessDeniedException("You don't authorized to information of user");
+        }
+
+        // devuelve una tupa con el usuarioDTO o un optional vacio
+        return maybeUserDTO;
     }
 
     @Override
     @Transactional
-    //@PreAuthorize(value = "hasRole('ADMIN')")
     public UserDTO registerUser(UserFormDTO userFormDTO) {
         User user = User.builder().build();
         return populationCreateOrEditUser(user,userFormDTO);
@@ -98,6 +116,86 @@ public class UserServiceImpl implements UserService {
                     user.setLastLoginAt(LocalDateTime.now());
                     userDao.save(user);
                 });
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public Optional<UserDTO> findById(String userId) throws AccessDeniedException{
+        // get user request by id
+        final Optional<UserDTO> maybeUserDTO = userId!=null ? userDao.findById(userId).map(user -> modelMapper.map(user,UserDTO.class)) : Optional.empty();
+
+        // get user auth
+        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login") );
+
+        // verify if the user auth is admin, and case if not be, if the id user request is same to auth
+        if(!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals( userAuth.getId() ) ){
+            throw new AccessDeniedException("You don't authorized to information of user");
+        }
+
+        return maybeUserDTO;
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public Optional<UserDTO> findUserAuthenticated() {
+        return whoAuthenticated().map(user -> modelMapper.map(user,UserDTO.class));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public PageDTO<UserDTO>  searchUsers(int pageNumber, int pageSize, SearchUserRecord searchUserRecord) {
+        Specification<User> spec = Specification.allOf();
+
+        if(searchUserRecord!=null) {
+            spec = Specification
+                    .where( UserSpecification.hasUsername( searchUserRecord.username() ) )
+                    .and( UserSpecification.hasSurname( searchUserRecord.surname() ) )
+                    .and( UserSpecification.hasName( searchUserRecord.name() ) )
+                    .and( UserSpecification.containsEmail( searchUserRecord.email() ) );
+        }
+
+        List<UserDTO> usersDto = userDao.findAll(spec)
+                .stream()
+                .map(user -> modelMapper.map(user,UserDTO.class))
+                .toList();
+
+        int startItem = pageNumber * pageSize;
+        final int totalPages = pageSize == NumberUtils.SHORT_ZERO ? NumberUtils.SHORT_ONE :  (int) Math.ceil((usersDto.size()/(double)pageSize));
+
+        if( startItem >= usersDto.size() ){ // there aren't tiems to show
+
+            return PageDTO.<UserDTO>builder()
+                    .items( List.of() )
+                    .pageSize( pageSize )
+                    .pageNumber( pageNumber )
+                    .totalPages( totalPages )
+                    .build();
+        }else{
+
+            if( pageSize == NumberUtils.SHORT_ZERO ){
+                usersDto = (List<UserDTO>) getItemsPageDto(usersDto,startItem,usersDto.size());
+            }else{
+                int end = Math.min(startItem + pageSize,usersDto.size());
+                usersDto = (List<UserDTO>) getItemsPageDto(usersDto,startItem,end);
+            }
+        }
+
+        return PageDTO.<UserDTO>builder()
+                .items( usersDto )
+                .pageSize( pageSize )
+                .pageNumber( pageNumber )
+                .totalPages( totalPages )
+                .build();
+
+    }
+
+    private static List<?> getItemsPageDto(List<?> items,int start,int end){
+        return IntStream.range(start,end)
+                .mapToObj(items::get)
+                .toList();
     }
 
     /**
@@ -188,5 +286,15 @@ public class UserServiceImpl implements UserService {
             }
         }
         return roles;
+    }
+
+    /**
+     * Given user, verify if the user has role ADMIN
+     *
+     * @param user information full user data
+     * @return true is the user contains the rol ADMIN, otherwise false
+     */
+    private boolean userIsAdmin(User user) {
+        return user.getRoles().stream().anyMatch(role -> role.getName().toUpperCase().contains("ADMIN"));
     }
 }
