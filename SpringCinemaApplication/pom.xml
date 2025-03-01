@@ -23,6 +23,7 @@
 		<module>core-film</module>
 		<module>dto-module</module>
 		<module>store-api</module>
+		<module>ratings-api</module>
 	</modules>
 	<packaging>pom</packaging>
 
@@ -95,6 +96,12 @@
 			<dependency>
 				<groupId>com.tokioschool.storeapp</groupId>
 				<artifactId>store-api</artifactId>
+				<version>${version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.filmapp</groupId>
+				<artifactId>ratings-api</artifactId>
 				<version>${version}</version>
 			</dependency>
 		</dependencies>

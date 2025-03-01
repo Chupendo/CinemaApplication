@@ -9,4 +9,7 @@
     <includeAll path="db/changelog/film" context="production"  contextFilter="production"/>
     <includeAll path="db/changelog/film-dev" context="dev" contextFilter="dev"/>
     <includeAll path="db/changelog/film-test" context="test" contextFilter="test"/>
+
+    <!-- ratings -->
+    <includeAll path="db/changelog/ratings-dev" context="dev" contextFilter="ratings-dev"/>
 </databaseChangeLog>
