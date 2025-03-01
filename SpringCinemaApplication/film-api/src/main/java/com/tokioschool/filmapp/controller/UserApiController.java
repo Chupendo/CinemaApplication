@@ -2,9 +2,11 @@ package com.tokioschool.filmapp.controller;
 
 import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.core.exception.ValidacionException;
+import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.user.RoleDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.filmapp.validation.RegisterUserValidation;
 import com.tokioschool.helpers.UUIDHelper;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -238,6 +241,15 @@ public class UserApiController {
         return ResponseEntity.ok(userDTO);
     }
 
+    @PostMapping(value="/search",consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE},produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name="auth-openapi")
+    public ResponseEntity<PageDTO<UserDTO>> searchUsersHandler(@RequestPart(required = false,value = "search-user-record") SearchUserRecord searchUserRecord,
+                                                               @Min(0) @RequestParam(value = "page", required = false,defaultValue = "0") int page,
+                                                               @Min(0) @RequestParam(value = "page-size",required = false,defaultValue = "100") int pageSize){
+        PageDTO<UserDTO> userPageDTO = userService.searchUsers(page,pageSize,searchUserRecord);
+        return ResponseEntity.ok(userPageDTO);
+    }
 
     /**
      * Mapper an instance UserDto to instance UserFormDto

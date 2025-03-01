@@ -2,16 +2,21 @@ package com.tokioschool.filmapp.services.user.impl;
 
 import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
+import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
 import com.tokioschool.filmapp.enums.RoleEnum;
+import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.user.UserService;
+import com.tokioschool.filmapp.specifications.UserSpecification;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -135,6 +141,61 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Optional<UserDTO> findUserAuthenticated() {
         return whoAuthenticated().map(user -> modelMapper.map(user,UserDTO.class));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public PageDTO<UserDTO>  searchUsers(int pageNumber, int pageSize, SearchUserRecord searchUserRecord) {
+        Specification<User> spec = Specification.allOf();
+
+        if(searchUserRecord!=null) {
+            spec = Specification
+                    .where( UserSpecification.hasUsername( searchUserRecord.username() ) )
+                    .and( UserSpecification.hasSurname( searchUserRecord.surname() ) )
+                    .and( UserSpecification.hasName( searchUserRecord.name() ) )
+                    .and( UserSpecification.containsEmail( searchUserRecord.email() ) );
+        }
+
+        List<UserDTO> usersDto = userDao.findAll(spec)
+                .stream()
+                .map(user -> modelMapper.map(user,UserDTO.class))
+                .toList();
+
+        int startItem = pageNumber * pageSize;
+        final int totalPages = pageSize == NumberUtils.SHORT_ZERO ? NumberUtils.SHORT_ONE :  (int) Math.ceil((usersDto.size()/(double)pageSize));
+
+        if( startItem >= usersDto.size() ){ // there aren't tiems to show
+
+            return PageDTO.<UserDTO>builder()
+                    .items( List.of() )
+                    .pageSize( pageSize )
+                    .pageNumber( pageNumber )
+                    .totalPages( totalPages )
+                    .build();
+        }else{
+
+            if( pageSize == NumberUtils.SHORT_ZERO ){
+                usersDto = (List<UserDTO>) getItemsPageDto(usersDto,startItem,usersDto.size());
+            }else{
+                int end = Math.min(startItem + pageSize,usersDto.size());
+                usersDto = (List<UserDTO>) getItemsPageDto(usersDto,startItem,end);
+            }
+        }
+
+        return PageDTO.<UserDTO>builder()
+                .items( usersDto )
+                .pageSize( pageSize )
+                .pageNumber( pageNumber )
+                .totalPages( totalPages )
+                .build();
+
+    }
+
+    private static List<?> getItemsPageDto(List<?> items,int start,int end){
+        return IntStream.range(start,end)
+                .mapToObj(items::get)
+                .toList();
     }
 
     /**

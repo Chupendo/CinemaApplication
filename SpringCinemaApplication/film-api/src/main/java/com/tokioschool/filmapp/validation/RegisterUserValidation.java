@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.validation;
 
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.records.SearchUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -24,13 +25,17 @@ public class RegisterUserValidation extends CustomValidatorBean {
 
     @Override
     public boolean supports(@NonNull Class<?> clazz) {
-        return UserFormDTO.class.isAssignableFrom(clazz);
+        return UserFormDTO.class.isAssignableFrom(clazz) || SearchUserRecord.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
         log.debug("RegisterUserValidation start");
         localValidatorFactoryBean.validate(target, errors);
+
+        if(!UserFormDTO.class.isInstance(target)) {
+            return;
+        }
 
         final UserFormDTO userFormDTO = (UserFormDTO) target;
 

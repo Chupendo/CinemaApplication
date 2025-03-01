@@ -4,11 +4,14 @@ import com.github.javafaker.Faker;
 import com.tokioschool.filmapp.domain.Authority;
 import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
+import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.user.UserDTO;
 import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import org.apache.commons.lang3.tuple.Pair;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,8 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -36,6 +41,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -344,6 +350,79 @@ class UserServiceImpUTest {
         assertThat(userDTO).isNotNull();
     }
 
+    @Test
+    void givenUserAuthenticated_whenFindUserAuthenticated_thenReturnUser() {
+        // Crear una autenticación simulada
+        Jwt jwt = Jwt.withTokenValue("asdfasdf").claim("sub", "ADMIN").header("a", "a").build();
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(jwt, "ADMIN");
+
+        // Crear un contexto de seguridad vacío
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+
+        // Establecer el contexto de seguridad en el SecurityContextHolder
+        SecurityContextHolder.setContext(context);
+
+        // users with distinct id
+        Role role = Role.builder().id(1L).name("ADMIN")
+                .authorities(Set.of(
+                                Authority.builder().id(2L).name("write").build()
+                        )
+                ).build();
+
+        User user = User.builder()
+                .id("0002AB")
+                .name("John")
+                .surname("Doe")
+                .password("encrypt@")
+                .passwordBis("encrypt@")
+                .username("johndoe")
+                .email("johndoe@example.com")
+                .birthDate(LocalDate.now().minusYears(30))
+                .roles(Set.of(role))
+                .build();
+
+        Mockito.when(userDao.findByUsernameOrEmailIgnoreCase("ADMIN")).thenReturn(Optional.of(user));
+
+        Optional<UserDTO> userDTOOptional = userService.findUserAuthenticated();
+
+        Assertions.assertThat(userDTOOptional)
+                .isPresent()
+                .get()
+                .satisfies(userDTO -> userDTO.getBirthDate().equals(user.getBirthDate()));
+    }
+
+    @Test
+    void givenNotUserAuthenticated_whenFindUserAuthenticated_thenReturnUserEmpty() {
+        Optional<UserDTO> userDTOOptional = userService.findUserAuthenticated();
+        Assertions.assertThat(userDTOOptional)
+                .isEmpty();
+    }
+
+    @Test
+    void givenSearchCriteriaProvided_whenSearchUsers_thenReturnsPagedUsers() {
+        SearchUserRecord searchUserRecord = new SearchUserRecord("username", "surname", "name", "email@example.com");
+        User user = new User();
+        when(userDao.findAll(any(Specification.class))).thenReturn(List.of(user));
+        when(modelMapper.map(user, UserDTO.class)).thenReturn(new UserDTO());
+
+        PageDTO<UserDTO> result = userService.searchUsers(0, 10, searchUserRecord);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getItems()).hasSize(1);
+    }
+
+    @Test
+    void givenNoUsersFound_whenSearchUsers_thenReturnsEmptyPage() {
+        SearchUserRecord searchUserRecord = new SearchUserRecord("username", "surname", "name", "email@example.com");
+        when(userDao.findAll(any(Specification.class))).thenReturn(List.of());
+
+        PageDTO<UserDTO> result = userService.searchUsers(0, 10, searchUserRecord);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getItems()).isEmpty();
+    }
     @AfterEach
     public void tearDown() {
         SecurityContextHolder.clearContext();
