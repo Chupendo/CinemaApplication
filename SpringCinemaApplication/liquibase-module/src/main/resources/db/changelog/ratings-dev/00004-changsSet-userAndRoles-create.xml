@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ChangeSet to create the users_roles table -->
+    <changeSet id="create-users-roles-table" author="andres.rpenuela" context="ratings-dev">
+        <comment>Created table user_roles for relationship to users with roles</comment>
+
+        <createTable tableName="users_roles">
+            <column name="USER_ID" type="VARCHAR(13)">
+                <constraints nullable="false" />
+            </column>
+            <column name="ROLE_ID" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <!-- Agregar clave foránea user_id que referencia a la tabla users -->
+        <addForeignKeyConstraint
+                baseTableName="users_roles"
+                baseColumnNames="USER_ID"
+                referencedTableName="users"
+                referencedColumnNames="ID"
+                constraintName="fk_user_roles_user_id" />
+
+        <!-- Agregar clave foránea role_id que referencia a la tabla roles -->
+        <addForeignKeyConstraint
+                baseTableName="users_roles"
+                baseColumnNames="ROLE_ID"
+                referencedTableName="roles"
+                referencedColumnNames="ID"
+                constraintName="fk_user_roles_role_id" />
+    </changeSet>
+
+    <changeSet id="user-with-roles-insert-data" author="andres.rpenuela" context="ratings-dev">
+        <insert tableName="users_roles">
+            <column name="USER_ID" value="0AVRSA787897A" />
+            <column name="ROLE_ID" value="1" />
+        </insert>
+
+        <insert tableName="users_roles">
+            <column name="USER_ID" value="0AVRSA787897B" />
+            <column name="ROLE_ID" value="2" />
+        </insert>
+    </changeSet>
+</databaseChangeLog>

@@ -11,6 +11,10 @@
 
     <artifactId>ratings-api</artifactId>
 
+    <properties>
+        <tsid-creator.version>5.2.5</tsid-creator.version>
+    </properties>
+
     <dependencies>
         <!-- spring core -->
         <dependency>
@@ -107,12 +111,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- model -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-
         <!-- spring data  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -155,6 +153,14 @@
                     <artifactId>mariadb-java-client</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- utils -->
+        <!-- https://mvnrepository.com/artifact/com.github.f4b6a3/tsid-creator -->
+        <dependency>
+            <groupId>com.github.f4b6a3</groupId>
+            <artifactId>tsid-creator</artifactId>
+            <version>${tsid-creator.version}</version>
         </dependency>
     </dependencies>
 
