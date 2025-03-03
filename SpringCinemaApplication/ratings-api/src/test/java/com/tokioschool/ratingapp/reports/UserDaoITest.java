@@ -73,6 +73,85 @@ public class UserDaoITest {
     }
 
     @Test
+    void searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase_returnsUser_whenUsernameMatches() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("mailtestuser@test.com");
+        user.setPassword("testpwd");
+        user.setPasswordBis("testpwd");
+
+        entityManager.persistAndFlush(user);
+
+        Optional<User> maybeFoundUser = userDao.searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase("testuser");
+
+        assertThat(maybeFoundUser).isPresent();
+        assertThat(maybeFoundUser.get().getUsername()).isEqualTo("testuser");
+    }
+
+    @Test
+    void searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase_returnsUser_whenEmailMatches() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("mailtestuser@test.com");
+        user.setPassword("testpwd");
+        user.setPasswordBis("testpwd");
+
+        entityManager.persistAndFlush(user);
+
+        Optional<User> maybeFoundUser = userDao.searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase("mailtestuser@test.com");
+
+        assertThat(maybeFoundUser).isPresent();
+        assertThat(maybeFoundUser.get().getEmail()).isEqualTo("mailtestuser@test.com");
+    }
+
+    @Test
+    void searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase_returnsEmpty_whenNoMatch() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("mailtestuser@test.com");
+        user.setPassword("testpwd");
+        user.setPasswordBis("testpwd");
+
+        entityManager.persistAndFlush(user);
+
+        Optional<User> maybeFoundUser = userDao.searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase("nonexistentuser");
+
+        assertThat(maybeFoundUser).isNotPresent();
+    }
+
+    @Test
+    void searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase_returnsUser_whenUsernameMatchesIgnoreCase() {
+        User user = new User();
+        user.setUsername("TestUser");
+        user.setEmail("mailtestuser@test.com");
+        user.setPassword("testpwd");
+        user.setPasswordBis("testpwd");
+
+        entityManager.persistAndFlush(user);
+
+        Optional<User> maybeFoundUser = userDao.searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase("testuser");
+
+        assertThat(maybeFoundUser).isPresent();
+        assertThat(maybeFoundUser.get().getUsername()).isEqualTo("TestUser");
+    }
+
+    @Test
+    void searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase_returnsUser_whenEmailMatchesIgnoreCase() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("MailTestUser@test.com");
+        user.setPassword("testpwd");
+        user.setPasswordBis("testpwd");
+
+        entityManager.persistAndFlush(user);
+
+        Optional<User> maybeFoundUser = userDao.searchUserByUsernameEqualsIgnoreCaseOrEmailEqualsIgnoreCase("mailtestuser@test.com");
+
+        assertThat(maybeFoundUser).isPresent();
+        assertThat(maybeFoundUser.get().getEmail()).isEqualTo("MailTestUser@test.com");
+    }
+
+    @Test
     void findUsersByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase_returnsUsers_whenUsernameMatches() {
         User user1 = new User();
         user1.setUsername("testuser1");
