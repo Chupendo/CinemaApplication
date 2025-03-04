@@ -1,4 +1,4 @@
-package com.tokioschool.ratingapp.securities;
+package com.tokioschool.ratingapp.securities.services.userdetails;
 
 import com.tokioschool.ratingapp.dto.roles.RoleDto;
 import com.tokioschool.ratingapp.dto.users.UserDto;

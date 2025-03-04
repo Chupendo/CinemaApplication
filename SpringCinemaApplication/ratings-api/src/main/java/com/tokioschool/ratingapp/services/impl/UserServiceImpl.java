@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
      * @throws IllegalArgumentException if the email or username is null or empty
      */
     @Override
+    @Transactional(readOnly = true) // this allowed loading the roles, those are lazy
     public Optional<Pair<UserDto, String>> findUserAndPasswordByEmail(String emailOrUsername) throws IllegalArgumentException {
         final String emailOrUsernamesStrip = Optional.ofNullable(emailOrUsername)
                 .map(StringUtils::stripToNull)
