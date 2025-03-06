@@ -1,6 +1,7 @@
 package com.tokioschool.ratingapp.securities.configurations.filter;
 
 
+import com.tokioschool.ratingapp.securities.jwt.converter.CustomJwtAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -27,6 +28,12 @@ public class RatingsApiSecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 // corfs por defecto para recibir petionces del localhost
                 .cors(Customizer.withDefaults())
+                // validacion de jwt (decodifcador), considerando los roles
+                .oauth2ResourceServer(oAuth2ResourceServerConfigurer -> oAuth2ResourceServerConfigurer.jwt(
+                        jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(
+                                new CustomJwtAuthenticationConverter()
+                        )
+                ))
                 .build();
     }
 }
