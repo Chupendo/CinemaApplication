@@ -1,0 +1,9 @@
+package com.tokioschool.ratingapp.core.exceptions;
+
+public class InternalErrorException extends RuntimeException {
+  public InternalErrorException(String message) {super(message); }
+  public InternalErrorException(Throwable cause){super(cause);}
+  public InternalErrorException(String message, Throwable cause){super(message,cause);}
+  public InternalErrorException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {super(message, cause, enableSuppression, writableStackTrace);}
+
+}
