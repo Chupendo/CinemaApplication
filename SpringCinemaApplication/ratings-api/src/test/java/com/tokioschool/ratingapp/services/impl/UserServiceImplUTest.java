@@ -108,7 +108,8 @@ class UserServiceImplUTest {
         assertThat(result).isNotPresent();
     }
 
-    void findByEmail_throwsException_whenEmailIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> userService.findByEmail(null));
+    @Test
+    void findByEmail_returnEmpty_whenEmailIsNull() {
+        assertThat( userService.findByEmail(null)).isEmpty();
     }
 }

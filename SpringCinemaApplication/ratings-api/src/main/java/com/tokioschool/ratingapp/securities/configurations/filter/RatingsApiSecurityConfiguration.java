@@ -20,6 +20,11 @@ public class RatingsApiSecurityConfiguration {
         // define una cadena de seugridad
         return httpSecurity
                 .securityMatcher("/ratings/api/**")
+                .authorizeHttpRequests(auth ->auth
+                        .requestMatchers("/ratings/api/auth","/ratings/api/auth/","ratings/api/auth/login").permitAll()
+                                .requestMatchers("ratings/api/auth/me").hasRole("ADMIN")
+                        //.requestMatchers("/store/api/**").authenticated()
+                )
                 // Gestion de session sin estado
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.
@@ -34,6 +39,8 @@ public class RatingsApiSecurityConfiguration {
                                 new CustomJwtAuthenticationConverter()
                         )
                 ))
+                // form login of spring
+                .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
 }

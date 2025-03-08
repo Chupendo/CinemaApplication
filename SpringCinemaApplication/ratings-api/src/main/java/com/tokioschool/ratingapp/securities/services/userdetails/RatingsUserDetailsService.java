@@ -77,7 +77,8 @@ public class RatingsUserDetailsService implements UserDetailsService {
             return null;
         }
 
-        // Convert roles to SimpleGrantedAuthority
+        // Convert roles to SimpleGrantedAuthority, concat the "Role_" because insert as SimpleGrantedAuthority
+        // and for read as ROLE at case, this is Required
         List<SimpleGrantedAuthority> roles = Optional.of(userDto)
                 .filter(userDto1 -> !userDto1.getRoles().isEmpty() )
                 .map(UserDto::getRoles)
