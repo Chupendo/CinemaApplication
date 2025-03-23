@@ -13,7 +13,7 @@ import java.nio.file.AccessDeniedException;
 
 public interface AuthenticationService {
 
-    AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationResponseDTO) throws UsernameNotFoundException, BadCredentialsException, AccessDeniedException;
+    AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationResponseDTO) throws Exception;
 
     AuthenticatedMeResponseDTO getAuthenticated() throws LoginException;
 

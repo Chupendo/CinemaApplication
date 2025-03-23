@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RatingFilmDao extends JpaRepository<RatingFilm,Long> {
-
-    List<RatingFilm> findRatingFilmByUserIdAndFilmId(String userId, Long filmId);
+    // TODO repair + test
+    Optional<RatingFilm> findRatingFilmByUserIdAndFilmId(String userId, Long filmId);
 
     @Query("SELECT AVG(r.score) FROM RatingFilm r WHERE r.filmId = ?1")
     BigDecimal mainScoreByFilmId(Long filmId);

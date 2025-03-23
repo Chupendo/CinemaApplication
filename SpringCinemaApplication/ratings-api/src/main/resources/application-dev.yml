@@ -2,6 +2,11 @@
 spring:
   application:
     name: ratings-api
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/.well-known/jwks.json
 # Liguibase
   liquibase:
     enabled: true
@@ -48,8 +53,8 @@ logging:
   level:
     org:
       springframework:
-        security: WARN
-        oauth2: WARN
+        security: TRACE
+        oauth2: TRACE
         web: WARN
 
 # actuator

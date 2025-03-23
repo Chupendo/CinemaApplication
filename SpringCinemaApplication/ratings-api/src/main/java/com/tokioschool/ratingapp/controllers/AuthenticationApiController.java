@@ -15,14 +15,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
-import java.nio.file.AccessDeniedException;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/ratings/api/auth")
@@ -67,7 +66,7 @@ public class AuthenticationApiController {
     )
     @PostMapping(value = {"","/","/login"},consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<AuthenticationResponseDTO> loginHandler(@RequestBody AuthenticationRequestDTO authenticationRequestDTO) throws UsernameNotFoundException, BadCredentialsException, AccessDeniedException {
+    public ResponseEntity<AuthenticationResponseDTO> loginHandler(@RequestBody AuthenticationRequestDTO authenticationRequestDTO) throws Exception {
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDTO) );
     }
 
@@ -98,9 +97,23 @@ public class AuthenticationApiController {
     )
     @SecurityRequirement(name = "auth-openapi")
     @GetMapping(value={"/me"},produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthenticatedMeResponseDTO> getAuthenticatedMe() throws LoginException {
         return ResponseEntity.ok(authenticationService.getAuthenticated());
     }
 
+    @PostMapping("/authorize")
+    public ResponseEntity<Object> authorizeHandler(@RequestHeader("Authorization") String authorziation,
+                                                    @RequestParam("grant_type") String grantType){
+
+        if( !"client_credentials".equalsIgnoreCase(grantType) ){
+            throw new AccessDeniedException("Grant type strong");
+        }
+
+        if( authorziation==null || authorziation.startsWith("Basic ")){
+            throw new AccessDeniedException("Bad formatted in headder");
+        }
+
+        return ResponseEntity.ok().build();
+    }
 }

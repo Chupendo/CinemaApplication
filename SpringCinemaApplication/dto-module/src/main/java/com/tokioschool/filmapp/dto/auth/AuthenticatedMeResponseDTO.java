@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class AuthenticatedMeResponseDTO {
     String username;
+    List<String> scopes;
     List<String> authorities;
     List<String> roles;
 }

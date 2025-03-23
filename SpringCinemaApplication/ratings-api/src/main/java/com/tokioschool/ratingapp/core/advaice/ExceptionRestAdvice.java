@@ -2,6 +2,7 @@ package com.tokioschool.ratingapp.core.advaice;
 
 import com.tokioschool.ratingapp.core.exceptions.InternalErrorException;
 import com.tokioschool.ratingapp.core.exceptions.NotFoundException;
+import com.tokioschool.ratingapp.core.exceptions.OperationNotAllowException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -64,8 +65,11 @@ public class ExceptionRestAdvice {
      * @return a map containing the error message and request URI
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public Map<String, String> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
+    @ExceptionHandler({
+            ConstraintViolationException.class,
+            OperationNotAllowException.class
+    })
+    public Map<String, String> handleConstraintViolationException(Exception ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
     }
 

@@ -6,11 +6,14 @@ import com.tokioschool.ratingapp.securities.jwt.converter.CustomJwtAuthenticatio
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -22,6 +25,46 @@ import org.springframework.security.web.SecurityFilterChain;
 public class RatingsApiSecurityConfiguration {
 
     /**
+     *
+     * Con "authorizationServer.oidc(...)"
+     *
+     * Habilita las características de OpenID Connect (OIDC) en el Authorization Server.
+     * OpenID Connect extiende OAuth 2.0 y permite la autenticación del usuario, no solo la autorización.
+     *
+     * Con "Customizer.withDefaults()"
+     *
+     * Aplica la configuración predeterminada de OIDC sin necesidad de personalizar los endpoints o los claims manualmente.
+     * Esto activa automáticamente los endpoints estándar de OIDC, como:
+     *  /oauth2/authorize → Para la autenticación y autorización.
+     *  /oauth2/token → Para la emisión de tokens de acceso.
+     *  /oauth2/introspect → Para validar tokens.
+     *  /oauth2/revoke → Para revocar tokens.
+     *  /oauth2/jwks → Para la clave pública de validación de tokens.
+     *  /.well-known/openid-configuration → Para la metadata de configuración OIDC.
+     *
+     * @param httpSecurity
+     * @return
+     * @throws Exception
+     */
+    @Bean
+    @Order(1)
+    public SecurityFilterChain oAuth2AuthorizationServerConfigurer(HttpSecurity httpSecurity,AuthorizationServerSettings authorizationServerSettings) throws Exception {
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
+
+        return httpSecurity
+
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/oauth2/**", "/.well-known/**").permitAll())
+                .with(authorizationServerConfigurer, (authorizationServer) ->
+                        authorizationServer
+                                .authorizationServerSettings(authorizationServerSettings)
+                                .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                )
+                //.userDetailsService()
+                .build();
+    }
+
+    /**
      * Configures the security filter chain for the Ratings API.
      *
      * @param httpSecurity the HttpSecurity object to configure
@@ -29,7 +72,10 @@ public class RatingsApiSecurityConfiguration {
      * @throws Exception if an error occurs while configuring the security filter chain
      */
     @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChainMainly(HttpSecurity httpSecurity) throws Exception {
+
+
         // Define a security chain
         return httpSecurity
                 .securityMatcher("/ratings/api/**")
@@ -38,10 +84,10 @@ public class RatingsApiSecurityConfiguration {
                         .accessDeniedHandler(new CustomAccessDeniedHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ratings/api/auth", "/ratings/api/auth/", "ratings/api/auth/login").permitAll()
-                        .requestMatchers("ratings/api/auth/me").hasRole("ADMIN")
+                        .requestMatchers("/ratings/api/auth", "/ratings/api/auth/", "ratings/api/auth/login","/ratings/api/auth/authorize").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                //.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 // Stateless session management
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer
@@ -58,8 +104,10 @@ public class RatingsApiSecurityConfiguration {
                                 new CustomJwtAuthenticationConverter()
                         )
                 ))
+
                 // Disable Spring's form login
                 .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
+
 }

@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
-@TestMethodOrder(MethodOrderer.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MovieServiceImplUTest {
 
     @Mock

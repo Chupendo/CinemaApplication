@@ -4,9 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
+import com.tokioschool.ratingapp.oauth.configurations.JwtAuthConfig;
+import com.tokioschool.ratingapp.oauth.registers.AuthClientsRegister;
+import com.tokioschool.ratingapp.securities.configurations.encoder.PasswordEncoderConfiguration;
 import com.tokioschool.ratingapp.securities.configurations.filter.RatingsApiSecurityConfiguration;
-import com.tokioschool.ratingapp.securities.jwt.configuration.JwtConfiguration;
+import com.tokioschool.ratingapp.securities.jwt.servicies.JwtService;
+import com.tokioschool.ratingapp.securities.services.userdetails.RatingsUserDetailsService;
 import com.tokioschool.ratingapp.services.AuthenticationService;
+import com.tokioschool.ratingapp.services.UserService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -16,6 +21,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,13 +46,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 })*/
 @ActiveProfiles("test")
 @Import({RatingsApiSecurityConfiguration.class,
-        JwtConfiguration.class})
+        JwtAuthConfig.class,
+        RatingsUserDetailsService.class,
+        PasswordEncoderConfiguration.class,
+        AuthClientsRegister.class // oauth20
+        //JwtConfiguration.class
+         })
 class AuthenticationApiControllerITest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
 
     @MockitoBean private AuthenticationService authenticationService;
+    @Autowired private AuthorizationServerSettings authorizationServerSettings;
+    //@Autowired private PasswordEncoder passwordEncoder;
+
+    @MockitoBean private AuthenticationManager authenticationManager;
+    @MockitoBean private JwtService jwtService;
+    @MockitoBean private UserService userService;
 
 
     @Test
@@ -107,13 +125,24 @@ class AuthenticationApiControllerITest {
 
     @Test
     @WithMockUser(username = "user",roles = "USER")
-    public void user_whenAuthMe_thenReturnForbidden() throws Exception {
+    public void user_whenAuthMe_thenReturnUserData() throws Exception {
+        // Simula el DTO de respuesta
+        AuthenticatedMeResponseDTO responseDTO = AuthenticatedMeResponseDTO.builder()
+                .username("user")
+                .roles(List.of("ROLE_USER"))
+                .build();
 
+        // Mock del servicio
+        Mockito.when(authenticationService.getAuthenticated()).thenReturn(responseDTO);
         // Realizar la solicitud POST y verificar la respuesta
-        mockMvc.perform(post("/ratings/api/auth/me")
+        mockMvc.perform(MockMvcRequestBuilders.get("/ratings/api/auth/me")
                         .contentType( MediaType.APPLICATION_JSON )
                 )
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+                //.andExpect(MockMvcResultMatchers.status().isForbidden());
+                .andExpect(MockMvcResultMatchers.status().isOk()) // Verifica que el estado sea 200
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)) // Verifica el tipo de contenido
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("user")) // Verifica el nombre de usuario
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0]").value("ROLE_USER")); // Verifica el rol
     }
 
     @Test

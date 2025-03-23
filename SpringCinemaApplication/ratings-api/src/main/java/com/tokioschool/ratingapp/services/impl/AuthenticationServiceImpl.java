@@ -1,12 +1,13 @@
 package com.tokioschool.ratingapp.services.impl;
 
+import com.nimbusds.jwt.SignedJWT;
 import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.ratingapp.dto.authorities.AuthorityDto;
 import com.tokioschool.ratingapp.dto.roles.RoleDto;
 import com.tokioschool.ratingapp.dto.users.UserDto;
-import com.tokioschool.ratingapp.securities.jwt.service.JwtService;
+import com.tokioschool.ratingapp.securities.jwt.servicies.JwtService;
 import com.tokioschool.ratingapp.services.AuthenticationService;
 import com.tokioschool.ratingapp.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
-import java.nio.file.AccessDeniedException;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -55,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * @throws BadCredentialsException if the password has error
      */
     @Override
-    public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationRequestDTO) throws UsernameNotFoundException, BadCredentialsException, AccessDeniedException {
+    public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationRequestDTO) throws Exception {
         final Pair<UserDto,String> pairUserAndPwd = userService.
                 findUserAndPasswordByEmail(authenticationRequestDTO.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException( MessageFormat.format("User {0} don't found",authenticationRequestDTO.getUsername() ) ) );
@@ -72,16 +72,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Generate JWT
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Jwt jwt = jwtService.generateToken(userDetails);
+        SignedJWT jwt = jwtService.generateToken(userDetails);
+       // JWKSource<SecurityContext> jwt =  new RatingsApiSecurityConfiguration().jwkSource();
 
         // Set Security Context for maintain the security context for the current session
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Return JWT
         return AuthenticationResponseDTO.builder()
-                .accessToken(jwt.getTokenValue())
+                .accessToken(jwt.serialize())
                 // +1 porque excluye el úlitmo digio del segundo y sea 3600 segundos
-                .expiresIn(ChronoUnit.SECONDS.between(Instant.now(), jwt.getExpiresAt()) +1)
+                .expiresIn( ChronoUnit.SECONDS.between(Instant.now(), ((Date) jwt.getJWTClaimsSet().getClaim("exp")).toInstant() ) +1  )//ChronoUnit.SECONDS.between(Instant.now(), jwt.getExpiresAt()) +1)
                 .build();
     }
 
@@ -92,15 +93,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      * @throws LoginException if there is not authenticated
      */
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public AuthenticatedMeResponseDTO getAuthenticated() throws LoginException { // para saber quin hizo la petición
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null){
             throw new LoginException("don't user authenticated");
         }
-
+        //TODO
         return AuthenticatedMeResponseDTO.builder()
                 .username(authentication.getName())
+                .scopes(
+                        Optional.of(authentication)
+                                .map(Authentication::getPrincipal)
+                                .filter(Jwt.class::isInstance)
+                                .map(jwt -> (Jwt)jwt)
+                                .map(token -> token.getClaim("scope"))
+                                .filter(List.class::isInstance)
+                                .map(scopes ->(List<String>)scopes)
+                                .orElseGet(Collections::emptyList)
+                )
                 .authorities(
                         Optional.of(authentication)
                                 .map(Authentication::getAuthorities)
@@ -160,9 +171,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return null;
     }
+    /*
 
+    public String generateToken(String username, List<String> roles) throws Exception {
+        // Obtener la clave privada desde JWKSource
+        JWK jwk = jwkSource.get(null).getKeys().get(0);
+        RSAKey rsaKey = (RSAKey) jwk;
+        RSAPrivateKey privateKey = rsaKey.toRSAPrivateKey();
 
+        // Crear los claims del token
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .subject(username)
+                .issuer("http://localhost:9000") // Servidor emisor
+                .issueTime(Date.from(Instant.now()))
+                .expirationTime(Date.from(Instant.now().plusSeconds(3600))) // Expira en 1 hora
+                .claim("roles", roles)
+                .jwtID(UUID.randomUUID().toString()) // ID único del token
+                .build();
 
+        // Firmar el token con la clave privada
+        JWSSigner signer = new RSASSASigner(privateKey);
+        SignedJWT signedJWT = new SignedJWT(
+                new com.nimbusds.jose.JWSHeader.Builder(JWSAlgorithm.RS256).keyID(rsaKey.getKeyID()).build(),
+                claimsSet);
+        signedJWT.sign(signer);
+
+        return signedJWT.serialize(); // Retorna el JWT como String
+    }
+
+     */
     /**
      * Load the loadAuthorities of user (privileges + roles)
      *

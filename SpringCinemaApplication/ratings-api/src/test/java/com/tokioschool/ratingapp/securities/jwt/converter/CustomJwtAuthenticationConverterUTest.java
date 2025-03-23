@@ -52,22 +52,23 @@ class CustomJwtAuthenticationConverterUTest {
     }
 
     @Test
-    void convert_withNullToken_thenReturnAccessDeniedException() {
+    void convert_withNullToken_thenReturnNullPointerException() {
 
 
         CustomJwtAuthenticationConverter converter = new CustomJwtAuthenticationConverter();
-        Assertions.assertThrows(AccessDeniedException.class, () ->  converter.convert( null ) );
+        Assertions.assertThrows(NullPointerException.class, () ->  converter.convert( null ) );
 
     }
 
     @Test
-    void convert_withNullAuthorities_thenReturnAccessDeniedException() {
+    void convert_withNullAuthorities_thenReturnTokenWithAuthoritiesEmpty() {
 
         when(jwt.getClaim("authorities")).thenReturn(null);
 
         CustomJwtAuthenticationConverter converter = new CustomJwtAuthenticationConverter();
 
-        Assertions.assertThrows(AccessDeniedException.class, () ->  converter.convert(jwt) );
+        AbstractAuthenticationToken token = converter.convert(jwt);
+        Assertions.assertTrue(token.getAuthorities().isEmpty());
     }
 
     @Test

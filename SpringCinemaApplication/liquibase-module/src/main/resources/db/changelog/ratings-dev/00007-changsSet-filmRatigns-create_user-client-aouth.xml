@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ChangeSet to create the USER table -->
+    <changeSet id="film-ratings-created-user-client-aouth" author="andres.rpenuela" context="ratings-dev">
+        <insert tableName="users">
+            <column name="ID" value="0AVRSA787897C" />
+            <column name="USERNAME" value="oauth-client" />
+            <column name="PASSWORD" value="$2a$12$5a6RB9Wu6Gw4V41h7x3PeuwKLwd29v/Vh6b2T.mDzqarTRurI9x2W" />
+            <column name="PASSWORD_BIS" value="$2a$12$5a6RB9Wu6Gw4V41h7x3PeuwKLwd29v/Vh6b2T.mDzqarTRurI9x2W" />
+            <column name="EMAIL" value="oauth-client@example.com" />
+            <column name="CREATE_AT" valueDate="2024-12-30T12:05:00" />
+            <column name="LAST_LOGIN_AT" valueDate="2024-12-30T12:05:00" />
+        </insert>
+
+        <insert tableName="users_roles">
+            <column name="USER_ID" value="0AVRSA787897C" />
+            <column name="ROLE_ID" value="1" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="ilm-ratings-created-user-client-aouth" author="andres.rpenuela">
+        <rollback>
+            <delete tableName="users_roles">
+                <where>USER_ID = '0AVRSA787897C'</where>
+            </delete>
+            <delete tableName="users">
+                <where>ID = '0AVRSA787897C'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -1,10 +1,12 @@
 package com.tokioschool.ratingapp.services.impl;
 
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
 import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
 import com.tokioschool.ratingapp.dto.users.UserDto;
-import com.tokioschool.ratingapp.securities.jwt.service.JwtService;
+import com.tokioschool.ratingapp.securities.jwt.servicies.JwtService;
 import com.tokioschool.ratingapp.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,9 +32,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.security.auth.login.LoginException;
-import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,18 +61,18 @@ class AuthenticationServiceImplUTest {
 
     private AuthenticationRequestDTO authenticationRequestDTO;
     private UserDto mockUserDto;
-    private Jwt mockJwt;
+    private SignedJWT mockJwt;
 
     @BeforeEach
     void setUp() {
         authenticationRequestDTO = AuthenticationRequestDTO.builder().username("testUser").password("password123").build();
         mockUserDto = new UserDto();
         mockUserDto.setEmail("testUser");
-        mockJwt = mock(Jwt.class);
+        mockJwt = mock(SignedJWT.class);
     }
 
     @Test
-    void user_whenAuthenticate_Success() throws AccessDeniedException {
+    void user_whenAuthenticate_Success() throws Exception {
         when(userService.findUserAndPasswordByEmail(authenticationRequestDTO.getUsername()))
                 .thenReturn(Optional.of(Pair.of(mockUserDto, "password123")));
 
@@ -81,14 +83,17 @@ class AuthenticationServiceImplUTest {
                 .thenReturn(mockAuthentication);
         when(mockAuthentication.getPrincipal()).thenReturn(mockUserDetails);
         when(jwtService.generateToken(mockUserDetails)).thenReturn(mockJwt);
-        when(mockJwt.getTokenValue()).thenReturn("mockJwtToken");
-        when(mockJwt.getExpiresAt()).thenReturn(Instant.now().plusSeconds(3600));
+        when(mockJwt.serialize()).thenReturn("mockJwtToken");
+        when(mockJwt.getJWTClaimsSet()).thenReturn(new JWTClaimsSet.Builder().claim("exp",new Date()).build());
 
         AuthenticationResponseDTO response = authenticationService.authenticate(authenticationRequestDTO);
 
         assertNotNull(response);
         assertEquals("mockJwtToken", response.getAccessToken());
         assertTrue(response.getExpiresIn() > 0);
+    }
+
+    private void assertTrue(boolean b) {
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.tokioschool.ratingapp.securities.jwt.converter;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,6 +12,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -18,6 +20,7 @@ import java.util.Optional;
  * Custom JWT Authentication Converter.
  * This class customizes the conversion of a JWT token to an AbstractAuthenticationToken.
  */
+@Slf4j
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     /**
@@ -29,16 +32,17 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
      * @return the AbstractAuthenticationToken
      */
     @Override
-    public AbstractAuthenticationToken convert(Jwt source) {
+    public AbstractAuthenticationToken convert(@NonNull Jwt source) {
         // Default Spring JWT Authentication Converter
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         // Customize roles and permissions
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
-                // Extract the "authorities" claim from the JWT payload, which is a String[],
-                // and convert it to a list of SimpleGrantedAuthority objects
-                CustomJwtAuthenticationConverter::getAuthorities
-        );
-
+        if(source.getClaim("authorities") != null) {
+            jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+                    // Extract the "authorities" claim from the JWT payload, which is a String[],
+                    // and convert it to a list of SimpleGrantedAuthority objects
+                    CustomJwtAuthenticationConverter::getAuthorities
+            );
+        }
         // Convert the rest of the fields using the default converter
         return jwtAuthenticationConverter.convert(source);
     }
@@ -56,7 +60,7 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
                 .map(auths -> (List<String>) auths)
                 .orElseGet(() -> null);
 
-        if (jwt == null || authorities == null || authorities.isEmpty()) {
+        if (authorities == null || authorities.isEmpty()) {
             throw new AccessDeniedException("No authorities");
         }
 

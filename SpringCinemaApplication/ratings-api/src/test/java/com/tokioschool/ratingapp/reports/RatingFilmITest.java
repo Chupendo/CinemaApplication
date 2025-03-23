@@ -5,12 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -23,7 +25,7 @@ class RatingFilmITest {
     private RatingFilmDao ratingFilmDao;
 
     @Test
-    void findRatingFilmByUserIdAndFilmId_withValidUserIdAndFilmId_shouldReturnRatings() {
+    void findRatingFilmByUserIdAndFilmId_withValidUserIdAndFilmIdRepeat_shouldReturnIncorrectResultSizeDataAccessException() {
         RatingFilm rating1 = new RatingFilm();
         rating1.setUserId("user123");
         rating1.setFilmId(1L);
@@ -36,18 +38,16 @@ class RatingFilmITest {
         rating2.setScore(BigDecimal.valueOf(5.0));
         entityManager.persistAndFlush(rating2);
 
-        List<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId("user123", 1L);
+        assertThatThrownBy( () -> ratingFilmDao.findRatingFilmByUserIdAndFilmId("user123", 1L) ).isInstanceOf(IncorrectResultSizeDataAccessException.class);
 
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(2);
     }
 
     @Test
     void findRatingFilmByUserIdAndFilmId_withInvalidUserIdAndFilmId_shouldReturnEmptyList() {
-        List<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId("invalidUser", 999L);
+        Optional<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId("invalidUser", 999L);
 
         assertThat(result).isNotNull();
-        assertThat(result).satisfies(List::isEmpty);
+        assertThat(result).isEmpty();
     }
 
     @Test

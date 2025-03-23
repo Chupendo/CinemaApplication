@@ -19,7 +19,7 @@ import java.time.Duration;
         "application.jwt.secret=test-secret",
         "application.jwt.expiration=PT30M"
 })
-public class JwtConfigurationPropertyUTest {
+public class JwtAuthConfigurationPropertyUTest {
 
     @Value("${application.jwt.secret}")
     private String secret;
