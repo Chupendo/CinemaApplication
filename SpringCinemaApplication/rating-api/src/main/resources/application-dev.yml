@@ -21,6 +21,25 @@ spring:
     user:
       name: user
       password: your_password
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:9095
+#      client:
+#        registration:
+#          oauth-client:
+#            client-id: your-client-id
+#            client-secret: your-client-secret
+#            authorization-grant-type: authorization_code
+#            scope: openid, profile, email
+#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#            authorization-uri: https://authorization-server.com/oauth2/authorize
+#            token-uri: https://authorization-server.com/oauth2/token
+#            client-name: OAuth Client
+#            client-alias: oauth-client
+#        provider:
+#          authorization-server:
+#            authorization-uri: https://authorization-server.com/oauth2/authorize
+#            token-uri: https://authorization-server.com/oauth2/token
   sql:
     init:
       platform: h2
@@ -47,3 +66,5 @@ logging:
     org:
       h2: DEBUG
       hibernate: DEBUG
+      springframework:
+        security: TRACE
