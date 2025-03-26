@@ -19,7 +19,7 @@ public class OAuth2AuthorizationController {
 
     @GetMapping("/authenticate")
     public ResponseEntity<OAuth2TokenResponse> authenticate(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization, @RequestParam("grant_type") String grantType) throws BadRequestException {
-        log.info("authorizaction: "+authorization+", grant_type:"+grantType);
+        log.debug("authorizaction: "+authorization+", grant_type:"+grantType);
         if( !"client_credentials".equals( grantType ) || !authorization.startsWith("Basic ") ){
             throw new BadRequestException("error in grant type or authorization");
         }

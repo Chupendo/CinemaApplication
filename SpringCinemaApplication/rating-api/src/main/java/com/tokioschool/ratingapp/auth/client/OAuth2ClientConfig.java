@@ -1,5 +1,6 @@
 package com.tokioschool.ratingapp.auth.client;
 
+import com.tokioschool.ratingapp.auth.configs.OauthClientProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,10 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 @RequiredArgsConstructor
 public class OAuth2ClientConfig {
 
+
+
     private final PasswordEncoder passwordEncoder;
+    private final OauthClientProperty oauthClientProperty;
 
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
@@ -21,16 +25,17 @@ public class OAuth2ClientConfig {
 
     @Bean
     public ClientRegistration clientRegistration() {
-        return ClientRegistration.withRegistrationId("oauth-client")
-                .clientId("oauth-client")
-                .clientSecret(passwordEncoder.encode("secret3"))
+        return ClientRegistration.withRegistrationId( oauthClientProperty.clientId() )
+                .clientId( oauthClientProperty.clientId() )
+                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientSecret() ))
                 .authorizationGrantType(org.springframework.security.oauth2.core.AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .redirectUri("http://127.0.0.1:9095/login/oauth2/code/oauth-client")
-                .scope("openid", "profile", "read","writer")
-                .authorizationUri("http://127.0.0.1:9095/oauth2/authorize")
-                .tokenUri("http://127.0.0.1:9095/oauth2/token")
-                .userInfoUri("http://127.0.0.1:9095/userinfo")
-                .userNameAttributeName("sub")
+                .redirectUri(oauthClientProperty.redirectUri() )
+                //.scope("openid", "profile", "read","writer")
+                .scope( oauthClientProperty.scopes() )
+                .authorizationUri(oauthClientProperty.authorizationUri() )
+                .tokenUri( oauthClientProperty.tokenUri() )
+                .userInfoUri( oauthClientProperty.userInfoUri() )
+                .userNameAttributeName( oauthClientProperty.userNameAttributeName() )
                 .build();
     }
 }

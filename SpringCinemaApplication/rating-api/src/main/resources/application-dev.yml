@@ -20,7 +20,7 @@ spring:
   security:
     user:
       name: user
-      password: your_password
+      password: $2a$12$UibaueeyGF36H2gHMDStEO/us3nEhtepGjF5FIlE76c7okmqgyTQW
     oauth2:
       authorizationserver:
         issuer: http://localhost:9095

@@ -1,6 +1,7 @@
 package com.tokioschool.ratingapp.auth.providers.registers;
 
 
+import com.tokioschool.ratingapp.auth.configs.OauthClientProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,18 +21,19 @@ import java.util.UUID;
 public class RegisterAuthConfig {
 
     private final PasswordEncoder passwordEncoder;
+    private final OauthClientProperty oauthClientProperty;
+
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oauth-client")
+                .clientId( oauthClientProperty.clientId() )
                 //.clientSecret("{noop}secret3") // No cifrado (usar BCrypt en prod)
-                .clientSecret(passwordEncoder.encode("secret3"))
+                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientSecret() ))
                 .clientAuthenticationMethod(org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(org.springframework.security.oauth2.core.AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
-                .scope("read")
-                .scope("write")
+                .scopes(scopes->scopes.addAll( oauthClientProperty.scopes() ))
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofHours(1))
                         .build())
