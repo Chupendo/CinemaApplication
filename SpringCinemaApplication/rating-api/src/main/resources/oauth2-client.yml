@@ -1,6 +1,6 @@
 # Properties custom
 oauth2:
-  client:
+  client-oauth:
     client-id: oauth-client
     client-secret: ${AOUTH2_SECRET}
     scopes: openid,profile,read,writer
@@ -8,4 +8,24 @@ oauth2:
     authorization-uri: http://127.0.0.1:9095/oauth2/authorize
     token-uri: http://127.0.0.1:9095/oauth2/token
     userInfo-uri: http://127.0.0.1:9095/userinfo
+    user-name-attribute-name: sub
+  client-oidc:
+    client-id: oidc-client
+    client-secret: ${AOUTH2_SECRET}
+    scopes: openid,profile,read,writer
+    redirect-uri: http://127.0.0.1:9095/login/oauth2/code/oidc-client
+    authorization-uri: http://127.0.0.1:9095/oauth2/authorize
+    token-uri: http://127.0.0.1:9095/oauth2/token
+    userInfo-uri: http://127.0.0.1:9095/userinfo
+    post-logout-redirect-uri: http://127.0.0.1:9095/
+    user-name-attribute-name: sub
+  client-oidc-web:
+    client-id: oidc-client-web
+    client-secret: ${AOUTH2_SECRET}
+    scopes: openid,profile,read,writer
+    redirect-uri: http://127.0.0.1:9095/login/oauth2/code/oidc-client-web
+    authorization-uri: http://127.0.0.1:9095/oauth2/authorize
+    token-uri: http://127.0.0.1:9095/oauth2/token
+    userInfo-uri: http://127.0.0.1:9095/userinfo
+    post-logout-redirect-uri: http://127.0.0.1:9095/
     user-name-attribute-name: sub

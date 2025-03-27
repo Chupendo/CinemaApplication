@@ -32,14 +32,14 @@ public class RegisterAuthConfig {
 
     private RegisteredClient registerCredentialClient(){
         return RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId( oauthClientProperty.clientId() )
+                .clientId( oauthClientProperty.clientOauth().clientId() )
                 //.clientSecret("{noop}secret3") // No cifrado (usar BCrypt en prod)
-                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientSecret() ))
+                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientOauth().clientSecret()) )
                 .clientAuthenticationMethod(org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(org.springframework.security.oauth2.core.AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
-                .scopes(scopes->scopes.addAll( oauthClientProperty.scopes() ))
+                .scopes(scopes->scopes.addAll( oauthClientProperty.clientOauth().scopes() ))
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofHours(1))
                         .build())
@@ -65,16 +65,17 @@ public class RegisterAuthConfig {
          * --form 'redirect_uri="http://127.0.0.1:9095/login/oauth2/code/oidc-client"'
          */
         return RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client")
+                .clientId( oauthClientProperty.clientOidc().clientId() )
                 .clientSecret(passwordEncoder.encode("secret3"))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:9095/login/oauth2/code/oidc-client")
-                .redirectUri("http://127.0.0.1:9095/oauth2/authorize")
+                .redirectUri( oauthClientProperty.clientOidc().redirectUri() )
+                .redirectUri( oauthClientProperty.clientOidc().authorizationUri() )
                 .postLogoutRedirectUri("http://127.0.0.1:9095/")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+                .scopes( scopes -> scopes.addAll( oauthClientProperty.clientOidcWeb().scopes() ))
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .build();
     }
@@ -82,16 +83,17 @@ public class RegisterAuthConfig {
     private RegisteredClient registerAuthenticationWebClient(){
         // This client, get token form request (required auth), en el navegador: http://127.0.0.1:9095/oauth2/authorize?response_type=code&client_id=oidc-client&redirect_uri=http://127.0.0.1:9095/login/oauth2/code/oidc-client&scope=openid
         return RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("oidc-client-web")
-                .clientSecret(passwordEncoder.encode("secret3"))
+                .clientId( oauthClientProperty.clientOidcWeb().clientId() )
+                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientOidcWeb().clientSecret() ))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:9095/login/oauth2/code/oidc-client-web")
-                .redirectUri("http://127.0.0.1:9095/oauth2/authorize")
-                .postLogoutRedirectUri("http://127.0.0.1:9095/")
-                .scope(OidcScopes.OPENID)
-                .scope(OidcScopes.PROFILE)
+                .redirectUri( oauthClientProperty.clientOidcWeb().redirectUri() )
+                .redirectUri( oauthClientProperty.clientOidcWeb().authorizationUri() )
+                .postLogoutRedirectUri( oauthClientProperty.clientOidcWeb().postLogoutRedirectUri() )
+//                .scope(OidcScopes.OPENID)
+//                .scope(OidcScopes.PROFILE)
+                .scopes( scopes -> scopes.addAll( oauthClientProperty.clientOidcWeb().scopes() ))
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(false).build())
                 .build();
     }

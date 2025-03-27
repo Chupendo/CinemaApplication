@@ -38,7 +38,7 @@ public class OAuth2TokenService {
     public OAuth2TokenResponse exchangeAuthorizationCodeForAccessToken(String basicAuthCredentials) {
 
         // URL del servidor de autorización
-        String tokenUri = oauthClientProperty.tokenUri();
+        String tokenUri = oauthClientProperty.clientOauth().tokenUri();
 
         String credentials = Optional.ofNullable(basicAuthCredentials)
                 .map(Base64.getDecoder()::decode)

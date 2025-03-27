@@ -30,47 +30,49 @@ public class OAuth2ClientConfig {
 
 
     public ClientRegistration clientCredentialsRegistration() {
-        return ClientRegistration.withRegistrationId( oauthClientProperty.clientId() )
-                .clientId( oauthClientProperty.clientId() )
-                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientSecret() ))
+        return ClientRegistration.withRegistrationId( oauthClientProperty.clientOauth().clientId() )
+                .clientId( oauthClientProperty.clientOauth().clientId() )
+                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientOauth().clientSecret() ))
                 .authorizationGrantType(org.springframework.security.oauth2.core.AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .redirectUri(oauthClientProperty.redirectUri() )
+                .redirectUri(oauthClientProperty.clientOauth().redirectUri() )
                 //.scope("openid", "profile", "read","writer")
-                .scope( oauthClientProperty.scopes() )
-                .authorizationUri(oauthClientProperty.authorizationUri() )
-                .tokenUri( oauthClientProperty.tokenUri() )
-                .userInfoUri( oauthClientProperty.userInfoUri() )
-                .userNameAttributeName( oauthClientProperty.userNameAttributeName() )
+                .scope( oauthClientProperty.clientOauth().scopes() )
+                .authorizationUri(oauthClientProperty.clientOauth().authorizationUri() )
+                .tokenUri( oauthClientProperty.clientOauth().tokenUri() )
+                .userInfoUri( oauthClientProperty.clientOauth().userInfoUri() )
+                .userNameAttributeName( oauthClientProperty.clientOauth().userNameAttributeName() )
                 .build();
     }
 
     public ClientRegistration clientAuthorizationRegistration() {
         return ClientRegistration.withRegistrationId( UUID.randomUUID().toString())
-                .clientId("oauth-client")
-                .clientSecret(passwordEncoder.encode("secret3"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:9095/login/oauth2/code/oidc-client")
-                .authorizationUri("http://127.0.0.1:9095/oauth2/authorize")
-                .tokenUri("http://127.0.0.1:9095/oauth2/token")
-                .scope("openid")
-                .scope("read")
+                .clientId( oauthClientProperty.clientOidc().clientId() )
+                .clientSecret( passwordEncoder.encode( oauthClientProperty.clientOidc().clientSecret() ))
+                .clientAuthenticationMethod( ClientAuthenticationMethod.CLIENT_SECRET_BASIC )
+                .authorizationGrantType( AuthorizationGrantType.AUTHORIZATION_CODE )
+                .authorizationGrantType( AuthorizationGrantType.REFRESH_TOKEN )
+                .redirectUri( oauthClientProperty.clientOidc().redirectUri() )
+                .authorizationUri( oauthClientProperty.clientOidc().authorizationUri() )
+                .tokenUri( oauthClientProperty.clientOidc().tokenUri() )
+                //.scope("openid")
+                //.scope("read")
+                .scope( oauthClientProperty.clientOidc().scopes() )
                 .build();
     }
 
     public ClientRegistration clientAuthorizationWebRegistration() {
         return ClientRegistration.withRegistrationId( UUID.randomUUID().toString())
-                .clientId("oidc-client-web")
-                .clientSecret(passwordEncoder.encode("secret3"))
+                .clientId( oauthClientProperty.clientOidcWeb().clientId() )
+                .clientSecret(passwordEncoder.encode( oauthClientProperty.clientOidcWeb().clientSecret() ) )
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:9095/login/oauth2/code/oidc-client-web")
-                .authorizationUri("http://127.0.0.1:9095/oauth2/authorize")
-                .tokenUri("http://127.0.0.1:9095/oauth2/token")
-                .scope("openid")
-                .scope("read")
+                .redirectUri( oauthClientProperty.clientOidcWeb().redirectUri() )
+                .authorizationUri( oauthClientProperty.clientOidcWeb().authorizationUri() )
+                .tokenUri( oauthClientProperty.clientOidcWeb().tokenUri() )
+                //.scope("openid")
+                //.scope("read")
+                .scope( oauthClientProperty.clientOidcWeb().scopes() )
                 .build();
     }
 
