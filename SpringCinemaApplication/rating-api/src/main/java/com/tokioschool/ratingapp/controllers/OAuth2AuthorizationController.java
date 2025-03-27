@@ -26,5 +26,4 @@ public class OAuth2AuthorizationController {
 
         return ResponseEntity.ok( oAuth2TokenService.exchangeAuthorizationCodeForAccessToken(authorization.replace("Basic ","")) );
     }
-
 }

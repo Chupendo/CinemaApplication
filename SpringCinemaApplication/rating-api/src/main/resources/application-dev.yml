@@ -24,6 +24,9 @@ spring:
     oauth2:
       authorizationserver:
         issuer: http://localhost:9095
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:9095
 #      client:
 #        registration:
 #          oauth-client:
@@ -68,3 +71,4 @@ logging:
       hibernate: DEBUG
       springframework:
         security: TRACE
+        web: DEBUG

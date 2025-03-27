@@ -3,8 +3,8 @@ package com.tokioschool.ratingapp.securities.routes;
 public interface Routes {
 
     String[] WHITE_LIST_URLS = {
-            "/oauth2**","/oauth2/**",
-            "/.well-known/**",
+            "/login**", "/error",
+            "/oauth2/authenticate","/login/oauth2/code/**","/oauth2/token","/.well-known/**",
             "/h2-console/**"
     };
 }

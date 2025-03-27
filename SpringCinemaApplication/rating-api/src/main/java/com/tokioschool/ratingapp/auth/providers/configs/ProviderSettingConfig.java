@@ -15,6 +15,9 @@ public class ProviderSettingConfig  {
     public AuthorizationServerSettings providerSettings() {
         return AuthorizationServerSettings.builder()
                 .issuer("http://localhost:9095") // OAuth2 Server
+                .authorizationEndpoint("/oauth2/authorize")
+                .tokenEndpoint("/oauth2/token")
                 .build();
     }
+
 }

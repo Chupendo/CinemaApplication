@@ -4,15 +4,16 @@ import com.tokioschool.ratingapp.auth.configs.OauthClientProperty;
 import com.tokioschool.ratingapp.core.responses.OAuth2TokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
@@ -86,5 +87,34 @@ public class OAuth2TokenService {
                 })
                 .bodyToMono(OAuth2TokenResponse.class)  // Recibir el cuerpo de la respuesta en formato String (JSON)
                 .block();  // Bloquear hasta obtener la respuesta
+    }
+
+    public OAuth2TokenResponse getAccessToken(String authorizationCode) {
+        String tokenUri = "http://localhost:9095/oauth2/token";
+
+        String basicAuth = "secret3";
+
+        HttpHeaders headers = new HttpHeaders();
+        //headers.set("Authorization", "Basic " + encodeBasicAuth("oauth-client-auth", passwordEncoder.encode(basicAuth) ));
+        headers.set("Authorization", "Basic " + encodeBasicAuth("oidc-client-web", basicAuth));
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        //body.add("grant_type", String.valueOf(AuthorizationGrantType.AUTHORIZATION_CODE));
+        body.add("grant_type", "authorization_code");//String.valueOf(AuthorizationGrantType.AUTHORIZATION_CODE));
+        body.add("code", authorizationCode);
+        body.add("redirect_uri", "http://127.0.0.1:9095/login/oauth2/code/oidc-client-web");
+        //body.add("redirect_uri", "http://127.0.0.1:9095/oauth2/authorized");
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<OAuth2TokenResponse> response = restTemplate.exchange(tokenUri, HttpMethod.POST, entity, OAuth2TokenResponse.class);
+
+        return response.getBody();  // Aquí obtienes el token de acceso
+    }
+
+    private String encodeBasicAuth(String clientId, String clientSecret) {
+        String credentials = clientId + ":" + clientSecret;
+        return new String(Base64.getEncoder().encode(credentials.getBytes()));
     }
 }
