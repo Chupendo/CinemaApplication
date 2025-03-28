@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.tokioschool.ratingapp.securities.routes.Routes.H2_CONSOLE_FULL;
 import static com.tokioschool.ratingapp.securities.routes.Routes.WHITE_LIST_URLS;
 
 @Configuration
@@ -37,7 +38,8 @@ public class RatingMainFilterSecurity {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
 
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.ignoringRequestMatchers(H2_CONSOLE_FULL)) // Ignora CSRF en H2 Console
+                //.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URLS).permitAll()
                         .anyRequest().authenticated()
@@ -54,6 +56,8 @@ public class RatingMainFilterSecurity {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER)                )
                 .logout(Customizer.withDefaults())
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); //required for user wit h2
+                //.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // Permite iframes de la misma fuente para usar h2
+
         return http.build();
     }
 
