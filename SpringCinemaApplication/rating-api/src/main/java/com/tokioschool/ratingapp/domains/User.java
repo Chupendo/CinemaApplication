@@ -45,10 +45,4 @@ public class User {
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "users_scopes",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "scope_id")})
-    private Set<Scope> scopes;
 }

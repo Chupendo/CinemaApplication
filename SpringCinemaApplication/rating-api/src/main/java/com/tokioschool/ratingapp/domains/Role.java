@@ -26,4 +26,10 @@ public class Role {
             joinColumns =  {@JoinColumn(name="ROLE_ID")},
             inverseJoinColumns = { @JoinColumn(name="AUTHORITY_ID")})
     private Set<Authority> authorities;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "roles_scopes",
+            joinColumns = {@JoinColumn(name = "ROLE_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "SCOPE_ID")})
+    private Set<Scope> scopes;
 }
