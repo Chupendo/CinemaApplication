@@ -1,5 +1,9 @@
 package com.tokioschool.ratingapp.core.responses;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Arrays;
+import java.util.Set;
 
 public class OAuth2TokenResponse {
 
@@ -12,7 +16,14 @@ public class OAuth2TokenResponse {
     @JsonProperty("expires_in")
     private int expiresIn;
 
+    @JsonProperty("refresh_token")
+    private String refreshToken;
+
+    @JsonProperty("scope")
+    private String scope;
+
     // Getters y Setters
+
     public String getAccessToken() {
         return accessToken;
     }
@@ -37,12 +48,30 @@ public class OAuth2TokenResponse {
         this.expiresIn = expiresIn;
     }
 
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
     @Override
     public String toString() {
         return "OAuth2TokenResponse{" +
                 "accessToken='" + accessToken + '\'' +
                 ", tokenType='" + tokenType + '\'' +
                 ", expiresIn=" + expiresIn +
+                ", refreshToken='" + refreshToken + '\'' +
+                ", scope=" + scope +
                 '}';
     }
 }

@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-public class LoginApiController {
+public class LoginOAuth2ApiController {
 
     private final OAuth2TokenService oAuth2TokenService;
 
-    public LoginApiController(OAuth2TokenService oAuth2TokenService) {
+    public LoginOAuth2ApiController(OAuth2TokenService oAuth2TokenService) {
         this.oAuth2TokenService = oAuth2TokenService;
     }
 

@@ -17,8 +17,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -63,13 +65,18 @@ public class OAuth2TokenService {
             throw new BadCredentialsException("bad credentials in authentication.");
         }
 
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        //body.add("grant_type", String.valueOf(AuthorizationGrantType.AUTHORIZATION_CODE));
+        body.add("grant_type", "client_credentials");//String.valueOf(AuthorizationGrantType.AUTHORIZATION_CODE));
+        body.add("scope",StringUtils.stripToEmpty(  clientRegistration.getScopes().stream().reduce("",(s, s2) -> s.concat(" "+s2)) ));
+
         // Construir la solicitud POST con WebClient
         return webClientBuilder.build()
                 .post()
                 .uri(tokenUri)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)  // Tipo de contenido para el formulario
                 .header(HttpHeaders.AUTHORIZATION, "Basic %s".formatted( basicAuthCredentials) ) // Autenticación básica
-                .bodyValue("grant_type=client_credentials")  // Parámetros en el cuerpo
+                .bodyValue(body)  // Parámetros en el cuerpo
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> {
                     // Manejo de errores en caso de fallo de autorización (401, 403, etc.)
