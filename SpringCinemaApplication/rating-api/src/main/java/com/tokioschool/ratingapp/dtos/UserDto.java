@@ -19,5 +19,4 @@ public class UserDto {
     private LocalDateTime created;
     private LocalDateTime lastLoginAt;
     private List<RoleDto> roles;
-    private List<String> scopes;
 }

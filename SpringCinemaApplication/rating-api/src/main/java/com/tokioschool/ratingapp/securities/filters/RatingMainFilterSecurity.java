@@ -1,5 +1,6 @@
 package com.tokioschool.ratingapp.securities.filters;
 
+import com.tokioschool.ratingapp.jwt.converter.CustomJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,11 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.tokioschool.ratingapp.securities.routes.Routes.H2_CONSOLE_FULL;
-import static com.tokioschool.ratingapp.securities.routes.Routes.WHITE_LIST_URLS;
+import static com.tokioschool.ratingapp.securities.routes.Routes.*;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +36,7 @@ public class RatingMainFilterSecurity {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
 
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers(H2_CONSOLE_FULL)) // Ignora CSRF en H2 Console
+                .csrf(csrf -> csrf.ignoringRequestMatchers(H2_CONSOLE_FULL,LOGIN_API_FULL)) // Ignora CSRF en H2 Console
                 //.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URLS).permitAll()
@@ -51,7 +49,8 @@ public class RatingMainFilterSecurity {
                                 .oidc(Customizer.withDefaults())    // Enable OpenID Connect 1.0
                 )
                 //.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())) // Habilita JWT
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter())))
+                //.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter())))
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter() )))
                 .formLogin(Customizer.withDefaults()) // Habilita el form login
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER)                )
                 .logout(Customizer.withDefaults())
@@ -73,5 +72,4 @@ public class RatingMainFilterSecurity {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
-
 }
