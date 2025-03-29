@@ -20,8 +20,8 @@
         <insert tableName="users">
             <column name="ID" value="2" />
             <column name="USERNAME" value="admin" />
-            <column name="PASSWORD" value="$2a$12$lWqfNW9r93S7NnsOEBtMseFV.1Wn/S9qQ0o91ND0hd0xoEDEBGXLW" />
-            <column name="PASSWORD_BIS" value="$2a$12$lWqfNW9r93S7NnsOEBtMseFV.1Wn/S9qQ0o91ND0hd0xoEDEBGXLW" />
+            <column name="PASSWORD" value="$2a$12$5a6RB9Wu6Gw4V41h7x3PeuwKLwd29v/Vh6b2T.mDzqarTRurI9x2W" />
+            <column name="PASSWORD_BIS" value="$2a$12$5a6RB9Wu6Gw4V41h7x3PeuwKLwd29v/Vh6b2T.mDzqarTRurI9x2W" />
             <column name="EMAIL" value="admin@rating.com" />
             <column name="CREATE_AT" valueDate="2024-12-30T12:00:00" />
             <column name="LAST_LOGIN_AT" valueDate="2024-12-30T12:00:00" />
