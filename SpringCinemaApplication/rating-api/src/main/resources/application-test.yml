@@ -1,5 +1,81 @@
 spring:
   application:
     name: rating-api
+  # Liguibase
+  liquibase:
+    enabled: false
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: rating-test
+    label-filter: rating-test
+  # h2 database
+  datasource:
+    url: jdbc:h2:mem:testdb
+    #url: jdbc:h2:~/testdb
+    #url: jdbc:h2:file:../rating-bbdd/testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  security:
+    user:
+      name: user
+      password: $2a$12$UibaueeyGF36H2gHMDStEO/us3nEhtepGjF5FIlE76c7okmqgyTQW
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:9095
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:9095
+  #      client:
+  #        registration:
+  #          oauth-client:
+  #            client-id: your-client-id
+  #            client-secret: your-client-secret
+  #            authorization-grant-type: authorization_code
+  #            scope: openid, profile, email
+  #            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+  #            authorization-uri: https://authorization-server.com/oauth2/authorize
+  #            token-uri: https://authorization-server.com/oauth2/token
+  #            client-name: OAuth Client
+  #            client-alias: oauth-client
+  #        provider:
+  #          authorization-server:
+  #            authorization-uri: https://authorization-server.com/oauth2/authorize
+  #            token-uri: https://authorization-server.com/oauth2/token
+  sql:
+    init:
+      platform: h2
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  httpexchanges:
+    recording:
+      enabled: true
 server:
-  port: 9095
+  port: 9096
+
+logging:
+  level:
+    org:
+      h2: DEBUG
+      hibernate: DEBUG
+      springframework:
+        security: TRACE
+        web: DEBUG

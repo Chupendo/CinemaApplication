@@ -3,6 +3,7 @@ package com.tokioschool.ratingapp.core.advaice;
 import com.tokioschool.ratingapp.core.exceptions.InternalErrorException;
 import com.tokioschool.ratingapp.core.exceptions.NotFoundException;
 import com.tokioschool.ratingapp.core.exceptions.OperationNotAllowException;
+import com.tokioschool.ratingapp.core.exceptions.ValidacionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,7 @@ public class ExceptionRestAdvice {
     /**
      * Handles ConstraintViolationException and returns a 400 status with a message.
      *
-     * @param ex the ConstraintViolationException
+     * @param ex the ConstraintViolationException, OperationNotAllowException, BadRequestException
      * @param request the HttpServletRequest
      * @return a map containing the error message and request URI
      */
@@ -73,6 +74,19 @@ public class ExceptionRestAdvice {
     })
     public Map<String, String> handleConstraintViolationException(Exception ex, HttpServletRequest request) {
         return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+    }
+
+    /**
+     * Handles ValidationException and returns a 400 status with a message.
+     *
+     * @param ex the ValidacionException
+     * @param request the HttpServletRequest
+     * @return a map containing the error message and request URI
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidacionException.class)
+    public Map<String, String> handlerErrorFormExceptionError(ValidacionException ex, HttpServletRequest request) {
+        return ex.getErrors();
     }
 
     /**
