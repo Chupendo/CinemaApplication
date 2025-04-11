@@ -26,29 +26,11 @@ public class JwtAuthConfig {
 
 
 
-    /**
-     * Esto permite generar las claves usadasa para obtener el JWK del servidor de Authenticación
-     * @return
-     */
 
-    @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        KeyPair keyPair = generateRsaKey(); // Metodo para generar una clave RSA
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-
-        JWK jwk = new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString()) // ID único para la clave
-                //.expirationTime( Date.from(Instant.now().plusMillis(Duration.ofHours(1).toMillis()  + 1 )  ) )
-                .build();
-
-        return new ImmutableJWKSet<>(new JWKSet(jwk));
-    }
 
     /**
-     * Permite agregar claims personalidzas al token al token de autenticación server
-     * Este bean se ejecuta antes de generar el token el servidor de authenticacion y añadir el usuario al contexto
+     * Permite agregar claims personalidzas al secret al secret de autenticación server
+     * Este bean se ejecuta antes de generar el secret el servidor de authenticacion y añadir el usuario al contexto
      *
      * @param userDetailsService
      * @return
@@ -84,20 +66,11 @@ public class JwtAuthConfig {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
-    private static KeyPair generateRsaKey() {
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            return keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException("Error generando la clave RSA", ex);
-        }
-    }
-
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
                 .build();
     }
+
 }

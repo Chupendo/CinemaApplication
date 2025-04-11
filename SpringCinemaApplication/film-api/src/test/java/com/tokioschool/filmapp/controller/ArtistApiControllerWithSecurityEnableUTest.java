@@ -2,7 +2,7 @@ package com.tokioschool.filmapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
-import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
+import com.tokioschool.filmapp.security.confings.JwtConfiguration;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.artist.ArtistService;
 import com.tokioschool.filmapp.services.user.UserService;
@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -30,16 +31,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-@WebMvcTest(controllers = ArtistApiController.class) // obtiente solo el contexto del contraldor especificado
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
-@AutoConfigureMockMvc // Habilita MockMvc con filtros de seguridad
 @TestPropertySource(properties = {
         "logging.level.org.springframework.security=DEBUG",
-        "application.jwt.secret=secretos123123",
-        "application.jwt.expiration=PT1H"
+        "jwt.secret=secretos123123",
+        "jwt.expiration=PT1H"
 })
-@Import({FilmApiSecurityConfiguration.class, JwtConfiguration.class}) // Importa la configuración de seguridad
 class ArtistApiControllerWithSecurityEnableUTest {
 
     @Autowired
@@ -108,7 +107,7 @@ class ArtistApiControllerWithSecurityEnableUTest {
 
 
         // Realizar la solicitud POST y verificar la respuesta
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/film/api/artists") // Ajusta el endpoint si es necesario
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/film/api/artists/register") // Ajusta el endpoint si es necesario
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(artistDtoJson))
                 .andExpect(MockMvcResultMatchers.status().isCreated())

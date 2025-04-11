@@ -24,6 +24,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Implementación de la interfaz {@link StoreFacade}.
+ *
+ * Esta clase proporciona la lógica para interactuar con la API de Store, permitiendo
+ * registrar, guardar, buscar, eliminar y actualizar recursos.
+ *
+ * Anotaciones:
+ * - {@link Service}: Marca esta clase como un componente de servicio de Spring.
+ * - {@link Slf4j}: Habilita el registro de logs utilizando SLF4J.
+ * - {@link RequiredArgsConstructor}: Genera un constructor con los argumentos requeridos.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -35,39 +49,44 @@ public class StoreFacadeImpl implements StoreFacade {
 
     private static final String RESOURCE_URL = "/store/api/resource";
 
+    /**
+     * Registra un recurso en el sistema.
+     *
+     * @param multipartFile El archivo que representa el recurso.
+     * @param description Una descripción del recurso.
+     * @return Un {@link Optional} que contiene el identificador único del recurso registrado.
+     */
     @Override
     public Optional<ResourceIdDto> registerResource(MultipartFile multipartFile, String description) {
-
-        // simulation of description as request part
-        Map<String,String> descriptionMap = new HashMap<>();
-        descriptionMap.put("description",description);
+        // Simulación de la descripción como parte de la solicitud
+        Map<String, String> descriptionMap = new HashMap<>();
+        descriptionMap.put("description", description);
         String descriptionBody = StringUtils.EMPTY;
-        try{
+        try {
             descriptionBody = objectMapper.writeValueAsString(descriptionMap);
-        }catch (JsonProcessingException e){
-            log.error("Error while parsing file", e);
+        } catch (JsonProcessingException e) {
+            log.error("Error al procesar la descripción", e);
         }
 
-        // simulation of content file as request part
+        // Simulación del archivo como parte de la solicitud
         MediaType mediaType;
-        try{
+        try {
             mediaType = MediaType.valueOf(multipartFile.getContentType());
-
-        }catch (Exception e){
-            log.error("Error while parsing file", e);
-            mediaType = MediaType.APPLICATION_OCTET_STREAM; // it save as binary strict
+        } catch (Exception e) {
+            log.error("Error al procesar el archivo", e);
+            mediaType = MediaType.APPLICATION_OCTET_STREAM; // Se guarda como binario
         }
 
-        // each part is a different object, and will is send as pair header more body
-        final HttpEntity<Object> descriptionPart = buildHttpEntity(MediaType.APPLICATION_JSON,descriptionBody);
-        final HttpEntity<Object> resourcePart = buildHttpEntity(mediaType,multipartFile.getResource());
+        // Construcción de las partes de la solicitud
+        final HttpEntity<Object> descriptionPart = buildHttpEntity(MediaType.APPLICATION_JSON, descriptionBody);
+        final HttpEntity<Object> resourcePart = buildHttpEntity(mediaType, multipartFile.getResource());
 
-        // mount the request body with multipart request parts
-        MultiValueMap<Object,Object> parts = new LinkedMultiValueMap<>();
-        parts.add("description",descriptionPart);
-        parts.add("content",resourcePart);
+        // Montaje del cuerpo de la solicitud multipart
+        MultiValueMap<Object, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("description", descriptionPart);
+        parts.add("content", resourcePart);
 
-        try{
+        try {
             final ResourceIdDto resourceIdDto = restClient.post()
                     .uri(RESOURCE_URL)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -77,45 +96,50 @@ public class StoreFacadeImpl implements StoreFacade {
 
             return Optional.ofNullable(resourceIdDto);
         } catch (Exception e) {
-            log.error("Error saving resource",e);
+            log.error("Error al guardar el recurso", e);
         }
 
         return Optional.empty();
     }
 
+    /**
+     * Guarda un recurso en el sistema.
+     *
+     * @param multipartFile El archivo que representa el recurso.
+     * @param description Una descripción del recurso.
+     * @return Un {@link Optional} que contiene el identificador único del recurso guardado.
+     */
     @Override
     public Optional<ResourceIdDto> saveResource(MultipartFile multipartFile, String description) {
-
-        // simulation of description as request part
-        Map<String,String> descriptionMap = new HashMap<>();
-        descriptionMap.put("description",description);
+        // Simulación de la descripción como parte de la solicitud
+        Map<String, String> descriptionMap = new HashMap<>();
+        descriptionMap.put("description", description);
         String descriptionBody = StringUtils.EMPTY;
-        try{
+        try {
             descriptionBody = objectMapper.writeValueAsString(descriptionMap);
-        }catch (JsonProcessingException e){
-            log.error("Error while parsing file", e);
+        } catch (JsonProcessingException e) {
+            log.error("Error al procesar la descripción", e);
         }
 
-        // simulation of content file as request part
+        // Simulación del archivo como parte de la solicitud
         MediaType mediaType;
-        try{
+        try {
             mediaType = MediaType.valueOf(multipartFile.getContentType());
-
-        }catch (Exception e){
-            log.error("Error while parsing file", e);
-            mediaType = MediaType.APPLICATION_OCTET_STREAM; // it save as binary strict
+        } catch (Exception e) {
+            log.error("Error al procesar el archivo", e);
+            mediaType = MediaType.APPLICATION_OCTET_STREAM; // Se guarda como binario
         }
 
-        // each part is a different object, and will is send as pair header more body
-        final HttpEntity<Object> descriptionPart = buildHttpEntity(MediaType.APPLICATION_JSON,descriptionBody);
-        final HttpEntity<Object> resourcePart = buildHttpEntity(mediaType,multipartFile.getResource());
+        // Construcción de las partes de la solicitud
+        final HttpEntity<Object> descriptionPart = buildHttpEntity(MediaType.APPLICATION_JSON, descriptionBody);
+        final HttpEntity<Object> resourcePart = buildHttpEntity(mediaType, multipartFile.getResource());
 
-        // mount the request body with multipart request parts
-        MultiValueMap<Object,Object> parts = new LinkedMultiValueMap<>();
-        parts.add("description",descriptionPart);
-        parts.add("content",resourcePart);
+        // Montaje del cuerpo de la solicitud multipart
+        MultiValueMap<Object, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("description", descriptionPart);
+        parts.add("content", resourcePart);
 
-        try{
+        try {
             final ResourceIdDto resourceIdDto = restClient.post()
                     .uri(RESOURCE_URL)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -125,55 +149,80 @@ public class StoreFacadeImpl implements StoreFacade {
 
             return Optional.ofNullable(resourceIdDto);
         } catch (Exception e) {
-            log.error("Error saving resource",e);
+            log.error("Error al guardar el recurso", e);
         }
 
         return Optional.empty();
     }
 
+    /**
+     * Busca un recurso en el sistema por su identificador.
+     *
+     * @param resourceId El identificador único del recurso.
+     * @return Un {@link Optional} que contiene el contenido del recurso si se encuentra.
+     */
     @Override
     public Optional<ResourceContentDto> findResource(UUID resourceId) {
         final String uri = "%s/{resourceId}".formatted(RESOURCE_URL);
-        try{
+        try {
             ResourceContentDto resourceContentDto = restClient.get()
-                    .uri(uri,resourceId)
+                    .uri(uri, resourceId)
                     .retrieve()
                     .body(ResourceContentDto.class);
 
             return Optional.ofNullable(resourceContentDto);
-        }catch (Exception e){
-            log.error("Exception in findResource",e);
+        } catch (Exception e) {
+            log.error("Excepción al buscar el recurso", e);
         }
 
         return Optional.empty();
     }
 
+    /**
+     * Elimina un recurso del sistema por su identificador.
+     *
+     * @param resourceId El identificador único del recurso a eliminar.
+     */
     @Override
     public void deleteResource(UUID resourceId) {
         final String uri = "%s/{resourceId}".formatted(RESOURCE_URL);
 
-        restClient.delete().uri(uri,resourceId)
+        restClient.delete().uri(uri, resourceId)
                 .retrieve()
                 .toBodilessEntity();
     }
 
+    /**
+     * Actualiza un recurso existente en el sistema.
+     *
+     * @param resourceIdOld El identificador único del recurso a actualizar.
+     * @param multipartFile El nuevo archivo que representa el recurso.
+     * @param description Una nueva descripción del recurso.
+     * @return Un {@link Optional} que contiene el identificador único del recurso actualizado.
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     public Optional<ResourceIdDto> updateResource(UUID resourceIdOld, MultipartFile multipartFile, String description) {
-        Optional<ResourceIdDto> resourceIdDtoOptional = saveResource(multipartFile,description);
+        Optional<ResourceIdDto> resourceIdDtoOptional = saveResource(multipartFile, description);
 
-        if(resourceIdDtoOptional.isEmpty())
+        if (resourceIdDtoOptional.isEmpty())
             return Optional.empty();
 
-        if(resourceIdOld!=null){
+        if (resourceIdOld != null) {
             deleteResource(resourceIdOld);
         }
 
         return resourceIdDtoOptional;
     }
 
-
-    private HttpEntity<Object> buildHttpEntity(MediaType mediaType,Object body) {
+    /**
+     * Construye una entidad HTTP con el tipo de contenido y el cuerpo proporcionados.
+     *
+     * @param mediaType El tipo de contenido de la entidad.
+     * @param body El cuerpo de la entidad.
+     * @return Una instancia de {@link HttpEntity}.
+     */
+    private HttpEntity<Object> buildHttpEntity(MediaType mediaType, Object body) {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(mediaType);
         return new HttpEntity<>(body, headers);

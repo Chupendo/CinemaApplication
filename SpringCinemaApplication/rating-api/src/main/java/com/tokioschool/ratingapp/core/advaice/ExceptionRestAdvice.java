@@ -1,9 +1,9 @@
 package com.tokioschool.ratingapp.core.advaice;
 
-import com.tokioschool.ratingapp.core.exceptions.InternalErrorException;
-import com.tokioschool.ratingapp.core.exceptions.NotFoundException;
-import com.tokioschool.ratingapp.core.exceptions.OperationNotAllowException;
-import com.tokioschool.ratingapp.core.exceptions.ValidacionException;
+import com.tokioschool.core.exception.InternalErrorException;
+import com.tokioschool.core.exception.NotFoundException;
+import com.tokioschool.core.exception.OperationNotAllowException;
+import com.tokioschool.core.exception.ValidacionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,49 +22,56 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Global exception handler for REST controllers.
+ * Manejador global de excepciones para controladores REST.
+ *
+ * Proporciona métodos para manejar diferentes tipos de excepciones y devolver respuestas HTTP adecuadas.
+ * Incluye manejo de excepciones comunes como validaciones, errores de autenticación y errores internos del servidor.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
  */
 @RestControllerAdvice(annotations = RestController.class)
 @Slf4j
 public class ExceptionRestAdvice {
 
     /**
-     * Handles NotFoundException and returns a 404 status with a message.
+     * Maneja NotFoundException y devuelve un estado 404 con un mensaje.
      *
-     * @param ex the NotFoundException
-     * @param request the HttpServletRequest
-     * @return a map containing the error message and request URI
+     * @param ex la excepción NotFoundException
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene el mensaje de error y la URI de la solicitud
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     public Map<String, String> handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+        log.error("Error in %s".formatted(request.getRequestURI()), ex);
+        return Map.of("message", ex.getMessage(), "request", request.getRequestURI());
     }
 
     /**
-     * Handles MethodArgumentNotValidException and returns a 400 status with a message.
+     * Maneja MethodArgumentNotValidException y devuelve un estado 400 con un mensaje.
      *
-     * @param ex the MethodArgumentNotValidException
-     * @param request the HttpServletRequest
-     * @return a map containing the error message
+     * @param ex la excepción MethodArgumentNotValidException
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene el mensaje de error
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String message =
-                ex.getBindingResult().getFieldErrors()
-                        .stream()
-                        .map(error -> error.getField()+": "+error.getDefaultMessage())
-                        .collect(Collectors.joining(". "));
+        String message = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(". "));
+        log.error("Error in {}, messages: {}", request.getRequestURI(), message, ex);
         return Map.of("message", message);
     }
 
     /**
-     * Handles ConstraintViolationException and returns a 400 status with a message.
+     * Maneja ConstraintViolationException y excepciones relacionadas, devolviendo un estado 400 con un mensaje.
      *
-     * @param ex the ConstraintViolationException, OperationNotAllowException, BadRequestException
-     * @param request the HttpServletRequest
-     * @return a map containing the error message and request URI
+     * @param ex la excepción ConstraintViolationException, OperationNotAllowException o BadRequestException
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene el mensaje de error y la URI de la solicitud
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
@@ -73,28 +80,30 @@ public class ExceptionRestAdvice {
             BadRequestException.class
     })
     public Map<String, String> handleConstraintViolationException(Exception ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+        log.error("Error in %s".formatted(request.getRequestURI()), ex);
+        return Map.of("message", ex.getMessage(), "request", request.getRequestURI());
     }
 
     /**
-     * Handles ValidationException and returns a 400 status with a message.
+     * Maneja ValidacionException y devuelve un estado 400 con un mensaje.
      *
-     * @param ex the ValidacionException
-     * @param request the HttpServletRequest
-     * @return a map containing the error message and request URI
+     * @param ex la excepción ValidacionException
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene los errores de validación
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ValidacionException.class)
     public Map<String, String> handlerErrorFormExceptionError(ValidacionException ex, HttpServletRequest request) {
+        log.error("Error in %s".formatted(request.getRequestURI()), ex);
         return ex.getErrors();
     }
 
     /**
-     * Handles authentication and authorization exceptions and returns a 401 status with a message.
+     * Maneja excepciones de autenticación y autorización, devolviendo un estado 401 con un mensaje.
      *
-     * @param ex the exception (BadCredentialsException, LoginException)
-     * @param request the HttpServletRequest
-     * @return a map containing the error message and request URI
+     * @param ex la excepción (BadCredentialsException, LoginException)
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene el mensaje de error y la URI de la solicitud
      */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({
@@ -103,32 +112,35 @@ public class ExceptionRestAdvice {
             LoginException.class
     })
     public Map<String, String> handleBadCredentialsExceptionError(Exception ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+        log.error("Error in %s".formatted(request.getRequestURI()), ex);
+        return Map.of("message", ex.getMessage(), "request", request.getRequestURI());
     }
 
     /**
-     * Handles InternalErrorException and returns a 500 status with a message.
+     * Maneja InternalErrorException y devuelve un estado 500 con un mensaje.
      *
-     * @param ex the InternalErrorException
-     * @param request the HttpServletRequest
-     * @return a map containing the error message and request URI
+     * @param ex la excepción InternalErrorException
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene el mensaje de error y la URI de la solicitud
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(InternalErrorException.class)
     public Map<String, String> handleInternalServerError(InternalErrorException ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+        log.error("Error in %s".formatted(request.getRequestURI()), ex);
+        return Map.of("message", ex.getMessage(), "request", request.getRequestURI());
     }
 
     /**
-     * Handles generic exceptions and returns a 500 status with a message.
+     * Maneja excepciones genéricas y devuelve un estado 500 con un mensaje.
      *
-     * @param ex the exception
-     * @param request the HttpServletRequest
-     * @return a map containing the error message and request URI
+     * @param ex la excepción
+     * @param request el HttpServletRequest
+     * @return un mapa que contiene el mensaje de error y la URI de la solicitud
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public Map<String, String> handleExceptionError(Exception ex, HttpServletRequest request) {
-        return Map.of("message", ex.getMessage(),"request",request.getRequestURI());
+        log.error("Error in %s".formatted(request.getRequestURI()), ex);
+        return Map.of("message", ex.getMessage(), "request", request.getRequestURI());
     }
 }

@@ -7,13 +7,27 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+/**
+ * Configuración de Redis para la aplicación.
+ *
+ * Esta clase define los beans necesarios para configurar la conexión a Redis
+ * y el uso de RedisTemplate con serializadores personalizados.
+ *
+ * Notas:
+ * - Utiliza Lettuce como cliente de conexión a Redis.
+ * - Configura RedisTemplate para serializar claves y valores como cadenas.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Configuration
 public class RedisConfiguration {
 
     /**
-     * Created an instance of Redis Connection Factory
+     * Crea una instancia de la fábrica de conexiones de Redis.
      *
-     * @return an instance of single thread-safe native connection by default
+     * @return una instancia de LettuceConnectionFactory, que proporciona una conexión nativa
+     *         de un solo subproceso de forma predeterminada.
      */
     @Bean
     public LettuceConnectionFactory connectionFactory() {
@@ -21,10 +35,14 @@ public class RedisConfiguration {
     }
 
     /**
-     * Created an instance of redis templated and it loader as component, required an instance of RedisConnectionFactory
+     * Crea una instancia de RedisTemplate y la registra como un componente.
      *
-     * @param connectionFactory type of Redis Connection Factory, this is injection for spring automatically
-     * @return an instance of redis template
+     * Este bean requiere una instancia de RedisConnectionFactory, que será inyectada automáticamente
+     * por Spring. Configura RedisTemplate para usar StringRedisSerializer tanto para las claves
+     * como para los valores.
+     *
+     * @param connectionFactory instancia de RedisConnectionFactory inyectada automáticamente.
+     * @return una instancia configurada de RedisTemplate.
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {

@@ -1,6 +1,6 @@
 package com.tokioschool.ratingapp.auth.configs;
 
-import com.tokioschool.ratingapp.core.config.YamlPropertySourceFactory;
+import com.tokioschool.configs.YamlPropertySourceFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;

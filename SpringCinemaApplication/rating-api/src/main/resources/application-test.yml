@@ -3,15 +3,15 @@ spring:
     name: rating-api
   # Liguibase
   liquibase:
-    enabled: false
+    enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
-    contexts: rating-test
-    label-filter: rating-test
+    contexts: dev,rating-dev
+    label-filter: rating-dev
   # h2 database
   datasource:
-    url: jdbc:h2:mem:testdb
+    #url: jdbc:h2:mem:testdb
     #url: jdbc:h2:~/testdb
-    #url: jdbc:h2:file:../rating-bbdd/testdb
+    url: jdbc:h2:file:../rating-bbdd/testdb
     driver-class-name: org.h2.Driver
     username: sa
     password: password
@@ -22,7 +22,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
   security:
     user:
@@ -43,13 +43,13 @@ spring:
   #            scope: openid, profile, email
   #            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
   #            authorization-uri: https://authorization-server.com/oauth2/authorize
-  #            token-uri: https://authorization-server.com/oauth2/token
+  #            secret-uri: https://authorization-server.com/oauth2/token
   #            client-name: OAuth Client
   #            client-alias: oauth-client
   #        provider:
   #          authorization-server:
   #            authorization-uri: https://authorization-server.com/oauth2/authorize
-  #            token-uri: https://authorization-server.com/oauth2/token
+  #            secret-uri: https://authorization-server.com/oauth2/token
   sql:
     init:
       platform: h2
@@ -69,7 +69,7 @@ management:
     recording:
       enabled: true
 server:
-  port: 9096
+  port: 9095
 
 logging:
   level:

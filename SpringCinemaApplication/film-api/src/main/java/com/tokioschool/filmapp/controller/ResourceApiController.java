@@ -24,59 +24,75 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Controlador REST para gestionar operaciones relacionadas con recursos.
+ *
+ * Este controlador proporciona endpoints para obtener y descargar contenido de recursos
+ * almacenados en el sistema, integrándose con el servicio `store-api`.
+ *
+ * Anotaciones:
+ * - {@link RestController}: Indica que esta clase es un controlador REST.
+ * - {@link RequestMapping}: Define la ruta base para los endpoints de este controlador.
+ * - {@link Tag}: Proporciona metadatos para la documentación de Swagger.
+ *
+ * Dependencias:
+ * - {@link StoreFacade}: Facade para gestionar recursos almacenados.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/film/api/resources")
-@Tag(name="Resource", description= "Resources operations, integration with store-api")
+@Tag(name = "Resource", description = "Resources operations, integration with store-api")
 @Slf4j
 public class ResourceApiController {
 
     private final StoreFacade storeFacade;
 
+    /**
+     * Endpoint para obtener el contenido de un recurso.
+     *
+     * Este metodo busca un recurso por su ID y devuelve su contenido.
+     *
+     * @param resourceId ID del recurso a buscar.
+     * @return Una respuesta HTTP con el contenido del recurso y un código de estado 200 (OK).
+     * @throws NotFoundException Si el recurso no se encuentra o el servidor remoto está desconectado.
+     */
     @Operation(
-            summary = "Get search by filter title or/and range release year",
-            description = "Search for movies by providing a title and/or a range of release years. You can also define pagination parameters. If \"pageSize\" is 0, then return all movies filters in a page.",
+            summary = "Obtener contenido de un recurso",
+            description = "Busca un recurso por su ID y devuelve su contenido.",
             parameters = {
                     @Parameter(
                             name = "resourceId",
-                            description = "Identification of resource (default: 4888138f-4a56-42a7-9bd6-da2751ded046)",
-                            required = false,
-                            example = "1"
+                            description = "Identificación del recurso (por defecto: 4888138f-4a56-42a7-9bd6-da2751ded046)",
+                            required = true,
+                            example = "4888138f-4a56-42a7-9bd6-da2751ded046"
                     )
             },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successful retrieval of content of resoruce",
+                            description = "Contenido del recurso obtenido exitosamente",
                             content = @Content(
                                     mediaType = "*/*",
                                     schema = @Schema(implementation = byte[].class)
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid request (e.g., malformed filter)",
-                            content = @Content(mediaType = "application/json")
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized access (user not authenticated)",
-                            content = @Content(mediaType = "application/json")
-                    ),
-                    @ApiResponse(
                             responseCode = "404",
-                            description = "Resource not found or Server Remote is disconnected)",
+                            description = "Recurso no encontrado o servidor remoto desconectado",
                             content = @Content(mediaType = "application/json")
                     ),
                     @ApiResponse(
                             responseCode = "500",
-                            description = "Internal server error",
+                            description = "Error interno del servidor",
                             content = @Content(mediaType = "application/json")
                     )
             }
     )
     @SecurityRequirement(name = "auth-openapi")
-    @GetMapping(value = {"/",""},produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"/", ""}, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> getContentResourceHandler(@RequestParam("resourceId") @Nonnull UUID resourceId) {
         final ResourceContentDto resourceContentDto = storeFacade.findResource(resourceId)
@@ -88,50 +104,49 @@ public class ResourceApiController {
                 .body(resourceContentDto.content());
     }
 
+    /**
+     * Endpoint para descargar el contenido de un recurso.
+     *
+     * Este metodo busca un recurso por su ID y permite descargar su contenido como un archivo adjunto.
+     *
+     * @param resourceId ID del recurso a descargar.
+     * @return Una respuesta HTTP con el contenido del recurso como archivo adjunto y un código de estado 200 (OK).
+     * @throws NotFoundException Si el recurso no se encuentra o el servidor remoto está desconectado.
+     */
     @Operation(
-            summary = "Get search by filter title or/and range release year",
-            description = "Search for movies by providing a title and/or a range of release years. You can also define pagination parameters. If \"pageSize\" is 0, then return all movies filters in a page.",
+            summary = "Descargar contenido de un recurso",
+            description = "Busca un recurso por su ID y permite descargar su contenido como un archivo adjunto.",
             parameters = {
                     @Parameter(
                             name = "resourceId",
-                            description = "Identification of resource (default: 4888138f-4a56-42a7-9bd6-da2751ded046)",
-                            required = false,
-                            example = "1"
+                            description = "Identificación del recurso (por defecto: 4888138f-4a56-42a7-9bd6-da2751ded046)",
+                            required = true,
+                            example = "4888138f-4a56-42a7-9bd6-da2751ded046"
                     )
             },
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "Successful download of content of resource",
+                            description = "Contenido del recurso descargado exitosamente",
                             content = @Content(
                                     mediaType = "*/*",
                                     schema = @Schema(implementation = byte[].class)
                             )
                     ),
                     @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid request (e.g., malformed filter)",
-                            content = @Content(mediaType = "application/json")
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized access (user not authenticated)",
-                            content = @Content(mediaType = "application/json")
-                    ),
-                    @ApiResponse(
                             responseCode = "404",
-                            description = "Resource not found or Server Remote is disconnected)",
+                            description = "Recurso no encontrado o servidor remoto desconectado",
                             content = @Content(mediaType = "application/json")
                     ),
                     @ApiResponse(
                             responseCode = "500",
-                            description = "Internal server error",
+                            description = "Error interno del servidor",
                             content = @Content(mediaType = "application/json")
                     )
             }
     )
     @SecurityRequirement(name = "auth-openapi")
-    @GetMapping(value = {"/download"},produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = {"/download"}, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> downloadContentResourceHandler(@RequestParam("resourceId") @Nonnull UUID resourceId) {
         final ResourceContentDto resourceContentDto = storeFacade.findResource(resourceId)

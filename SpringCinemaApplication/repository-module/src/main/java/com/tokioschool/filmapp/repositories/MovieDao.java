@@ -7,25 +7,44 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repositorio para la entidad {@link Movie}.
+ *
+ * Esta interfaz extiende {@link JpaRepository} para proporcionar métodos CRUD
+ * y consultas personalizadas para la entidad Movie.
+ *
+ * Anotaciones:
+ * - {@link Repository}: Marca esta interfaz como un componente de acceso a datos de Spring.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Repository
-public interface MovieDao extends JpaRepository<Movie,Long> {
+public interface MovieDao extends JpaRepository<Movie, Long> {
 
         /**
-         * Search all movies that contains the world given in the title
+         * Busca todas las películas cuyo título contenga la palabra especificada,
+         * ignorando mayúsculas y minúsculas.
          *
-         * @param title
-         * @return
+         * @param title El texto que debe estar contenido en el título de las películas.
+         * @return Una lista de proyecciones {@link ResultMovie} que coinciden con el criterio.
          */
         List<ResultMovie> findMovieByTitleContainsIgnoreCase(String title);
 
         /**
-         * Interval inclusive, search: releaseYear c [yearMin,yearMax]
+         * Busca películas cuyo año de lanzamiento esté dentro de un intervalo inclusivo.
          *
-         * @param yearMin
-         * @param yearMax
-         * @return
+         * @param yearMin El año mínimo del intervalo.
+         * @param yearMax El año máximo del intervalo.
+         * @return Una lista de proyecciones {@link ResultMovie} que coinciden con el criterio.
          */
-        List<ResultMovie> findMovieByReleaseYearBetween(Integer yearMin,Integer yearMax);
+        List<ResultMovie> findMovieByReleaseYearBetween(Integer yearMin, Integer yearMax);
 
+        /**
+         * Busca películas cuyo año de lanzamiento sea igual al especificado.
+         *
+         * @param year El año de lanzamiento de las películas a buscar.
+         * @return Una lista de proyecciones {@link ResultMovie} que coinciden con el criterio.
+         */
         List<ResultMovie> findMovieByReleaseYearIs(Integer year);
 }

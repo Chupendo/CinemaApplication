@@ -41,7 +41,7 @@ class JwtBlacklistServiceImplUTest {
     @Order(1)
     void givenToken_whenAddToBlacklist_thenReturnOk() {
         final long expiredAt = Instant.now().plus(3600, ChronoUnit.MILLIS).getEpochSecond();
-        final String token = "token";
+        final String token = "secret";
 
         jwtBlacklistService.addToBlacklist(token,expiredAt);
 
@@ -52,7 +52,7 @@ class JwtBlacklistServiceImplUTest {
     @Test
     @Order(2)
     void givenToken_whenIsBlacklisted_returnOk() {
-        final String token = "token";
+        final String token = "secret";
 
         Mockito.when(redisTemplate.hasKey(token)).thenReturn(Boolean.TRUE);
 

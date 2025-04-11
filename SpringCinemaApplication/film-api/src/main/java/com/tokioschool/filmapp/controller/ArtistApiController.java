@@ -1,9 +1,7 @@
 package com.tokioschool.filmapp.controller;
 
-
-import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
-import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
+import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.services.artist.ArtistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,49 +23,74 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar operaciones relacionadas con artistas.
+ *
+ * Este controlador proporciona endpoints para registrar artistas y obtener
+ * una lista de todos los artistas registrados en el sistema.
+ *
+ * Anotaciones:
+ * - {@link RestController}: Indica que esta clase es un controlador REST.
+ * - {@link RequestMapping}: Define la ruta base para los endpoints de este controlador.
+ * - {@link Tag}: Proporciona metadatos para la documentación de Swagger.
+ *
+ * Dependencias:
+ * - {@link ArtistService}: Servicio para manejar la lógica de negocio relacionada con artistas.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/film/api/artists")
-@Tag(name="artist", description= "artist operations")
+@Tag(name = "artist", description = "Operaciones relacionadas con artistas")
 public class ArtistApiController {
 
     private final ArtistService artistService;
 
+    /**
+     * Endpoint para registrar un nuevo artista en el sistema.
+     *
+     * Este metodo valida los datos del artista proporcionados en el cuerpo de la solicitud
+     * y los registra en el sistema si son válidos.
+     *
+     * @param artistDto Objeto {@link ArtistDto} que contiene los datos del artista a registrar.
+     * @param bindingResult Resultado de la validación de los datos del artista.
+     * @return Una respuesta HTTP con el artista registrado y un código de estado 201 (CREATED).
+     * @throws ValidacionException Si hay errores de validación en los datos del artista.
+     */
     @Operation(
-            summary = "Post register artist in the system",
+            summary = "Registrar un artista en el sistema",
+            description = "Este endpoint permite registrar un nuevo artista en el sistema.",
             responses = {
                     @ApiResponse(
                             responseCode = "201",
-                            description = "register artist",
-                            content = @Content(schema = @Schema(implementation = AuthenticationResponseDTO.class))
+                            description = "Artista registrado exitosamente",
+                            content = @Content(schema = @Schema(implementation = ArtistDto.class))
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "register artist failed",
+                            description = "Errores de validación en los datos del artista",
                             content = @Content(schema = @Schema(implementation = Map.class))
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "request don't allow",
-                            content = @Content(schema = @Schema(implementation = Map.class))
-                    ),
-                    @ApiResponse(
-                            responseCode = "406",
-                            description = "the data of artist not allow",
+                            description = "No autorizado",
                             content = @Content(schema = @Schema(implementation = Map.class))
                     ),
                     @ApiResponse(
                             responseCode = "500",
-                            description = "error internal",
+                            description = "Error interno del servidor",
                             content = @Content(schema = @Schema(implementation = Map.class))
                     )
-            }
+            },
+            security = @SecurityRequirement(name = "auth-openapi")
     )
-    @SecurityRequirement(name = "auth-openapi")
-    @PostMapping(value={"","/","/register"},consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ArtistDto> registerArtistDto(@Valid @RequestBody ArtistDto artistDto, BindingResult bindingResult){
-        if( bindingResult.hasErrors() ){
+    @SecurityRequirement(name = "auth-openapi")
+    public ResponseEntity<ArtistDto> registerArtistDto(@Valid @RequestBody ArtistDto artistDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             Map<String, String> errores = bindingResult.getFieldErrors().stream()
                     .collect(Collectors.toMap(
                             FieldError::getField,
@@ -76,33 +99,43 @@ public class ArtistApiController {
             throw new ValidacionException("Errores de validación", errores);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body( artistService.registerArtist(artistDto) );
+        return ResponseEntity.status(HttpStatus.CREATED).body(artistService.registerArtist(artistDto));
     }
 
+    /**
+     * Endpoint para obtener una lista de todos los artistas registrados.
+     *
+     * Este metodo devuelve una lista de objetos {@link ArtistDto} que representan
+     * a todos los artistas registrados en el sistema.
+     *
+     * @return Una respuesta HTTP con la lista de artistas y un código de estado 200 (OK).
+     */
     @Operation(
-            summary = "Post register artist in the system",
+            summary = "Obtener todos los artistas",
+            description = "Este endpoint devuelve una lista de todos los artistas registrados en el sistema.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "register artist",
-                            content = @Content(schema = @Schema(implementation = AuthenticationResponseDTO.class))
+                            description = "Lista de artistas obtenida exitosamente",
+                            content = @Content(schema = @Schema(implementation = ArtistDto.class))
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "request don't allow",
+                            description = "No autorizado",
                             content = @Content(schema = @Schema(implementation = Map.class))
                     ),
                     @ApiResponse(
                             responseCode = "500",
-                            description = "error internal",
+                            description = "Error interno del servidor",
                             content = @Content(schema = @Schema(implementation = Map.class))
                     )
-            }
+            },
+            security = @SecurityRequirement(name = "auth-openapi")
     )
-    @GetMapping(value={"/find-all"},produces = {MediaType.APPLICATION_JSON_VALUE})
+    @GetMapping(value = "/find-all", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<ArtistDto>> findAllArtists(){
-
-        return ResponseEntity.ok( artistService.findByAll() );
+    @SecurityRequirement(name = "auth-openapi")
+    public ResponseEntity<List<ArtistDto>> findAllArtists() {
+        return ResponseEntity.ok(artistService.findByAll());
     }
 }

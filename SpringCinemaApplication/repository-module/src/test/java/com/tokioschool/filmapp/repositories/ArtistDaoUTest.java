@@ -29,49 +29,6 @@ class ArtistDaoUTest {
 
     private static List<Artist> artists;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @BeforeEach
     void init(){
         TYPE_ARTIST[] types = TYPE_ARTIST.values();

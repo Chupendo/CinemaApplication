@@ -7,14 +7,59 @@ import java.util.Arrays;
 import java.util.UUID;
 
 /**
- * Class that model the data minimal of a resource with its content
+ * DTO que modela los datos mínimos de un recurso junto con su contenido.
  *
- * @version 1
- * @autor andres.rpenuela
+ * Esta clase utiliza un record para representar un recurso con su contenido,
+ * incluyendo información como el ID del recurso, el contenido en bytes, el nombre,
+ * el tipo de contenido, una descripción y su tamaño.
+ *
+ * Notas:
+ * - Es inmutable gracias al uso de `record`.
+ * - Se utiliza la anotación @Jacksonized para facilitar la serialización/deserialización con Jackson.
+ * - Se construye utilizando el patrón Builder.
+ *
+ * @version 1.0
+ * @author
  */
 @Builder
 @Jacksonized
-public record ResourceContentDto(UUID resourceId,byte[] content,String resourceName,String contentType,String description,int size) {
+public record ResourceContentDto(
+        /**
+         * Identificador único del recurso.
+         */
+        UUID resourceId,
+
+        /**
+         * Contenido del recurso en formato de arreglo de bytes.
+         */
+        byte[] content,
+
+        /**
+         * Nombre del recurso.
+         */
+        String resourceName,
+
+        /**
+         * Tipo de contenido del recurso (por ejemplo, "image/png").
+         */
+        String contentType,
+
+        /**
+         * Descripción adicional del recurso.
+         */
+        String description,
+
+        /**
+         * Tamaño del recurso en bytes.
+         */
+        int size) {
+
+    /**
+     * Compara este objeto con otro para determinar si son iguales.
+     *
+     * @param o Objeto a comparar.
+     * @return `true` si los objetos son iguales, de lo contrario `false`.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -28,6 +73,11 @@ public record ResourceContentDto(UUID resourceId,byte[] content,String resourceN
         return contentType.equals(that.contentType);
     }
 
+    /**
+     * Calcula el código hash para este objeto.
+     *
+     * @return Código hash del objeto.
+     */
     @Override
     public int hashCode() {
         int result = resourceId.hashCode();
@@ -37,6 +87,11 @@ public record ResourceContentDto(UUID resourceId,byte[] content,String resourceN
         return result;
     }
 
+    /**
+     * Devuelve una representación en forma de cadena del objeto.
+     *
+     * @return Representación en forma de cadena del objeto.
+     */
     @Override
     public String toString() {
         return "ResourceContentDto{" +

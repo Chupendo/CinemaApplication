@@ -5,25 +5,24 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
-    contexts: rating-dev
+    contexts: dev,rating-dev
     label-filter: rating-dev
-  # h2 database
+    # maria db docker
   datasource:
-    #url: jdbc:h2:mem:testdb
-    #url: jdbc:h2:~/testdb
-    url: jdbc:h2:file:../rating-bbdd/testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:mariadb://localhost:3307/film?createDatabaseIfNotExist=true
+    username: root
+    password: dbpw
+    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+        transaction:
+          jta:
+            platform: org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
+    #validate, none, update, create-drop
     hibernate:
-      ddl-auto: none
-    show-sql: true
+      ddl-auto: validate
   security:
     user:
       name: user
@@ -43,13 +42,13 @@ spring:
 #            scope: openid, profile, email
 #            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
 #            authorization-uri: https://authorization-server.com/oauth2/authorize
-#            token-uri: https://authorization-server.com/oauth2/token
+#            secret-uri: https://authorization-server.com/oauth2/token
 #            client-name: OAuth Client
 #            client-alias: oauth-client
 #        provider:
 #          authorization-server:
 #            authorization-uri: https://authorization-server.com/oauth2/authorize
-#            token-uri: https://authorization-server.com/oauth2/token
+#            secret-uri: https://authorization-server.com/oauth2/token
   sql:
     init:
       platform: h2

@@ -5,21 +5,31 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 /**
- * Class for model the file in extension json, that is saved at each load to system of a resource.
+ * DTO (Data Transfer Object) para describir un recurso.
  *
- * Note:
- * - This information don't save in base data.
- * - The name of this file, is the ID of same, and is a reference of UUID.
- * - The name or recourse is the join of its name and extension.
- * - The resources are hosting in directory defined inside properties of application.
+ * Esta clase modela un archivo en formato JSON que se guarda en cada carga al sistema de un recurso.
  *
- * @version 1
- * @autor andres.rpenuela
+ * Notas:
+ * - Esta información no se guarda en la base de datos.
+ * - El nombre de este archivo es el ID del mismo y es una referencia de UUID.
+ * - El nombre del recurso es la combinación de su nombre y extensión.
+ * - Los recursos se alojan en un directorio definido dentro de las propiedades de la aplicación.
+ *
+ * Anotaciones:
+ * - {@link Value}: Marca la clase como inmutable y genera métodos como equals, hashCode y toString.
+ * - {@link Builder}: Proporciona un patrón de construcción para instanciar objetos de esta clase.
+ * - {@link Jacksonized}: Permite la deserialización de objetos utilizando Jackson.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
  */
 @Value
 @Builder
 @Jacksonized
 public class ResourceDescriptionDto {
 
+    /**
+     * Descripción del recurso.
+     */
     private String description;
 }

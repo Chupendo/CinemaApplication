@@ -1,10 +1,10 @@
 package com.tokioschool.filmapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDTO;
-import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDTO;
-import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDTO;
-import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
+import com.tokioschool.filmapp.dto.auth.AuthenticatedMeResponseDto;
+import com.tokioschool.filmapp.dto.auth.AuthenticationRequestDto;
+import com.tokioschool.filmapp.dto.auth.AuthenticationResponseDto;
+import com.tokioschool.filmapp.security.confings.JwtConfiguration;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
 import com.tokioschool.filmapp.services.auth.AuthenticationService;
 import com.tokioschool.filmapp.services.user.UserService;
@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -28,16 +29,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-@WebMvcTest(controllers = AuthenticationApiController.class) // obtiente solo el contexto del contraldor especificado
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
-@AutoConfigureMockMvc // Habilita MockMvc con filtros de seguridad
 @TestPropertySource(properties = {
         "logging.level.org.springframework.security=DEBUG",
-        "application.jwt.secret=secretos123123",
-        "application.jwt.expiration=PT1H"
+        "jwt.secret=secretos123123",
+        "jwt.expiration=PT1H"
 })
-@Import({FilmApiSecurityConfiguration.class, JwtConfiguration.class}) // Importa la configuración de seguridad
 class AuthenticationApiControllerWithSecurityEnableUTest {
 
     @Autowired private MockMvc mockMvc;
@@ -51,13 +50,13 @@ class AuthenticationApiControllerWithSecurityEnableUTest {
     @Test
     void givenUserLogin_whenPostAuthenticated_whenReturnOk () throws Exception {
         // Configurar los datos de prueba
-        AuthenticationRequestDTO requestDTO = AuthenticationRequestDTO.builder()
+        AuthenticationRequestDto requestDTO = AuthenticationRequestDto.builder()
                 .username("user")
                 .password("user")
                 .build();
 
-        AuthenticationResponseDTO responseDTO = AuthenticationResponseDTO.builder()
-                .accessToken("fake-jwt-token")
+        AuthenticationResponseDto responseDTO = AuthenticationResponseDto.builder()
+                .accessToken("fake-jwt-secret")
                 .build();
 
         // Mockear el servicio
@@ -69,14 +68,14 @@ class AuthenticationApiControllerWithSecurityEnableUTest {
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").value("fake-jwt-token")); // Verificar el token en la respuesta
+                .andExpect(MockMvcResultMatchers.jsonPath("$.access_token").value("fake-jwt-secret")); // Verificar el secret en la respuesta
     }
 
     @Test
     @WithMockUser(username = "user",authorities = "ROLE_USER") // Simula un usuario autenticado
     void givenUserAuthenticated_whenGetAuthenticatedMe_thenReturnAuthenticatedMe() throws Exception {
         // Simula el DTO de respuesta
-        AuthenticatedMeResponseDTO responseDTO = AuthenticatedMeResponseDTO.builder()
+        AuthenticatedMeResponseDto responseDTO = AuthenticatedMeResponseDto.builder()
                 .username("user")
                 .roles(List.of("ROLE_USER"))
                 .build();

@@ -23,62 +23,79 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Implementación del servicio para la gestión de recursos en el sistema.
+ *
+ * Esta clase proporciona metodos para cargar, buscar y eliminar recursos,
+ * utilizando un sistema de almacenamiento basado en archivos.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class StoreServiceImpl implements StoreService {
 
     private final StoreConfigurationProperties storeConfigurationProperties;
-    private final ObjectMapper  objectMapper;
+    private final ObjectMapper objectMapper;
 
+    /**
+     * Inicializa el directorio de trabajo si no existe.
+     *
+     * Este metodo se ejecuta después de la construcción de la clase y asegura
+     * que el directorio de trabajo definido en las propiedades de configuración
+     * esté disponible.
+     *
+     * @throws IOException Si ocurre un error al crear el directorio.
+     */
     @PostConstruct
     public void init() throws IOException {
         FileHelper.createWorkIfNotExists(Path.of(storeConfigurationProperties.relativePath()));
     }
 
     /**
-     * Upload a resource in the system, as file json and your content with name UUID
+     * Sube un recurso al sistema, guardando su contenido y metadatos.
      *
-     * @param multipartFile resource to upload in the system
-     * @param description information additional, this is optional
-     * @return the identification of resource encapsulated as ResourceIdDto
+     * @param multipartFile El archivo que se desea cargar en el sistema.
+     * @param description Información adicional sobre el recurso (opcional).
+     * @return Un objeto `Optional` que contiene el identificador del recurso encapsulado en `ResourceIdDto`.
      */
     @Override
     public Optional<ResourceIdDto> saveResource(MultipartFile multipartFile, @Nullable String description) {
-        // verify resource
-        if(multipartFile.isEmpty()){
+        // Verifica si el recurso está vacío
+        if (multipartFile.isEmpty()) {
             log.error("The resource is empty");
             return Optional.empty();
         }
 
-        // build struct data that save in file json
+        // Construye los metadatos del recurso
         final ResourceDescription resourceDescription = ResourceDescription.builder()
                 .resourceName(multipartFile.getOriginalFilename())
                 .description(description)
                 .size((int) multipartFile.getSize())
                 .contentType(multipartFile.getContentType()).build();
 
-        // generated name of resources
+        // Genera un identificador único para el recurso
         final ResourceIdDto resourceIdDto = ResourceIdDto.builder().resourceId(UUID.randomUUID()).build();
         final String resourceName = "%s".formatted(resourceIdDto.resourceId());
         final String resourceDescriptionName = "%s.json".formatted(resourceIdDto.resourceId());
 
-        // amount the resource in the path (where upload in the repository), used the relative path
-        final Path pathResourceToContent  = storeConfigurationProperties.getResourcePathFromRelativePathGivenNameResource(resourceName);
+        // Define las rutas para guardar el contenido y los metadatos
+        final Path pathResourceToContent = storeConfigurationProperties.getResourcePathFromRelativePathGivenNameResource(resourceName);
         final Path pathResourceToDescription = storeConfigurationProperties.getResourcePathFromRelativePathGivenNameResource(resourceDescriptionName);
 
-        // upload the content in the system
+        // Guarda el contenido del recurso
         try {
-            Files.write(pathResourceToContent,multipartFile.getBytes());
-
+            Files.write(pathResourceToContent, multipartFile.getBytes());
         } catch (IOException e) {
-            log.error("Don't save content resource, cause: %s".formatted(e),e);
+            log.error("Don't save content resource, cause: %s".formatted(e), e);
             return Optional.empty();
         }
 
-        // upolad the met data of resource as JSON Format, encapsulated in object of ResourceDescription
+        // Guarda los metadatos del recurso en formato JSON
         try {
-            objectMapper.writeValue(pathResourceToDescription.toFile(),resourceDescription);
+            objectMapper.writeValue(pathResourceToDescription.toFile(), resourceDescription);
         } catch (IOException e) {
             log.error("Don't save meta data of resource, cause: %s".formatted(e));
             try {
@@ -89,52 +106,53 @@ public class StoreServiceImpl implements StoreService {
             return Optional.empty();
         }
 
-        // return the id of resource created
+        // Retorna el identificador del recurso creado
         return Optional.of(resourceIdDto);
     }
 
     /**
-     * Find the resource given its id and return it, encapsulated as resource content dto optional
+     * Busca un recurso dado su identificador y lo retorna encapsulado en un `ResourceContentDto`.
      *
-     * @param resourceId identification of resource
-     * @return optional with content and description of resource, or optional empty when don't found
+     * @param resourceId El identificador del recurso.
+     * @return Un objeto `Optional` que contiene el contenido y los metadatos del recurso,
+     *         o un `Optional.empty` si no se encuentra.
      */
     @Override
     public Optional<ResourceContentDto> findResource(UUID resourceId) {
-        final String patternFileName  = "%s".formatted(resourceId);
-        final String patternFileJsonName  = "%s.json".formatted(resourceId);
+        final String patternFileName = "%s".formatted(resourceId);
+        final String patternFileJsonName = "%s.json".formatted(resourceId);
 
         final Optional<File> fileResourceOpt;
         final Optional<File> fileDescriptionResourceOpt;
 
-        // find of resources in the system given its id
+        // Busca los archivos del recurso en el sistema
         final FilenameFilter filenameFilter = (dir, name) -> name.contains(patternFileName);
         final File[] files = storeConfigurationProperties.buildResourcePathFromRelativePathGivenNameResource()
                 .toFile()
                 .listFiles(filenameFilter);
 
-        if( files == null || files.length <= 1){
-            log.debug("Error to find the resource with id {}, don't found",resourceId);
+        if (files == null || files.length <= 1) {
+            log.debug("Error to find the resource with id {}, don't found", resourceId);
             return Optional.empty();
         }
 
-        // load files of the resource
+        // Carga los archivos del recurso
         fileResourceOpt = Arrays.stream(files).filter(file -> file.getName().equalsIgnoreCase(patternFileName)).findFirst();
         fileDescriptionResourceOpt = Arrays.stream(files).filter(file -> file.getName().equalsIgnoreCase(patternFileJsonName)).findFirst();
 
-        if(fileResourceOpt.isEmpty() || fileDescriptionResourceOpt.isEmpty()){
-            log.debug("Error the resource with id {}, uncompleted number files",resourceId);
+        if (fileResourceOpt.isEmpty() || fileDescriptionResourceOpt.isEmpty()) {
+            log.debug("Error the resource with id {}, uncompleted number files", resourceId);
             return Optional.empty();
         }
 
-        // read
-        try{
+        // Lee el contenido y los metadatos del recurso
+        try {
             final byte[] content = Files.readAllBytes(fileResourceOpt.get().toPath());
 
             final ResourceDescription resourceDescription = this.objectMapper
                     .readValue(fileDescriptionResourceOpt.get(), ResourceDescription.class);
 
-            // build the result end, after read resources
+            // Construye el resultado final
             final ResourceContentDto resourceContentDto = ResourceContentDto.builder()
                     .contentType(resourceDescription.getContentType())
                     .description(resourceDescription.getDescription())
@@ -146,16 +164,16 @@ public class StoreServiceImpl implements StoreService {
 
             return Optional.of(resourceContentDto);
 
-        }catch (IOException e){
-            log.error("Error the read the file with id {}, because {}",resourceId,e.getMessage(),e);
+        } catch (IOException e) {
+            log.error("Error the read the file with id {}, because {}", resourceId, e.getMessage(), e);
             return Optional.empty();
         }
     }
 
     /**
-     * Delete a resource (content more description file) given its id
+     * Elimina un recurso (contenido y archivo de descripción) dado su identificador.
      *
-     * @param resourceId identification of resource
+     * @param resourceId El identificador del recurso.
      */
     @Override
     public void deleteResource(UUID resourceId) {
@@ -165,7 +183,7 @@ public class StoreServiceImpl implements StoreService {
                 .toFile()
                 .listFiles(filenameFilter::accept);
 
-        Arrays.stream(filesByName).forEach(file->{
+        Arrays.stream(filesByName).forEach(file -> {
             try {
                 Files.deleteIfExists(file.toPath());
             } catch (IOException e) {

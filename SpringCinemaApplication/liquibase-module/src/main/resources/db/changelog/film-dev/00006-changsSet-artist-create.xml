@@ -7,7 +7,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <!-- ChangeSet to create the users_roles table -->
-    <changeSet id="create-artist-table" author="andres.rpenuela">
+    <changeSet id="create-artist-table" author="andres.rpenuela" context="dev">
         <comment>Created table user_roles for relationship to users with roles</comment>
 
         <createTable tableName="artists">

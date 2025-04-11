@@ -2,9 +2,15 @@ package com.tokioschool.ratingapp.core.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Arrays;
-import java.util.Set;
-
+/**
+ * Clase que representa la respuesta de un token OAuth2.
+ *
+ * Contiene información sobre el token de acceso, tipo de token, tiempo de expiración,
+ * token de actualización y el alcance.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 public class OAuth2TokenResponse {
 
     @JsonProperty("access_token")

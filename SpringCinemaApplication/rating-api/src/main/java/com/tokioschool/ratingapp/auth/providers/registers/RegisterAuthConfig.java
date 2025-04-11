@@ -81,7 +81,7 @@ public class RegisterAuthConfig {
     }
 
     private RegisteredClient registerAuthenticationWebClient(){
-        // This client, get token form request (required auth), en el navegador: http://127.0.0.1:9095/oauth2/authorize?response_type=code&client_id=oidc-client&redirect_uri=http://127.0.0.1:9095/login/oauth2/code/oidc-client&scope=openid
+        // This client, get secret form request (required auth), en el navegador: http://127.0.0.1:9095/oauth2/authorize?response_type=code&client_id=oidc-client&redirect_uri=http://127.0.0.1:9095/login/oauth2/code/oidc-client&scope=openid
         return RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId( oauthClientProperty.clientOidcWeb().clientId() )
                 .clientSecret(passwordEncoder.encode( oauthClientProperty.clientOidcWeb().clientSecret() ))

@@ -7,25 +7,46 @@ import lombok.extern.jackson.Jacksonized;
 import java.util.UUID;
 
 /**
- * Class for model the file in extension json, that is saved at each load to system of a resource.
+ * Representa la descripción de un recurso almacenado en el sistema.
  *
- * Note:
- * - This information don't save in base data.
- * - The name of this file, is the ID of same, and is a reference of UUID.
- * - The name or recourse is the join of its name and extension.
- * - The resources are hosting in directory defined inside properties of application.
+ * Esta clase modela un archivo en formato JSON que se guarda cada vez que se carga un recurso en el sistema.
  *
- * @version 1
- * @autor andres.rpenuela
+ * Notas:
+ * - Esta información no se almacena en la base de datos.
+ * - El nombre de este archivo es el ID del mismo y se utiliza como referencia de un UUID.
+ * - El nombre del recurso es la combinación de su nombre y extensión.
+ * - Los recursos se alojan en un directorio definido en las propiedades de la aplicación.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
  */
 @Value
 @Builder
 @Jacksonized
 public class ResourceDescription {
 
+    /**
+     * Identificador único del recurso.
+     */
     UUID id;
+
+    /**
+     * Nombre del recurso, que incluye su nombre y extensión.
+     */
     String resourceName;
+
+    /**
+     * Tipo de contenido del recurso (por ejemplo, "image/png").
+     */
     String contentType;
+
+    /**
+     * Descripción adicional del recurso.
+     */
     String description;
+
+    /**
+     * Tamaño del recurso en bytes.
+     */
     int size;
 }

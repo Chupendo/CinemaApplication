@@ -1,9 +1,11 @@
 package com.tokioschool.filmapp.mapper;
 
+import com.tokioschool.configs.ModelMapperConfiguration;
 import com.tokioschool.filmapp.domain.Authority;
 import com.tokioschool.filmapp.domain.Role;
+import com.tokioschool.filmapp.domain.Scope;
 import com.tokioschool.filmapp.domain.User;
-import com.tokioschool.filmapp.dto.user.UserDTO;
+import com.tokioschool.filmapp.dto.user.UserDto;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,7 @@ public class UserToUserDtoMapperUTest {
                 .id(1L)
                 .name("ADMIN")
                 .authorities(Set.of(Authority.builder().id(1L).name("writer").build()))
+                .scopes(Set.of(Scope.builder().id(1L).name("openid").build()))
                 .build();
 
         final User user = User.builder()
@@ -51,18 +54,20 @@ public class UserToUserDtoMapperUTest {
                 .build();
 
 
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        UserDto userDTO = modelMapper.map(user, UserDto.class);
 
         Assertions.assertThat(userDTO)
-                .returns(user.getName(),UserDTO::getName)
-                .returns(user.getEmail(),UserDTO::getEmail)
-                .returns(user.getBirthDate(),UserDTO::getBirthDate)
-                .returns(user.getLastLoginAt(),UserDTO::getLastLogin)
-                .returns(user.getCreated(),UserDTO::getCreated)
-                .returns(user.getUsername(),UserDTO::getUsername)
-                .returns(user.getSurname(),UserDTO::getSurname)
-                .returns(user.getImage().toString(),UserDTO::getResourceId)
+                .returns(user.getName(), UserDto::getName)
+                .returns(user.getEmail(), UserDto::getEmail)
+                .returns(user.getBirthDate(), UserDto::getBirthDate)
+                .returns(user.getLastLoginAt(), UserDto::getLastLogin)
+                .returns(user.getCreated(), UserDto::getCreated)
+                .returns(user.getUsername(), UserDto::getUsername)
+                .returns(user.getSurname(), UserDto::getSurname)
+                .returns(user.getImage().toString(), UserDto::getResourceId)
                 .satisfies(userDTO1 ->
-                        Assertions.assertThat(userDTO1.getRoles().getFirst().getAuthorities().contains( "writer" )).isTrue() );
+                        Assertions.assertThat(userDTO1.getRoles().getFirst().getAuthorities().contains( "writer" )).isTrue() )
+                .satisfies(userDTO1 ->
+                        Assertions.assertThat(userDTO1.getRoles().getFirst().getScopes().contains( "openid" )).isTrue() );
     }
 }

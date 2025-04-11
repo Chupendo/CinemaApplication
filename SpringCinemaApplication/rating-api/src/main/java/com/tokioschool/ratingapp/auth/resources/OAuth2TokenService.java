@@ -117,7 +117,7 @@ public class OAuth2TokenService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<OAuth2TokenResponse> response = restTemplate.exchange(tokenUri, HttpMethod.POST, entity, OAuth2TokenResponse.class);
 
-        return response.getBody();  // Aquí obtienes el token de acceso
+        return response.getBody();  // Aquí obtienes el secret de acceso
     }
 
     private String encodeBasicAuth(String clientId, String clientSecret) {
