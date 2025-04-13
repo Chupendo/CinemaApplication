@@ -9,26 +9,38 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-
+/**
+ * Clase de utilidad para operaciones relacionadas con archivos y directorios.
+ *
+ * Esta clase proporciona métodos estáticos para manejar rutas, crear directorios
+ * y eliminar archivos o directorios de manera segura.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 public class FileHelper {
 
+    // Constructor privado para evitar la instanciación de la clase.
     private FileHelper(){}
+
     /**
-     * Method that return the segment path given aver current working directory
-     * @param segmentPath framgent of path for amount  aver current working directory
-     * @return path with segment gien
+     * Obtiene la ruta actual de trabajo con un segmento adicional opcional.
+     *
+     * @param segmentPath Fragmento opcional de la ruta que se añadirá al directorio de trabajo actual.
+     * @return La ruta completa que incluye el segmento proporcionado, o una ruta vacía si el segmento es nulo.
      */
     public static Path getCurrentWorking(@Nullable String segmentPath){
-
         return Optional.ofNullable(segmentPath)
                 .map(FileSystems.getDefault()::getPath)
                 .orElse(FileSystems.getDefault().getPath(StringUtils.EMPTY));
     }
 
     /**
-     * Method that create the directories if not exits
-     * @param path directory to builder
-     * @return true if was possible the created, otherwise false
+     * Crea los directorios especificados si no existen.
+     *
+     * @param path Ruta del directorio que se desea crear.
+     * @return `true` si los directorios fueron creados exitosamente, de lo contrario `false`.
+     * @throws IOException Si ocurre un error al intentar crear los directorios.
      */
     public static boolean createWorkIfNotExists(Path path) throws IOException {
         if(!Files.exists(path)){
@@ -39,11 +51,13 @@ public class FileHelper {
     }
 
     /**
-     * Method that delete the directory or file if exits
-     * @param path directory to delete
-     * @return true if was possible the deleted, otherwise false
+     * Elimina un archivo o directorio si existe.
+     *
+     * @param path Ruta del archivo o directorio que se desea eliminar.
+     * @return `true` si el archivo o directorio fue eliminado exitosamente, de lo contrario `false`.
+     * @throws IOException Si ocurre un error al intentar eliminar el archivo o directorio.
      */
     public static boolean deleteWorkIfNotExists(Path path) throws IOException {
-            return Files.deleteIfExists(path);
+        return Files.deleteIfExists(path);
     }
 }

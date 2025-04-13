@@ -14,9 +14,9 @@ public class UUIDToStringConverterUTest {
 
     private final UUIDToStringConverter converter = new UUIDToStringConverter();
 
-
     @Test
-    void givenUUID_wneConvert_tenReturnString() {
+    void convert_withValidTypeArtist_shouldReturnNameUpperCase() {
+
         // Arrange
         UUID uuid = UUID.randomUUID();
 
@@ -29,6 +29,29 @@ public class UUIDToStringConverterUTest {
         // Assertions
         Assertions.assertThat(uuidStr)
                 .isEqualTo(uuid.toString());
+    }
 
+    @Test
+    void convert_withNullUUID_shouldReturnNull() {
+
+        // Arrange
+        MappingContext<UUID, String> context = Mockito.mock(MappingContext.class);
+        Mockito.when(context.getSource()).thenReturn(null);
+
+        // Act
+        String typeArtist = converter.convert(context);
+
+        // Assertions
+        Assertions.assertThat(typeArtist).isNull();
+    }
+
+    @Test
+    void convert_withNull_shouldReturnNull() {
+
+        // Act
+        String typeArtist = converter.convert(null);
+
+        // Assertions
+        Assertions.assertThat(typeArtist).isNull();
     }
 }

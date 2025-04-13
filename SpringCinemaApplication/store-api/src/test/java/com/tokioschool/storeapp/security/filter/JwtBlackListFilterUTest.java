@@ -41,7 +41,7 @@ class JwtBlackListFilterUTest {
         jwtBlackListFilter.doFilterInternal(request, response, filterChain);
 
         // Verify response sends error and filter chain is NOT executed
-        Mockito.verify(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
+        Mockito.verify(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token está en la lista negra");
         Mockito.verify(filterChain, Mockito.never()).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
     }
 

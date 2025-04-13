@@ -5,8 +5,8 @@ import com.tokioschool.filmapp.domain.Authority;
 import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.common.PageDTO;
-import com.tokioschool.filmapp.dto.user.UserDTO;
-import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.dto.user.UserDto;
+import com.tokioschool.filmapp.dto.user.UserFormDto;
 import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
@@ -23,7 +23,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -91,9 +90,9 @@ class UserServiceImpUTest {
         Mockito.when(userDao.findByUsernameOrEmailIgnoreCase(users.getFirst().getEmail()))
                 .thenReturn(Optional.of(users.getFirst()));
 
-        Optional<Pair<UserDTO,String>> maybePairUserDTOPwd = userService.findUserAndPasswordByEmail(users.getFirst().getEmail());
+        Optional<Pair<UserDto,String>> maybePairUserDTOPwd = userService.findUserAndPasswordByEmail(users.getFirst().getEmail());
 
-        Mockito.verify(modelMapper,Mockito.times(1)).map(users.getFirst(), UserDTO.class);
+        Mockito.verify(modelMapper,Mockito.times(1)).map(users.getFirst(), UserDto.class);
 
         userService.findUserAndPasswordByEmail(users.getFirst().getEmail());
 
@@ -102,10 +101,10 @@ class UserServiceImpUTest {
                 .returns(users.getFirst().getPassword(), Pair::getRight)
                 .extracting(Pair::getLeft)
                 .isNotNull()
-                .returns(users.getFirst().getEmail(),UserDTO::getEmail)
-                .returns(users.getFirst().getName(),UserDTO::getName)
-                .returns(users.getFirst().getBirthDate(),UserDTO::getBirthDate)
-                .returns(users.getFirst().getCreated(),UserDTO::getCreated);
+                .returns(users.getFirst().getEmail(), UserDto::getEmail)
+                .returns(users.getFirst().getName(), UserDto::getName)
+                .returns(users.getFirst().getBirthDate(), UserDto::getBirthDate)
+                .returns(users.getFirst().getCreated(), UserDto::getCreated);
     }
 
     @Test
@@ -113,9 +112,9 @@ class UserServiceImpUTest {
         Mockito.when(userDao.findByUsernameOrEmailIgnoreCase(users.getFirst().getUsername()))
                 .thenReturn(Optional.of(users.getFirst()));
 
-        Optional<Pair<UserDTO,String>> maybePairUserDTOPwd = userService.findUserAndPasswordByEmail(users.getFirst().getUsername());
+        Optional<Pair<UserDto,String>> maybePairUserDTOPwd = userService.findUserAndPasswordByEmail(users.getFirst().getUsername());
 
-        Mockito.verify(modelMapper,Mockito.times(1)).map(users.getFirst(), UserDTO.class);
+        Mockito.verify(modelMapper,Mockito.times(1)).map(users.getFirst(), UserDto.class);
 
         userService.findUserAndPasswordByEmail(users.getFirst().getUsername());
 
@@ -124,10 +123,10 @@ class UserServiceImpUTest {
                 .returns(users.getFirst().getPassword(), Pair::getRight)
                 .extracting(Pair::getLeft)
                 .isNotNull()
-                .returns(users.getFirst().getEmail(),UserDTO::getEmail)
-                .returns(users.getFirst().getName(),UserDTO::getName)
-                .returns(users.getFirst().getBirthDate(),UserDTO::getBirthDate)
-                .returns(users.getFirst().getCreated(),UserDTO::getCreated);
+                .returns(users.getFirst().getEmail(), UserDto::getEmail)
+                .returns(users.getFirst().getName(), UserDto::getName)
+                .returns(users.getFirst().getBirthDate(), UserDto::getBirthDate)
+                .returns(users.getFirst().getCreated(), UserDto::getCreated);
     }
 
     @Test
@@ -138,16 +137,16 @@ class UserServiceImpUTest {
         Mockito.when(userDao.findByUsernameOrEmailIgnoreCase(users.getFirst().getEmail()))
                 .thenReturn(Optional.of(users.getFirst()));
 
-        // Simulate a JWT with a token value and expiration date
+        // Simulate a JWT with a secret value and expiration date
         Instant expirationTime = Instant.now().plusSeconds(3600);
-        Jwt jwt = Jwt.withTokenValue("mocked-jwt-token")
+        Jwt jwt = Jwt.withTokenValue("mocked-jwt-secret")
                 .header("alg", "HS256")
                 .claim("sub", users.getFirst().getEmail())
                 .claim("authorities", users.getFirst().getRoles())
                 .expiresAt(expirationTime)
                 .build();
 
-        // Create the authentication token with the mocked JWT
+        // Create the authentication secret with the mocked JWT
         JwtAuthenticationToken jwtAuthToken = new JwtAuthenticationToken(jwt, Collections.emptyList());
 
         // Mock the security context to set the authenticated user
@@ -155,15 +154,15 @@ class UserServiceImpUTest {
         Mockito.when(securityContext.getAuthentication()).thenReturn(jwtAuthToken);
         SecurityContextHolder.setContext(securityContext);
 
-        Optional<UserDTO> maybeUserDTO = userService.findByEmail(users.getFirst().getEmail());
+        Optional<UserDto> maybeUserDTO = userService.findByEmail(users.getFirst().getEmail());
 
-        Mockito.verify(modelMapper, Mockito.times(1)).map(users.getFirst(), UserDTO.class);
+        Mockito.verify(modelMapper, Mockito.times(1)).map(users.getFirst(), UserDto.class);
 
         assertThat(maybeUserDTO).isPresent().get()
-                .returns(users.getFirst().getEmail(), UserDTO::getEmail)
-                .returns(users.getFirst().getName(), UserDTO::getName)
-                .returns(users.getFirst().getBirthDate(), UserDTO::getBirthDate)
-                .returns(users.getFirst().getCreated(), UserDTO::getCreated);
+                .returns(users.getFirst().getEmail(), UserDto::getEmail)
+                .returns(users.getFirst().getName(), UserDto::getName)
+                .returns(users.getFirst().getBirthDate(), UserDto::getBirthDate)
+                .returns(users.getFirst().getCreated(), UserDto::getCreated);
 
         SecurityContextHolder.clearContext();
     }
@@ -171,7 +170,7 @@ class UserServiceImpUTest {
     @Test
     void givenUserFormDto_whenRegister_thenReturnUserDto(){
         // Arrange
-        UserFormDTO userFormDTO = UserFormDTO.builder()
+        UserFormDto userFormDTO = UserFormDto.builder()
                 .name("John")
                 .surname("Doe")
                 .password("Contraseña1@")
@@ -201,15 +200,15 @@ class UserServiceImpUTest {
 
 
         // Act
-        UserDTO reusltUserDto = userService.registerUser(userFormDTO);
+        UserDto reusltUserDto = userService.registerUser(userFormDTO);
 
         // Assertions
-        Mockito.verify(modelMapper,Mockito.times(1)).map(user,UserDTO.class);
+        Mockito.verify(modelMapper,Mockito.times(1)).map(user, UserDto.class);
 
         assertThat(reusltUserDto).isNotNull()
-                .returns(userFormDTO.getName(),UserDTO::getName)
-                .returns(userFormDTO.getSurname(),UserDTO::getSurname)
-                .returns(userFormDTO.getUsername(),UserDTO::getUsername)
+                .returns(userFormDTO.getName(), UserDto::getName)
+                .returns(userFormDTO.getSurname(), UserDto::getSurname)
+                .returns(userFormDTO.getUsername(), UserDto::getUsername)
                 .returns(userFormDTO.getRoles().getFirst(), userDto -> userDto.getRoles().getFirst().getName());
     }
 
@@ -227,7 +226,7 @@ class UserServiceImpUTest {
         SecurityContextHolder.setContext(context);
 
         // Arrange
-        UserFormDTO userFormDTO = UserFormDTO.builder()
+        UserFormDto userFormDTO = UserFormDto.builder()
                 .name("John")
                 .surname("Doe")
                 .password("Contraseña1@")
@@ -259,7 +258,7 @@ class UserServiceImpUTest {
         SecurityContextHolder.setContext(context);
 
         // Arrange
-        UserFormDTO userFormDTO = UserFormDTO.builder()
+        UserFormDto userFormDTO = UserFormDto.builder()
                 .id("0002AB")
                 .name("John")
                 .surname("Doe")
@@ -311,7 +310,7 @@ class UserServiceImpUTest {
         SecurityContextHolder.setContext(context);
 
         // Arrange
-        UserFormDTO userFormDTO = UserFormDTO.builder()
+        UserFormDto userFormDTO = UserFormDto.builder()
                 .id("0002AB")
                 .name("John")
                 .surname("Doe")
@@ -345,7 +344,7 @@ class UserServiceImpUTest {
         Mockito.when(userDao.save(user)).thenReturn(user);
 
         // Act
-        UserDTO userDTO = userService.updateUser(userFormDTO.getId(), userFormDTO);
+        UserDto userDTO = userService.updateUser(userFormDTO.getId(), userFormDTO);
 
         assertThat(userDTO).isNotNull();
     }
@@ -385,7 +384,7 @@ class UserServiceImpUTest {
 
         Mockito.when(userDao.findByUsernameOrEmailIgnoreCase("ADMIN")).thenReturn(Optional.of(user));
 
-        Optional<UserDTO> userDTOOptional = userService.findUserAuthenticated();
+        Optional<UserDto> userDTOOptional = userService.findUserAuthenticated();
 
         Assertions.assertThat(userDTOOptional)
                 .isPresent()
@@ -395,7 +394,7 @@ class UserServiceImpUTest {
 
     @Test
     void givenNotUserAuthenticated_whenFindUserAuthenticated_thenReturnUserEmpty() {
-        Optional<UserDTO> userDTOOptional = userService.findUserAuthenticated();
+        Optional<UserDto> userDTOOptional = userService.findUserAuthenticated();
         Assertions.assertThat(userDTOOptional)
                 .isEmpty();
     }
@@ -405,9 +404,9 @@ class UserServiceImpUTest {
         SearchUserRecord searchUserRecord = new SearchUserRecord("username", "surname", "name", "email@example.com");
         User user = new User();
         when(userDao.findAll(any(Specification.class))).thenReturn(List.of(user));
-        when(modelMapper.map(user, UserDTO.class)).thenReturn(new UserDTO());
+        when(modelMapper.map(user, UserDto.class)).thenReturn(new UserDto());
 
-        PageDTO<UserDTO> result = userService.searchUsers(0, 10, searchUserRecord);
+        PageDTO<UserDto> result = userService.searchUsers(0, 10, searchUserRecord);
 
         assertThat(result).isNotNull();
         assertThat(result.getItems()).hasSize(1);
@@ -418,7 +417,7 @@ class UserServiceImpUTest {
         SearchUserRecord searchUserRecord = new SearchUserRecord("username", "surname", "name", "email@example.com");
         when(userDao.findAll(any(Specification.class))).thenReturn(List.of());
 
-        PageDTO<UserDTO> result = userService.searchUsers(0, 10, searchUserRecord);
+        PageDTO<UserDto> result = userService.searchUsers(0, 10, searchUserRecord);
 
         assertThat(result).isNotNull();
         assertThat(result.getItems()).isEmpty();

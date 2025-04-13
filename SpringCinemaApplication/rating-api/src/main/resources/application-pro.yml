@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: rating-api
+server:
+  port: 9095

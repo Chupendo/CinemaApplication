@@ -29,7 +29,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Operations for give support to requests about movies
+ * Implementación del servicio para gestionar películas.
+ *
+ * Esta clase proporciona métodos para realizar operaciones CRUD y otras
+ * funcionalidades relacionadas con la entidad {@link Movie}.
+ *
+ * Anotaciones:
+ * - {@link Service}: Marca esta clase como un componente de servicio de Spring.
+ * - {@link RequiredArgsConstructor}: Genera un constructor con los campos finales requeridos.
  *
  * @author andres.rpenuela
  * @version 1.0
@@ -40,14 +47,13 @@ public class MovieServiceImpl implements MovieService {
 
     private final MovieDao movieDao;
     private final ModelMapper modelMapper;
-
     private final ArtistService artistService;
 
     /**
-     * Search movie in the system apply a filter by default, also if page size is 0,
-     * then return all items filters and ignored the page or page number.
+     * Busca películas en el sistema aplicando un filtro por defecto. Si el tamaño de página es 0,
+     * devuelve todos los elementos filtrados e ignora la paginación.
      *
-     * @return page of result of search of movies in the system
+     * @return Página de resultados de búsqueda de películas en el sistema.
      */
     @Override
     public PageDTO<MovieDto> searchMovie() {
@@ -55,274 +61,245 @@ public class MovieServiceImpl implements MovieService {
     }
 
     /**
-     * Search movie in the system apply a filter of searched, also if page size is 0,
-     * then return all items filters and ignored the page or page number.
+     * Busca películas en el sistema aplicando un filtro de búsqueda. Si el tamaño de página es 0,
+     * devuelve todos los elementos filtrados e ignora la paginación.
      *
-     * @param searchMovieRecord filter to apply
-     * @return page of result of search of movies in the system
+     * @param searchMovieRecord Filtro a aplicar.
+     * @return Página de resultados de búsqueda de películas en el sistema.
      */
     @Override
-    public PageDTO<MovieDto> searchMovie(SearchMovieRecord searchMovieRecord){
-        if(searchMovieRecord == null) {
+    public PageDTO<MovieDto> searchMovie(SearchMovieRecord searchMovieRecord) {
+        if (searchMovieRecord == null) {
             searchMovieRecord = SearchMovieRecord.builder()
                     .page(0)
                     .pageSize(5)
                     .build();
         }
 
-        // filters
+        // Filtros
         List<Movie> movies = movieDao.findAll();
-        movies = getMoviesFilterByTitle(searchMovieRecord,movies);
+        movies = getMoviesFilterByTitle(searchMovieRecord, movies);
         movies = getMoviesFilterByReleaseYear(searchMovieRecord, movies);
 
-        // Build Page<MovieResult>
-        int star = searchMovieRecord.page() * searchMovieRecord.pageSize(); // first item of Page<T>
+        // Construcción de la página de resultados
+        int start = searchMovieRecord.page() * searchMovieRecord.pageSize();
 
-        if(star >= movies.size()) { // there aren't items to show
-            int finalPageSize = searchMovieRecord.pageSize() == 0? movies.size() : searchMovieRecord.pageSize();
+        if (start >= movies.size()) {
+            int finalPageSize = searchMovieRecord.pageSize() == 0 ? movies.size() : searchMovieRecord.pageSize();
             return PageDTO.<MovieDto>builder()
                     .items(List.of())
                     .pageNumber(searchMovieRecord.page())
-                    .pageSize(finalPageSize )
-                    .totalPages((int) Math.ceil(movies.size()/(double)finalPageSize ))
+                    .pageSize(finalPageSize)
+                    .totalPages((int) Math.ceil(movies.size() / (double) finalPageSize))
                     .build();
-
-        }else{
+        } else {
             List<MovieDto> items;
 
-            if(searchMovieRecord.pageSize() ==  0){
-                items = getMovieDtoPageDTO(movies, star, movies.size());
-            }else{
-                int end = Math.min(star + searchMovieRecord.pageSize(),movies.size());
-                items = getMovieDtoPageDTO(movies, star, end);
+            if (searchMovieRecord.pageSize() == 0) {
+                items = getMovieDtoPageDTO(movies, start, movies.size());
+            } else {
+                int end = Math.min(start + searchMovieRecord.pageSize(), movies.size());
+                items = getMovieDtoPageDTO(movies, start, end);
             }
 
-            int finalPageSize = searchMovieRecord.pageSize() == 0? items.size() : searchMovieRecord.pageSize();
+            int finalPageSize = searchMovieRecord.pageSize() == 0 ? items.size() : searchMovieRecord.pageSize();
 
             return PageDTO.<MovieDto>builder()
                     .items(items)
                     .pageNumber(searchMovieRecord.page())
-                    .pageSize( finalPageSize )
-                    .totalPages((int) Math.ceil(movies.size() /(double) finalPageSize ) )
+                    .pageSize(finalPageSize)
+                    .totalPages((int) Math.ceil(movies.size() / (double) finalPageSize))
                     .build();
-
         }
     }
 
     /**
-     * Find the movie given it's identifier in the system
+     * Encuentra una película dado su identificador en el sistema.
      *
-     * @param movieId identification of the movie
-     * @return the movie which identification in the system is the given
-     * @throws NotFoundException if there aren't a movie with this identification
-     *  @throws NotFoundException if the id given is null
+     * @param movieId Identificación de la película.
+     * @return La película cuyo identificador coincide con el proporcionado.
+     * @throws NotFoundException Si no se encuentra una película con el identificador proporcionado.
      */
     @Override
-    public MovieDto getMovieById(Long movieId) throws InvalidDataAccessApiUsageException,NotFoundException {
+    public MovieDto getMovieById(Long movieId) throws InvalidDataAccessApiUsageException, NotFoundException {
         return movieDao.findById(movieId)
                 .map(movie -> modelMapper.map(movie, MovieDto.class))
                 .orElseThrow(() -> new NotFoundException("The movie is not found in the system"));
     }
 
     /**
-     * Created a new Movie in the system
-     * @param movieDto data to persists in bbdd
-     * @return movie register in the system
+     * Crea una nueva película en el sistema.
      *
-     * @throws InvalidDataAccessApiUsageException error to persist the data
+     * @param movieDto Datos a persistir en la base de datos.
+     * @return Película registrada en el sistema.
+     * @throws InvalidDataAccessApiUsageException Error al persistir los datos.
      */
     @Override
-    @Transactional(rollbackFor = {IllegalArgumentException.class,ValidacionException.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, ValidacionException.class})
     public MovieDto createMovie(MovieDto movieDto) throws InvalidDataAccessApiUsageException {
-        if( movieDto == null || StringUtils.stripToNull( movieDto.getResourceId() ) == null){
-            Map<String,String> errors = Collections.singletonMap("image","Resource in movie is required");
-            throw new ValidacionException("movie don't create",errors);
+        if (movieDto == null || StringUtils.stripToNull(movieDto.getResourceId()) == null) {
+            Map<String, String> errors = Collections.singletonMap("image", "Resource in movie is required");
+            throw new ValidacionException("movie don't create", errors);
         }
 
-        Movie movie = createOrUpdateMovie(new Movie(),movieDto);
+        Movie movie = createOrUpdateMovie(new Movie(), movieDto);
         return modelMapper.map(movie, MovieDto.class);
     }
 
     /**
-     * Updated movie
-     * @param movieId identificaiton of movie to updated
-     * @param movieDto data to updated
-     * @return movie with updated information
+     * Actualiza una película existente.
      *
-     * @throws InvalidDataAccessApiUsageException error to persist the data
-     * @throws NotFoundException if the movie to updated is don't found in the system
+     * @param movieId  Identificación de la película a actualizar.
+     * @param movieDto Datos a actualizar.
+     * @return Película con la información actualizada.
+     * @throws InvalidDataAccessApiUsageException Error al persistir los datos.
+     * @throws NotFoundException Si no se encuentra la película a actualizar en el sistema.
      */
     @Override
-    @Transactional(rollbackFor = {IllegalArgumentException.class,ValidacionException.class})
+    @Transactional(rollbackFor = {IllegalArgumentException.class, ValidacionException.class})
     public MovieDto updateMovie(Long movieId, MovieDto movieDto) throws InvalidDataAccessApiUsageException, NotFoundException {
         Movie movie = movieDao.findById(movieId).orElseThrow(() -> new NotFoundException("Movie with %d don't found. The image maybe be updated".formatted(movieId)));
         movieDao.flush();
-        movie = createOrUpdateMovie( movie,movieDto);
+        movie = createOrUpdateMovie(movie, movieDto);
         return modelMapper.map(movie, MovieDto.class);
     }
 
     /**
-     * Copy a collection in other collection deterministic where your size is range
-     * between [star,end]
+     * Copia una colección en otra colección de forma determinista, donde su tamaño está en el rango [start, end].
      *
-     * @param movies collection with data source
-     * @param star position where start to copy the source collection
-     * @param end position where finished of copy the source collection
-     * @return a new collection with tha data of collection given, and are hosting in the position [star,end]
+     * @param movies Colección con los datos fuente.
+     * @param start  Posición inicial para copiar de la colección fuente.
+     * @param end    Posición final para copiar de la colección fuente.
+     * @return Una nueva colección con los datos de la colección fuente en el rango [start, end].
      */
-    private List<MovieDto> getMovieDtoPageDTO(List<Movie> movies, int star, int end ) {
-        return IntStream.range(star, end)
+    private List<MovieDto> getMovieDtoPageDTO(List<Movie> movies, int start, int end) {
+        return IntStream.range(start, end)
                 .mapToObj(movies::get)
                 .map(movie -> modelMapper.map(movie, MovieDto.class))
                 .toList();
-
-
     }
 
     /**
-     * Filter a movie by release year, if is null then don't filter
+     * Filtra películas por año de lanzamiento. Si es nulo, no aplica filtro.
      *
-     * @param searchMovieRecord instance with the value for filter
-     * @param movies collection to filter
-     * @return collection of movies to check your release year field with of the filter
-     *
-     * {@link #filterByReleaseYear(Movie, RangeReleaseYear) Dependency}
+     * @param searchMovieRecord Instancia con el valor para filtrar.
+     * @param movies            Colección a filtrar.
+     * @return Colección de películas filtradas por año de lanzamiento.
      */
-    private List<Movie> getMoviesFilterByReleaseYear(SearchMovieRecord searchMovieRecord,@NonNull List<Movie> movies) {
+    private List<Movie> getMoviesFilterByReleaseYear(SearchMovieRecord searchMovieRecord, @NonNull List<Movie> movies) {
         return Optional.ofNullable(searchMovieRecord)
                 .map(SearchMovieRecord::rangeReleaseYear)
                 .map(rangeReleaseYear ->
-                        movies
-                                .stream()
+                        movies.stream()
                                 .filter(movie -> filterByReleaseYear(movie, rangeReleaseYear))
                                 .toList())
-                .orElseGet(()->movies);
+                .orElseGet(() -> movies);
     }
 
     /**
-     * Filter type "LIKE" a movie by title, if is null then don't filter
+     * Filtra películas por título utilizando un filtro de tipo "LIKE". Si es nulo, no aplica filtro.
      *
-     * @param searchMovieRecord instance with the value for filter
-     * @param movies collection to filter
-     * @return collection of movies to check your title field with of the filter
+     * @param searchMovieRecord Instancia con el valor para filtrar.
+     * @param movies            Colección a filtrar.
+     * @return Colección de películas filtradas por título.
      */
-    private List<Movie> getMoviesFilterByTitle(SearchMovieRecord searchMovieRecord,@NonNull List<Movie> movies) {
+    private List<Movie> getMoviesFilterByTitle(SearchMovieRecord searchMovieRecord, @NonNull List<Movie> movies) {
         return Optional.ofNullable(searchMovieRecord)
                 .map(SearchMovieRecord::title)
                 .map(StringUtils::stripToNull)
                 .map(StringUtils::lowerCase)
                 .map(title ->
-                        movies
-                                .stream()
+                        movies.stream()
                                 .filter(movie -> movie.getTitle().toLowerCase().contains(title))
                                 .toList())
                 .orElseGet(() -> movies);
     }
 
     /**
-     * Filter a movie by range release years min and max inclusive, if the range is null, then
-     * don't filter and result is true
+     * Filtra una película por rango de años de lanzamiento (mínimo y máximo, inclusivo). Si el rango es nulo, no aplica filtro.
      *
-     * Pre-Conditions:
-     * - If rangeReleaseYear is null, then don't filter, return true
-     * - If rangeReleaseYear.min <=0, then there aren't min.
-     * - If rangeReleaseYear.max <=0, then there aren't max.
-     *
-     * @param movie list of movies to filter by release year field
-     * @param rangeReleaseYear range min and max of year to filter
-     * @return true if the range is null or the field release year of the movie is between to range, otherwise false
-     *
+     * @param movie             Película a filtrar.
+     * @param rangeReleaseYear  Rango mínimo y máximo de años para filtrar.
+     * @return true si el rango es nulo o el año de lanzamiento de la película está dentro del rango, de lo contrario false.
      */
-    private boolean filterByReleaseYear(@NonNull Movie movie,@Nullable RangeReleaseYear rangeReleaseYear) {
-        if(rangeReleaseYear==null || movie.getReleaseYear() == null){
+    private boolean filterByReleaseYear(@NonNull Movie movie, @Nullable RangeReleaseYear rangeReleaseYear) {
+        if (rangeReleaseYear == null || movie.getReleaseYear() == null) {
             return true;
-        }else{
-            if(rangeReleaseYear.yearMin() == null || rangeReleaseYear.yearMin() <=0 ){
-                // no hay minimo
-                if(rangeReleaseYear.yearMax() == null || rangeReleaseYear.yearMax() <= 0 ){
-                    // ni hay ni minimo, ni maximo
+        } else {
+            if (rangeReleaseYear.yearMin() == null || rangeReleaseYear.yearMin() <= 0) {
+                if (rangeReleaseYear.yearMax() == null || rangeReleaseYear.yearMax() <= 0) {
                     return true;
-                }else{
-                    // no hay minimo, pero si maximo
+                } else {
                     return movie.getReleaseYear() <= rangeReleaseYear.yearMax();
                 }
-            }else{
-                // hay minimo
-                if(rangeReleaseYear.yearMax() == null || rangeReleaseYear.yearMax() <= 0 ){
-                    // hay ni minimo, pero no maximo
+            } else {
+                if (rangeReleaseYear.yearMax() == null || rangeReleaseYear.yearMax() <= 0) {
                     return movie.getReleaseYear() >= rangeReleaseYear.yearMin();
-                }else{
-                    // hay minimo y maximo
+                } else {
                     return movie.getReleaseYear() >= rangeReleaseYear.yearMin()
-                            && movie.getReleaseYear() >= rangeReleaseYear.yearMax();
+                            && movie.getReleaseYear() <= rangeReleaseYear.yearMax();
                 }
             }
         }
-
     }
 
     /**
-     * Create or update a movie in the system
+     * Crea o actualiza una película en el sistema.
      *
-     * @param movie movie to update, if is empty then create a new movie, otherwise update the movie
-     * @param movieDto data to update or create the movie
-     * @return the movie updated or created
-     *
-     * @throws NotFoundException if the data of movie is null
+     * @param movie    Película a actualizar. Si está vacía, crea una nueva película.
+     * @param movieDto Datos para actualizar o crear la película.
+     * @return La película actualizada o creada.
+     * @throws NotFoundException Si los datos de la película son nulos.
      */
-
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = NotFoundException.class)
-    protected Movie createOrUpdateMovie(Movie movie, MovieDto movieDto) throws NotFoundException{
-        if(movieDto == null){
+    protected Movie createOrUpdateMovie(Movie movie, MovieDto movieDto) throws NotFoundException {
+        if (movieDto == null) {
             throw new IllegalArgumentException("The data of movie is null");
         }
         movie.setTitle(movieDto.getTitle());
 
-        // get manager of system more validation
-        Artist manger = Optional.of(movieDto.getManagerDto() )
+        // Obtener manager del sistema con validación
+        Artist manager = Optional.of(movieDto.getManagerDto())
                 .map(ArtistDto::getId)
-                .map(artisId -> getArtistById(artisId))
+                .map(this::getArtistById)
                 .filter(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR))
-                .orElseThrow(() -> new NotFoundException("The manger is strong"));
-        movie.setManager( manger );
+                .orElseThrow(() -> new NotFoundException("The manager is strong"));
+        movie.setManager(manager);
 
-        // collection mutable, get list of artists
+        // Obtener lista de artistas
         List<Artist> artists = movieDto.getArtistDtos().stream()
                 .map(artistDto -> getArtistById(artistDto.getId()))
                 .collect(Collectors.toList());
 
-        // validation
-        if ( artists.stream().anyMatch(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR)) ){
-            throw new NotFoundException("The artis list is strong");
+        // Validación
+        if (artists.stream().anyMatch(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR))) {
+            throw new NotFoundException("The artist list is strong");
         }
         movie.setArtists(artists);
 
         movie.setReleaseYear(movieDto.getReleaseYear());
 
-        final Optional<UUID> maybeUUID = UUIDHelper.mapStringToUUID( movieDto.getResourceId() );
+        final Optional<UUID> maybeUUID = UUIDHelper.mapStringToUUID(movieDto.getResourceId());
         maybeUUID.ifPresent(movie::setImage);
 
         return movieDao.saveAndFlush(movie);
     }
 
     /**
-     * Find the Artist given you id
+     * Encuentra un artista dado su identificador.
      *
-     * @see {@link ArtistService::findById(Long) }
-     *
-     * @param artistId identification of artist
-     * @return the artis with the identification given
-     * @throws NotFoundException if the artis with id given is null
+     * @param artistId Identificación del artista.
+     * @return El artista con el identificador proporcionado.
+     * @throws NotFoundException Si no se encuentra el artista con el identificador proporcionado.
      */
     @Transactional(readOnly = true)
     protected Artist getArtistById(Long artistId) throws NotFoundException {
         final ArtistDto artistDto = artistService.findById(artistId);
-        final Artist artist = Artist.builder()
+        return Artist.builder()
                 .id(artistDto.getId())
                 .name(artistDto.getName())
                 .surname(artistDto.getSurname())
                 .typeArtist(TYPE_ARTIST.valueOf(artistDto.getTypeArtist()))
                 .build();
-        return artist;
     }
 }

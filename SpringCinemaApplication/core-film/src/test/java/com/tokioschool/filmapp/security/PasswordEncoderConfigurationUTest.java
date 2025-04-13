@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.security;
 
+import com.tokioschool.securities.configs.PasswordEncoderConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;

@@ -5,60 +5,69 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 
+/**
+ * Clase que proporciona especificaciones para filtrar entidades {@link User}.
+ *
+ * Esta clase utiliza el API de Criteria de JPA para construir consultas dinámicas
+ * basadas en los atributos de la entidad User.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 public class UserSpecification {
 
-    /** Name Fields of class {@link User} used for filter **/
+    /** Nombre de los campos de la clase {@link User} utilizados para filtrar **/
     private static final String USER_NAME_FIELD = "name";
     private static final String USER_SURNAME_FIELD = "surname";
     private static final String USER_USERNAME_FIELD = "username";
     private static final String USER_EMAIL_FIELD = "email";
 
     /**
-     * Creates a specification to filter users by name.
+     * Crea una especificación para filtrar usuarios por nombre.
      *
-     * @param name the name to filter by
-     * @return a specification for filtering users by name
+     * @param name El nombre por el cual filtrar.
+     * @return Una especificación para filtrar usuarios por nombre.
      */
     public static Specification<User> hasName(String name) {
         return filterEqualString(USER_NAME_FIELD, name);
     }
 
     /**
-     * Creates a specification to filter users by surname.
+     * Crea una especificación para filtrar usuarios por apellido.
      *
-     * @param surname the surname to filter by
-     * @return a specification for filtering users by surname
+     * @param surname El apellido por el cual filtrar.
+     * @return Una especificación para filtrar usuarios por apellido.
      */
     public static Specification<User> hasSurname(String surname) {
         return filterEqualString(USER_SURNAME_FIELD, surname);
     }
 
     /**
-     * Creates a specification to filter users by username.
+     * Crea una especificación para filtrar usuarios por nombre de usuario.
      *
-     * @param username the username to filter by
-     * @return a specification for filtering users by username
+     * @param username El nombre de usuario por el cual filtrar.
+     * @return Una especificación para filtrar usuarios por nombre de usuario.
      */
     public static Specification<User> hasUsername(String username) {
         return filterEqualString(USER_USERNAME_FIELD, username);
     }
 
     /**
-     * Creates a specification to filter users by email, ignoring case.
+     * Crea una especificación para filtrar usuarios por correo electrónico, ignorando mayúsculas y minúsculas.
      *
-     * @param email the email to filter by
-     * @return a specification for filtering users by email, ignoring case
+     * @param email El correo electrónico por el cual filtrar.
+     * @return Una especificación para filtrar usuarios por correo electrónico, ignorando mayúsculas y minúsculas.
      */
     public static Specification<User> containsEmail(String email) {
         return filterContainsStringIgnoreCase(USER_EMAIL_FIELD, email);
     }
 
     /**
-     * Creates a specification to filter users by a string attribute with an exact match.
+     * Crea una especificación para filtrar usuarios por un atributo de tipo cadena con coincidencia exacta.
      *
-     * @param name  the attribute name to filter by
-     * @param value the value to filter by
-     * @return a specification for filtering users by the specified attribute
+     * @param name  El nombre del atributo por el cual filtrar.
+     * @param value El valor por el cual filtrar.
+     * @return Una especificación para filtrar usuarios por el atributo especificado.
      */
     private static Specification<User> filterEqualString(@NonNull final String name, String value) {
         final String maybeValue = StringUtils.stripToNull(value);
@@ -66,11 +75,11 @@ public class UserSpecification {
     }
 
     /**
-     * Creates a specification to filter users by a string attribute containing a value, ignoring case.
+     * Crea una especificación para filtrar usuarios por un atributo de tipo cadena que contenga un valor, ignorando mayúsculas y minúsculas.
      *
-     * @param nameField  the attribute name to filter by
-     * @param valueField the value to filter by
-     * @return a specification for filtering users by the specified attribute, ignoring case
+     * @param nameField  El nombre del atributo por el cual filtrar.
+     * @param valueField El valor por el cual filtrar.
+     * @return Una especificación para filtrar usuarios por el atributo especificado, ignorando mayúsculas y minúsculas.
      */
     private static Specification<User> filterContainsStringIgnoreCase(@NonNull final String nameField, String valueField) {
         final String maybeValue = StringUtils.stripToNull(valueField);

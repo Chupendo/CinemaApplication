@@ -8,14 +8,31 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-public class EnumStringValidImpl implements ConstraintValidator<EnumValid,String> {
+/**
+ * Implementación de la interfaz ConstraintValidator para validar cadenas
+ * contra los valores de un enum especificado en la anotación {@link EnumValid}.
+ *
+ * Esta clase realiza la validación de cadenas, asegurándose de que el valor
+ * pertenezca al enum objetivo y cumpla con los requisitos de obligatoriedad.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
+public class EnumStringValidImpl implements ConstraintValidator<EnumValid, String> {
     private List<String> entries;
     private boolean required;
 
+    /**
+     * Inicializa el validador con los valores del enum objetivo y la configuración
+     * de obligatoriedad definida en la anotación {@link EnumValid}.
+     *
+     * @param constraintAnnotation La anotación {@link EnumValid} que contiene
+     *                             la configuración de validación.
+     */
     @Override
     public void initialize(EnumValid constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
-        // initialize, get value of annotation of property target
+        // Obtiene los valores del enum objetivo y los convierte a una lista de cadenas en mayúsculas
         final Enum<?>[] constrainsEnum = constraintAnnotation.target().getEnumConstants();
         this.entries = Arrays.stream(constrainsEnum)
                 .map(Enum::toString)
@@ -25,24 +42,30 @@ public class EnumStringValidImpl implements ConstraintValidator<EnumValid,String
         this.required = constraintAnnotation.required();
     }
 
+    /**
+     * Valida una cadena contra los valores del enum objetivo.
+     *
+     * @param source                   La cadena a validar.
+     * @param constraintValidatorContext El contexto de validación.
+     * @return true si la cadena es válida, false en caso contrario.
+     */
     @Override
     public boolean isValid(String source, ConstraintValidatorContext constraintValidatorContext) {
-        // Validation
+        // Maneja valores nulos y convierte la cadena a mayúsculas
         String trimmed = Optional.ofNullable(source)
-                .map(StringUtils::stripToNull)    // Trim and convert blanks to null
-                .filter(Objects::nonNull)         // Filter out null values
-                .map(String::toUpperCase)         // Convert to uppercase
-                .orElseGet(() -> null);    // Collect as List
+                .map(StringUtils::stripToNull)    // Recorta y convierte espacios en blanco a nulos
+                .filter(Objects::nonNull)         // Filtra valores nulos
+                .map(String::toUpperCase)         // Convierte a mayúsculas
+                .orElseGet(() -> null);
 
-
-        // comprueba que el valor este dentro del enum a validar
+        // Comprueba que el valor esté dentro del enum objetivo
         boolean isValid = this.entries.contains(trimmed);
 
-        if( this.required ){
-            // es valido
+        if (this.required) {
+            // Es válido si es obligatorio y el valor coincide
             return isValid;
-        }else {
-            // no es valido
+        } else {
+            // Es válido si no es obligatorio y el valor es nulo o coincide
             return trimmed == null || isValid;
         }
     }

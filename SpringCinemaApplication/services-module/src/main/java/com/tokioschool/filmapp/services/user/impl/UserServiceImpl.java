@@ -3,8 +3,8 @@ package com.tokioschool.filmapp.services.user.impl;
 import com.tokioschool.filmapp.domain.Role;
 import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.common.PageDTO;
-import com.tokioschool.filmapp.dto.user.UserDTO;
-import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.dto.user.UserDto;
+import com.tokioschool.filmapp.dto.user.UserFormDto;
 import com.tokioschool.filmapp.enums.RoleEnum;
 import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.repositories.RoleDao;
@@ -33,6 +33,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
+/**
+ * Implementación del servicio de usuarios.
+ *
+ * Esta clase proporciona métodos para gestionar usuarios, incluyendo
+ * registro, actualización, búsqueda y autenticación.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -40,74 +49,97 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
-
     private final ModelMapper modelMapper;
 
+    /**
+     * Busca un usuario por su correo electrónico y devuelve un par con el usuario y su contraseña encriptada.
+     *
+     * @param mail Correo electrónico del usuario.
+     * @return Un {@link Optional} que contiene un par con el {@link UserDto} y la contraseña encriptada.
+     */
     @Override
-    @Transactional(readOnly = true) // aseguras que los datos relacionados con carga perezosa pueden cargarse durante la transacción.
-    public Optional<Pair<UserDTO, String>> findUserAndPasswordByEmail(String mail) {
+    @Transactional(readOnly = true)
+    public Optional<Pair<UserDto, String>> findUserAndPasswordByEmail(String mail) {
         final String maybeEmail = Optional.ofNullable(mail)
                 .map(StringUtils::stripToNull)
-                .orElseThrow(()->new IllegalArgumentException("Email not allow"));
+                .orElseThrow(() -> new IllegalArgumentException("Email not allow"));
 
-        // devuelve una tupa con el usuarioDTO y la pwd encriptada dentro de un optional
-        // o un optional vacio
         return userDao.findByUsernameOrEmailIgnoreCase(maybeEmail)
-                .map(user ->  Pair.of(modelMapper.map(user, UserDTO.class), user.getPassword()));
+                .map(user -> Pair.of(modelMapper.map(user, UserDto.class), user.getPassword()));
     }
 
+    /**
+     * Busca un usuario por su correo electrónico.
+     *
+     * @param email Correo electrónico del usuario.
+     * @return Un {@link Optional} que contiene el {@link UserDto} del usuario.
+     * @throws AccessDeniedException Si el usuario autenticado no tiene permisos para acceder a la información.
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
-    public Optional<UserDTO> findByEmail(String email) {
+    public Optional<UserDto> findByEmail(String email) {
         final String maybeEmail = Optional.ofNullable(email)
                 .map(StringUtils::stripToNull)
-                .orElseThrow(()->new IllegalArgumentException("Email not allow"));
+                .orElseThrow(() -> new IllegalArgumentException("Email not allow"));
 
-        final Optional<UserDTO> maybeUserDTO = userDao.findByEmailIgnoreCase(maybeEmail)
-                .map(user -> modelMapper.map(user, UserDTO.class));
+        final Optional<UserDto> maybeUserDTO = userDao.findByEmailIgnoreCase(maybeEmail)
+                .map(user -> modelMapper.map(user, UserDto.class));
 
-        // get user auth
-        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login") );
+        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login"));
 
-        // verify if the user auth is admin, and case if not be, if the id user request is same to auth
-        if(!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals( userAuth.getId() ) ){
+        if (!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals(userAuth.getId())) {
             throw new AccessDeniedException("You don't authorized to information of user");
         }
 
-        // devuelve una tupa con el usuarioDTO o un optional vacio
         return maybeUserDTO;
     }
 
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * @param userFormDTO Datos del usuario a registrar.
+     * @return Un objeto {@link UserDto} que representa al usuario registrado.
+     */
     @Override
     @Transactional
-    public UserDTO registerUser(UserFormDTO userFormDTO) {
+    public UserDto registerUser(UserFormDto userFormDTO) {
         User user = User.builder().build();
-        return populationCreateOrEditUser(user,userFormDTO);
+        return populationCreateOrEditUser(user, userFormDTO);
     }
 
+    /**
+     * Actualiza los datos de un usuario existente.
+     *
+     * @param userId ID del usuario a actualizar.
+     * @param userFormDTO Datos actualizados del usuario.
+     * @return Un objeto {@link UserDto} que representa al usuario actualizado.
+     * @throws AuthenticationException Si el usuario no está autenticado o no tiene permisos.
+     */
     @Override
     @Transactional
     @PreAuthorize(value = "isAuthenticated()")
-    public UserDTO updateUser(String userId, UserFormDTO userFormDTO) {
-        // verify the operation
+    public UserDto updateUser(String userId, UserFormDto userFormDTO) {
         whoAuthenticated()
-                .filter(user -> Objects.equals(userId,user.getId()) ||
-                        (!Objects.equals(userId,user.getId()) && isUserAdmin(user.getRoles()) ) )
+                .filter(user -> Objects.equals(userId, user.getId()) ||
+                        (!Objects.equals(userId, user.getId()) && isUserAdmin(user.getRoles())))
                 .orElseThrow(() -> new AuthenticationException("User no authenticated") {
                 });
 
-        User user = userDao.findById(userId).orElseThrow(()-> new IllegalArgumentException("User don't found"));
+        User user = userDao.findById(userId).orElseThrow(() -> new IllegalArgumentException("User don't found"));
 
-        return populationCreateOrEditUser(user,userFormDTO);
+        return populationCreateOrEditUser(user, userFormDTO);
     }
 
+    /**
+     * Actualiza la última hora de inicio de sesión del usuario autenticado.
+     */
     @Override
     @Transactional
     public void updateLastLoginTime() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional.ofNullable(authentication)
-                .map(auth ->(UserDetails) auth.getPrincipal())
+                .map(auth -> (UserDetails) auth.getPrincipal())
                 .map(UserDetails::getUsername)
                 .map(userDao::findByUsernameOrEmailIgnoreCase)
                 .filter(Optional::isPresent)
@@ -118,166 +150,184 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    /**
+     * Busca un usuario por su ID.
+     *
+     * @param userId ID del usuario.
+     * @return Un {@link Optional} que contiene el {@link UserDto} del usuario.
+     * @throws AccessDeniedException Si el usuario autenticado no tiene permisos para acceder a la información.
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
-    public Optional<UserDTO> findById(String userId) throws AccessDeniedException{
-        // get user request by id
-        final Optional<UserDTO> maybeUserDTO = userId!=null ? userDao.findById(userId).map(user -> modelMapper.map(user,UserDTO.class)) : Optional.empty();
+    public Optional<UserDto> findById(String userId) throws AccessDeniedException {
+        final Optional<UserDto> maybeUserDTO = userId != null ? userDao.findById(userId).map(user -> modelMapper.map(user, UserDto.class)) : Optional.empty();
 
-        // get user auth
-        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login") );
+        final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login"));
 
-        // verify if the user auth is admin, and case if not be, if the id user request is same to auth
-        if(!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals( userAuth.getId() ) ){
+        if (!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals(userAuth.getId())) {
             throw new AccessDeniedException("You don't authorized to information of user");
         }
 
         return maybeUserDTO;
     }
 
+    /**
+     * Obtiene el usuario autenticado.
+     *
+     * @return Un {@link Optional} que contiene el {@link UserDto} del usuario autenticado.
+     */
     @Override
     @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
-    public Optional<UserDTO> findUserAuthenticated() {
-        return whoAuthenticated().map(user -> modelMapper.map(user,UserDTO.class));
+    public Optional<UserDto> findUserAuthenticated() {
+        return whoAuthenticated().map(user -> modelMapper.map(user, UserDto.class));
     }
 
+    /**
+     * Busca usuarios según criterios de búsqueda.
+     *
+     * @param pageNumber Número de página.
+     * @param pageSize Tamaño de página.
+     * @param searchUserRecord Criterios de búsqueda.
+     * @return Un objeto {@link PageDTO} que contiene la lista de usuarios encontrados.
+     */
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
-    public PageDTO<UserDTO>  searchUsers(int pageNumber, int pageSize, SearchUserRecord searchUserRecord) {
+    public PageDTO<UserDto> searchUsers(int pageNumber, int pageSize, SearchUserRecord searchUserRecord) {
         Specification<User> spec = Specification.allOf();
 
-        if(searchUserRecord!=null) {
+        if (searchUserRecord != null) {
             spec = Specification
-                    .where( UserSpecification.hasUsername( searchUserRecord.username() ) )
-                    .and( UserSpecification.hasSurname( searchUserRecord.surname() ) )
-                    .and( UserSpecification.hasName( searchUserRecord.name() ) )
-                    .and( UserSpecification.containsEmail( searchUserRecord.email() ) );
+                    .where(UserSpecification.hasUsername(searchUserRecord.username()))
+                    .and(UserSpecification.hasSurname(searchUserRecord.surname()))
+                    .and(UserSpecification.hasName(searchUserRecord.name()))
+                    .and(UserSpecification.containsEmail(searchUserRecord.email()));
         }
 
-        List<UserDTO> usersDto = userDao.findAll(spec)
+        List<UserDto> usersDto = userDao.findAll(spec)
                 .stream()
-                .map(user -> modelMapper.map(user,UserDTO.class))
+                .map(user -> modelMapper.map(user, UserDto.class))
                 .toList();
 
         int startItem = pageNumber * pageSize;
-        final int totalPages = pageSize == NumberUtils.SHORT_ZERO ? NumberUtils.SHORT_ONE :  (int) Math.ceil((usersDto.size()/(double)pageSize));
+        final int totalPages = pageSize == NumberUtils.SHORT_ZERO ? NumberUtils.SHORT_ONE : (int) Math.ceil((usersDto.size() / (double) pageSize));
 
-        if( startItem >= usersDto.size() ){ // there aren't tiems to show
-
-            return PageDTO.<UserDTO>builder()
-                    .items( List.of() )
-                    .pageSize( pageSize )
-                    .pageNumber( pageNumber )
-                    .totalPages( totalPages )
+        if (startItem >= usersDto.size()) {
+            return PageDTO.<UserDto>builder()
+                    .items(List.of())
+                    .pageSize(pageSize)
+                    .pageNumber(pageNumber)
+                    .totalPages(totalPages)
                     .build();
-        }else{
-
-            if( pageSize == NumberUtils.SHORT_ZERO ){
-                usersDto = (List<UserDTO>) getItemsPageDto(usersDto,startItem,usersDto.size());
-            }else{
-                int end = Math.min(startItem + pageSize,usersDto.size());
-                usersDto = (List<UserDTO>) getItemsPageDto(usersDto,startItem,end);
+        } else {
+            if (pageSize == NumberUtils.SHORT_ZERO) {
+                usersDto = (List<UserDto>) getItemsPageDto(usersDto, startItem, usersDto.size());
+            } else {
+                int end = Math.min(startItem + pageSize, usersDto.size());
+                usersDto = (List<UserDto>) getItemsPageDto(usersDto, startItem, end);
             }
         }
 
-        return PageDTO.<UserDTO>builder()
-                .items( usersDto )
-                .pageSize( pageSize )
-                .pageNumber( pageNumber )
-                .totalPages( totalPages )
+        return PageDTO.<UserDto>builder()
+                .items(usersDto)
+                .pageSize(pageSize)
+                .pageNumber(pageNumber)
+                .totalPages(totalPages)
                 .build();
-
     }
 
-    private static List<?> getItemsPageDto(List<?> items,int start,int end){
-        return IntStream.range(start,end)
+    /**
+     * Obtiene una sublista de elementos para la paginación.
+     *
+     * @param items Lista de elementos.
+     * @param start Índice inicial.
+     * @param end Índice final.
+     * @return Sublista de elementos.
+     */
+    private static List<?> getItemsPageDto(List<?> items, int start, int end) {
+        return IntStream.range(start, end)
                 .mapToObj(items::get)
                 .toList();
     }
 
     /**
-     * Register or Updated the data user in the system
+     * Registra o actualiza los datos de un usuario.
      *
-     * @param user if empty is new, otherwise is updated
-     * @param userFormDTO data of user
-     * @return user to object
+     * @param user Usuario a registrar o actualizar.
+     * @param userFormDTO Datos del usuario.
+     * @return Un objeto {@link UserDto} que representa al usuario registrado o actualizado.
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    protected UserDTO populationCreateOrEditUser(User user,UserFormDTO userFormDTO){
-        if(userFormDTO == null){
+    protected UserDto populationCreateOrEditUser(User user, UserFormDto userFormDTO) {
+        if (userFormDTO == null) {
             throw new IllegalArgumentException("The data of user is null");
         }
-        //user.setId(userFormDTO.getId());
         user.setName(userFormDTO.getName());
         user.setSurname(userFormDTO.getSurname());
         user.setEmail(userFormDTO.getEmail());
 
-        if(user.getPassword() == null || userFormDTO.isUpdatePassword() ) {
+        if (user.getPassword() == null || userFormDTO.isUpdatePassword()) {
             user.setPassword(passwordEncoder.encode(userFormDTO.getPassword()));
             user.setPasswordBis(passwordEncoder.encode(userFormDTO.getPasswordBis()));
         }
 
         user.setUsername(userFormDTO.getUsername());
         user.setBirthDate(userFormDTO.getBirthDate());
+        user.setRoles(getRolesByName(userFormDTO.getRoles().toArray(new String[0])));
 
-        // roles
-        user.setRoles(getRolesByName(userFormDTO.getRoles().toArray(new String[0]) ) );
-
-        // images
-        if(userFormDTO.getImage() != null){
+        if (userFormDTO.getImage() != null) {
             user.setImage(UUID.fromString(userFormDTO.getImage()));
         }
         user = userDao.save(user);
 
-        return modelMapper.map(user,UserDTO.class);
+        return modelMapper.map(user, UserDto.class);
     }
 
-    private Optional<User> whoAuthenticated(){
+    /**
+     * Obtiene el usuario autenticado.
+     *
+     * @return Un {@link Optional} que contiene el usuario autenticado.
+     */
+    private Optional<User> whoAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return Optional.ofNullable(authentication)
-                .map(auth ->  (Jwt) auth.getPrincipal())
+                .map(auth -> (Jwt) auth.getPrincipal())
                 .map(Jwt::getClaims)
-                .map(claim-> (String) claim.get("sub"))
+                .map(claim -> (String) claim.get("sub"))
                 .map(userDao::findByUsernameOrEmailIgnoreCase)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
     }
 
     /**
-     * Given a collection of roles, check if contains the role Admin
+     * Verifica si un conjunto de roles contiene el rol de administrador.
      *
-     * @param roles collection
-     * @return true if contains the rol Admin, otherwise false
+     * @param roles Conjunto de roles.
+     * @return true si contiene el rol de administrador, de lo contrario false.
      */
-    private boolean isUserAdmin(Set<Role> roles){
+    private boolean isUserAdmin(Set<Role> roles) {
         return roles.stream().map(Role::getName)
                 .map(StringUtils::upperCase)
                 .anyMatch(roleName -> roleName.equals(RoleEnum.ADMIN.name()));
     }
 
     /**
-     * Obtained the roles of user given name role, if this isn't name, then
-     * return role user by default
+     * Obtiene los roles de un usuario a partir de sus nombres.
      *
-     * @param roleNames
-     * @return
+     * @param roleNames Nombres de los roles.
+     * @return Un conjunto de roles.
      */
-
-    private Set<Role> getRolesByName(String... roleNames){
+    private Set<Role> getRolesByName(String... roleNames) {
         Set<Role> roles = new HashSet<>();
 
-        // Verifica si roleNames es nulo o está vacío
         if (roleNames == null || roleNames.length == 0) {
-            // Si no se proporcionan nombres de roles, asigna el rol "user" por defecto
             Role roleUser = roleDao.findByNameIgnoreCase("user");
             if (roleUser != null) {
                 roles.add(roleUser);
             }
         } else {
-            // Si se proporcionan nombres de roles, busca cada uno
             for (String roleName : roleNames) {
                 Role role = roleDao.findByNameIgnoreCase(roleName);
                 if (role != null) {
@@ -289,10 +339,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Given user, verify if the user has role ADMIN
+     * Verifica si un usuario tiene el rol de administrador.
      *
-     * @param user information full user data
-     * @return true is the user contains the rol ADMIN, otherwise false
+     * @param user Usuario.
+     * @return true si el usuario tiene el rol de administrador, de lo contrario false.
      */
     private boolean userIsAdmin(User user) {
         return user.getRoles().stream().anyMatch(role -> role.getName().toUpperCase().contains("ADMIN"));

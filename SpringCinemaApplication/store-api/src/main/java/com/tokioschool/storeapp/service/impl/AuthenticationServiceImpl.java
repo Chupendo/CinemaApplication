@@ -33,6 +33,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Implementación del servicio de autenticación.
+ *
+ * Esta clase proporciona métodos para autenticar usuarios, obtener información
+ * del usuario autenticado y gestionar tokens JWT.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -43,54 +52,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
     /**
+     * Autentica a un usuario en el sistema utilizando su nombre de usuario y contraseña.
      *
-     * Method that authenticated a user in the system by user nad password
-     *
-     * @param authenticationRequestDTO username and password plain
-     * @return token and expired at
-     *
-     * @throws UsernameNotFoundException the user don't found in the system
-     * @throws BadCredentialsException if the password has error
+     * @param authenticationRequestDTO Objeto que contiene el nombre de usuario y la contraseña en texto plano.
+     * @return Un objeto `AuthenticationResponseDTO` que contiene el token JWT y su tiempo de expiración.
+     * @throws UsernameNotFoundException Si el usuario no se encuentra en el sistema.
+     * @throws BadCredentialsException Si la contraseña es incorrecta.
      */
     @Override
     public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authenticationRequestDTO) throws UsernameNotFoundException, BadCredentialsException {
         final UserDto userDto = storeUserService.findByUserName(authenticationRequestDTO.getUsername());
 
-        // Create Authentication Token
+        // Crear el token de autenticación
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 authenticationRequestDTO.getUsername(),
                 authenticationRequestDTO.getPassword(),
                 loadAuthorities(userDto) );
-        // Authenticate User
+        // Autenticar al usuario
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-        // Generate JWT
+        // Generar el token JWT
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Jwt jwt = jwtService.generateToken(userDetails);
 
-        // Set Security Context for maintain the security context for the current session
+        // Establecer el contexto de seguridad para mantener la sesión actual
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Return JWT
+        // Retornar el token JWT
         return AuthenticationResponseDTO.builder()
                 .accessToken(jwt.getTokenValue())
-                // +1 porque excluye el úlitmo digio del segundo y sea 3600 segundos
+                // +1 porque excluye el último dígito del segundo y sea 3600 segundos
                 .expiresIn(ChronoUnit.SECONDS.between(Instant.now(), jwt.getExpiresAt()) +1)
                 .build();
     }
 
     /**
-     * Get data about user with role 'ADMIN'
+     * Obtiene los datos del usuario autenticado con el rol 'ADMIN'.
      *
-     * @return data user authenticated
-     * @throws LoginException if there is not authenticated
+     * @return Un objeto `AuthenticatedMeResponseDTO` con los datos del usuario autenticado.
+     * @throws LoginException Si no hay un usuario autenticado.
      */
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public AuthenticatedMeResponseDTO getAuthenticated() throws LoginException { // para saber quin hizo la petición
+    public AuthenticatedMeResponseDTO getAuthenticated() throws LoginException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null){
-            throw new LoginException("don't user authenticated");
+            throw new LoginException("No hay un usuario autenticado");
         }
 
         return AuthenticatedMeResponseDTO.builder()
@@ -107,11 +114,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 ).build();
     }
 
-    /**+
-     * Method that token value and expired of request http
+    /**
+     * Obtiene el valor del token y su tiempo de expiración desde la solicitud HTTP.
      *
-     * @param request information of authentication in headers request http
-     * @return token value and expired time of the same
+     * @param request La solicitud HTTP que contiene la información de autenticación en los encabezados.
+     * @return Un par que contiene el valor del token y su tiempo de expiración en segundos.
      */
     @Override
     @PreAuthorize("isAuthenticated()")
@@ -142,23 +149,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return null;
     }
 
-
     /**
-     * Verify if the password of request is the password of user saved in the system
+     * Verifica si la contraseña proporcionada coincide con la contraseña codificada almacenada en el sistema.
      *
-     * @param rawPassword password to verify
-     * @param encodedPassword password of user in the system
-     * @return true if the password matches with password encoded
+     * @param rawPassword La contraseña en texto plano que se desea verificar.
+     * @param encodedPassword La contraseña codificada almacenada en el sistema.
+     * @return `true` si las contraseñas coinciden, de lo contrario `false`.
      */
     private boolean verifyPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword,encodedPassword.replace("{bcrypt}", StringUtils.EMPTY));
     }
 
     /**
-     * Load the loadAuthorities of user (privileges + roles)
+     * Carga las autoridades (privilegios y roles) de un usuario.
      *
-     * @param userStore data of user to authenticated
-     * @return collection of authorities of user
+     * @param userStore Los datos del usuario que se está autenticando.
+     * @return Una lista de autoridades del usuario.
      */
     private List<SimpleGrantedAuthority> loadAuthorities(UserDto userStore) {
         List<SimpleGrantedAuthority> privileges = userStore.authorities().stream()

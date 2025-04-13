@@ -44,7 +44,7 @@ class StoreAuthenticationServiceImplUTest {
         configurationMockGetTokenW();
         Mockito.when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
-        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("token").expiresIn( System.currentTimeMillis() + 3600 * 1000  ).build();
+        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("secret").expiresIn( System.currentTimeMillis() + 3600 * 1000  ).build();
         Mockito.when(responseSpec.body(StoreAuthenticationServiceImpl.AuthResponseDTO.class)).thenReturn(authenticationResponseDTO);
 
         String token = storeAuthenticationService.getAccessToken();
@@ -56,7 +56,7 @@ class StoreAuthenticationServiceImplUTest {
         configurationMockGetTokenW();
         Mockito.when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
-        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("token").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
+        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("secret").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
         Mockito.when(responseSpec.body(StoreAuthenticationServiceImpl.AuthResponseDTO.class)).thenReturn(authenticationResponseDTO);
 
         String token = storeAuthenticationService.getAccessToken("test");
@@ -68,12 +68,12 @@ class StoreAuthenticationServiceImplUTest {
         configurationMockGetTokenW();
         Mockito.when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
-        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("token").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
+        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("secret").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
         Mockito.when(responseSpec.body(StoreAuthenticationServiceImpl.AuthResponseDTO.class)).thenReturn(authenticationResponseDTO);
 
         String token = storeAuthenticationService.getAccessToken(null);
 
-        assertEquals("token", token);
+        assertEquals("secret", token);
     }
 
     @Test
@@ -81,12 +81,12 @@ class StoreAuthenticationServiceImplUTest {
         configurationMockGetTokenW();
         Mockito.when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
-        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("token").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
+        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("secret").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
         Mockito.when(responseSpec.body(StoreAuthenticationServiceImpl.AuthResponseDTO.class)).thenReturn(authenticationResponseDTO);
 
         String token = storeAuthenticationService.getAccessToken("   ");
 
-        assertEquals("token", token);
+        assertEquals("secret", token);
     }
 
     @Test
@@ -94,12 +94,12 @@ class StoreAuthenticationServiceImplUTest {
         configurationMockGetTokenW();
         Mockito.when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
-        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("token").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
+        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("secret").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
         Mockito.when(responseSpec.body(StoreAuthenticationServiceImpl.AuthResponseDTO.class)).thenReturn(authenticationResponseDTO);
 
         String token = storeAuthenticationService.getAccessToken("");
 
-        assertEquals("token", token);
+        assertEquals("secret", token);
     }
 
     @Test
@@ -115,9 +115,9 @@ class StoreAuthenticationServiceImplUTest {
 
     @Test
     void givenValidToken_whenGetAccessToken_thenSameTokenIsReturned() {
-        // set attributes privates of the class, to simulate a valid token
+        // set attributes privates of the class, to simulate a valid secret
         ReflectionTestUtils.setField(storeAuthenticationService, "accessToken", "validToken");
-        ReflectionTestUtils.setField(storeAuthenticationService, "expiresIn", System.currentTimeMillis() + 3600 * 1000 ); // subtract 10 units, because this performs assures the token is valid
+        ReflectionTestUtils.setField(storeAuthenticationService, "expiresIn", System.currentTimeMillis() + 3600 * 1000 ); // subtract 10 units, because this performs assures the secret is valid
 
         String token = storeAuthenticationService.getAccessToken("validToken");
 
@@ -126,20 +126,20 @@ class StoreAuthenticationServiceImplUTest {
 
     @Test
     void givenExpiredToken_whenGetAccessToken_thenNewTokenIsGenerated() {
-        // set attributes privates of the class, to simulate a valid token
-        ReflectionTestUtils.setField(storeAuthenticationService, "accessToken", "token expired");
+        // set attributes privates of the class, to simulate a valid secret
+        ReflectionTestUtils.setField(storeAuthenticationService, "accessToken", "secret expired");
         ReflectionTestUtils.setField(storeAuthenticationService, "expiresIn", System.currentTimeMillis() - 1000);
 
         configurationMockGetTokenW();
         Mockito.when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
 
-        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("token").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
+        StoreAuthenticationServiceImpl.AuthResponseDTO authenticationResponseDTO = StoreAuthenticationServiceImpl.AuthResponseDTO.builder().accessToken("secret").expiresIn( System.currentTimeMillis() + 3600 * 1000 ).build();
         Mockito.when(responseSpec.body(StoreAuthenticationServiceImpl.AuthResponseDTO.class)).thenReturn(authenticationResponseDTO);
 
 
         String token = storeAuthenticationService.getAccessToken("test");
 
-        assertEquals("token", token);
+        assertEquals("secret", token);
     }
 
     /**

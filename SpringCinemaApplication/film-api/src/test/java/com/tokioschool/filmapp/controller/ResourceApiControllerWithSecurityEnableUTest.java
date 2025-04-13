@@ -1,19 +1,29 @@
 package com.tokioschool.filmapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tokioschool.filmapp.jwt.properties.JwtConfiguration;
+import com.tokioschool.filmapp.security.confings.JwtAuthenticationProvider;
+import com.tokioschool.filmapp.security.confings.JwtConfiguration;
 import com.tokioschool.filmapp.security.filter.FilmApiSecurityConfiguration;
+import com.tokioschool.filmapp.services.artist.ArtistService;
+import com.tokioschool.filmapp.services.jwt.JwtService;
+import com.tokioschool.filmapp.services.movie.MovieService;
+import com.tokioschool.filmapp.services.ratings.RatingFilmService;
 import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.redis.services.JwtBlacklistService;
 import com.tokioschool.store.dto.ResourceContentDto;
 import com.tokioschool.store.facade.StoreFacade;
+import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,24 +38,37 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = ResourceApiController.class) // obtiente solo el contexto del contraldor especificado
+//@WebMvcTest(controllers = ResourceApiController.class) // obtiente solo el contexto del contraldor especificado
+//@ActiveProfiles("test")
+//@AutoConfigureMockMvc // Habilita MockMvc con filtros de seguridad
+//@TestPropertySource(properties = {
+//        "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
+//        "spring.jpa.hibernate.ddl-auto=create-drop",
+//        "spring.datasource.driver-class-name=org.h2.Driver",
+//        "spring.datasource.url=dbc:h2:file:../rating-bbdd/testdb",
+//        "spring.datasource.username=sa",
+//        "spring.datasource.password=password",
+//        "logging.level.org.springframework.security=DEBUG",
+//        "jwt.secret=secretos123123",
+//        "jwt.expiration=PT1H"
+//})
+//@Import({FilmApiSecurityConfiguration.class,
+//        JwtConfiguration.class}) // Importa la configuración de seguridad
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
-@AutoConfigureMockMvc // Habilita MockMvc con filtros de seguridad
 @TestPropertySource(properties = {
-        "logging.level.org.springframework.security=DEBUG",
-        "application.jwt.secret=secretos123123",
-        "application.jwt.expiration=PT1H"
+        "jwt.secret=secretos123123",
+        "jwt.expiration=PT1H"
 })
-@Import({FilmApiSecurityConfiguration.class, JwtConfiguration.class}) // Importa la configuración de seguridad
 public class ResourceApiControllerWithSecurityEnableUTest {
 
     @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    // required for log filter
-    @MockitoBean    private UserService userService;
-    @MockitoBean    private JwtBlacklistService jwtBlacklistService;
 
-    // service in controller
+//    // required for log filter
+    @MockitoBean    private UserService userService;
+//    @MockitoBean    private JwtBlacklistService jwtBlacklistService;
+//    // service in controller
     @MockitoBean private StoreFacade storeFacade;
 
     @Test

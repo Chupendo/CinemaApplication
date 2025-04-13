@@ -4,20 +4,38 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+/**
+ * Configuración para el bean de \{@link LocalValidatorFactoryBean\} utilizado en la validación de datos.
+ *
+ * Esta clase define un bean de \{@link LocalValidatorFactoryBean\} que se puede inyectar en otras partes
+ * de la aplicación para realizar validaciones personalizadas. Permite configurar un origen de mensajes
+ * para las validaciones y aplicar configuraciones personalizadas después de inicializar las propiedades.
+ *
+ * @version 1.0
+ * @author
+ */
 @Configuration
 //@RequiredArgsConstructor
 public class LocalValidatorFactoryBeanConfiguration {
 
-    // ID
     //private final MessageSource messageSource;
 
+    /**
+     * Define un bean de \{@link LocalValidatorFactoryBean\} con configuración personalizada.
+     *
+     * Este bean permite configurar un origen de mensajes para las validaciones y aplica
+     * configuraciones personalizadas después de inicializar las propiedades.
+     *
+     * @return Una instancia de \{@link LocalValidatorFactoryBean\}.
+     */
     @Bean
     public LocalValidatorFactoryBean localValidatorFactoryBean() {
         final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
-        // defined the message source as messages validation
-        //localValidatorFactoryBean.setValidationMessageSource(messageSource);
+        // Define el origen de mensajes para las validaciones (descomentarlo si es necesario)
+        // localValidatorFactoryBean.setValidationMessageSource(messageSource);
 
-        localValidatorFactoryBean.afterPropertiesSet(); // apply the custom configurations
+        // Aplica configuraciones personalizadas después de inicializar las propiedades
+        localValidatorFactoryBean.afterPropertiesSet();
         return localValidatorFactoryBean;
     }
 }

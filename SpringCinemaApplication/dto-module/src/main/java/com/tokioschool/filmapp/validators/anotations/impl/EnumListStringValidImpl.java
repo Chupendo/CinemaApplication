@@ -7,6 +7,16 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
+/**
+ * Implementación de la interfaz ConstraintValidator para validar listas de cadenas
+ * contra los valores de un enum especificado en la anotación {@link EnumListValid}.
+ *
+ * Esta clase realiza la validación de listas de cadenas, asegurándose de que los valores
+ * pertenezcan al enum objetivo y cumplan con los requisitos de obligatoriedad.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 public class EnumListStringValidImpl implements ConstraintValidator<EnumListValid,List<String>> {
     private List<String> entries;
     private boolean required;

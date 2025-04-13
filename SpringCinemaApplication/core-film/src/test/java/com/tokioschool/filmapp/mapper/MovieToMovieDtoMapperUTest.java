@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.mapper;
 
+import com.tokioschool.configs.ModelMapperConfiguration;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.movie.MovieDto;

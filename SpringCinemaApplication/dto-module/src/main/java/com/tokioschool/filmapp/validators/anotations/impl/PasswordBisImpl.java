@@ -1,6 +1,6 @@
 package com.tokioschool.filmapp.validators.anotations.impl;
 
-import com.tokioschool.filmapp.dto.user.UserFormDTO;
+import com.tokioschool.filmapp.dto.user.UserFormDto;
 import com.tokioschool.filmapp.validators.anotations.PasswordBis;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -10,33 +10,50 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Validated of password, checking that password and passwordbis are equals and matches with pattern @{@link  #PASSWORD_PATTERN}
+ * Implementación de la interfaz ConstraintValidator para validar contraseñas.
+ *
+ * Esta clase verifica que los campos de contraseña y confirmación de contraseña (passwordBis)
+ * sean iguales y que la contraseña cumpla con un patrón definido por {@link #PASSWORD_PATTERN}.
  *
  * @author anres.rpenuela
  * @version 1.0
  */
-public class PasswordBisImpl implements ConstraintValidator<PasswordBis, UserFormDTO> {
+public class PasswordBisImpl implements ConstraintValidator<PasswordBis, UserFormDto> {
     /**
-     * Length min., 8 chars.
-     * min., a letter lower case (a-z).
-     * min., a letter upper case  (A-Z).
-     * min., a digit (0-9).
-     * min., a character of the next list: @, #, $, %, ^, &, +, =.
+     * Patrón de validación para contraseñas:
+     * - Longitud mínima de 8 caracteres.
+     * - Al menos una letra minúscula (a-z).
+     * - Al menos una letra mayúscula (A-Z).
+     * - Al menos un dígito (0-9).
+     * - Al menos un carácter especial de la lista: @, #, $, %, ^, &, +, =.
      */
     private static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$";
 
+    /**
+     * Inicializa el validador con la configuración de la anotación {@link PasswordBis}.
+     *
+     * @param constraintAnnotation La anotación {@link PasswordBis} que contiene la configuración.
+     */
     @Override
     public void initialize(PasswordBis constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
+    /**
+     * Valida un objeto {@link UserFormDto} verificando que las contraseñas coincidan
+     * y que la contraseña cumpla con el patrón definido.
+     *
+     * @param source                   El objeto {@link UserFormDto} a validar.
+     * @param constraintValidatorContext El contexto de validación.
+     * @return true si la validación es exitosa, false en caso contrario.
+     */
     @Override
-    public boolean isValid(UserFormDTO source, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(UserFormDto source, ConstraintValidatorContext constraintValidatorContext) {
         return Optional.ofNullable(source)
-                .filter(user -> user.getCreated() == null || user.isUpdatePassword())
-                .filter(user -> Objects.equals(user.getPassword(),user.getPasswordBis()))
-                .map(UserFormDTO::getPassword)
-                .map(password -> Pattern.matches(PASSWORD_PATTERN, password))
-                .orElseGet(()->Boolean.FALSE);
+                .filter(user -> user.getCreated() == null || user.isUpdatePassword()) // Verifica si es necesario validar la contraseña.
+                .filter(user -> Objects.equals(user.getPassword(), user.getPasswordBis())) // Verifica que las contraseñas coincidan.
+                .map(UserFormDto::getPassword)
+                .map(password -> Pattern.matches(PASSWORD_PATTERN, password)) // Verifica que la contraseña cumpla con el patrón.
+                .orElseGet(() -> Boolean.FALSE); // Devuelve false si alguna validación falla.
     }
 }
