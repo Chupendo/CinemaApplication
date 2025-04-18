@@ -1,6 +1,7 @@
 package com.tokioschool.filmexport.configs.batchs;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Profile;
  * @author andres.rpenuela
  * @version 1.0
  */
+@Configuration
 @Profile("test")
 @EnableBatchProcessing // Si se habilita, las tablas no se crean automáticamente. Si se elimina, las tablas se crean.
 public class BatchProcessingConfig {
