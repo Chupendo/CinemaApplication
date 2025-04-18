@@ -12,6 +12,10 @@
     <artifactId>film-web</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <spring-icu.version>0.3.0</spring-icu.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -24,9 +28,17 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- templates html -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- internationalization -->
+        <dependency>
+            <groupId>com.github.transferwise</groupId>
+            <artifactId>spring-icu</artifactId>
+            <version>${spring-icu.version}</version>
         </dependency>
 
         <dependency>
@@ -48,6 +60,15 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <!-- for use icu -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>

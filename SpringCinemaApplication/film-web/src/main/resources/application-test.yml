@@ -7,6 +7,10 @@ spring:
     enabled: false
     # Debug queries
     show-sql: true
+  web:
+    locale: es
+  messages:
+    encoding: UTF-8
 server:
   port: 8083
 
