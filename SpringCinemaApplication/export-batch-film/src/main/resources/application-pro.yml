@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: export-batch-film
+server:
+  port: 9096
+# TODO apliar cuando se despliegue

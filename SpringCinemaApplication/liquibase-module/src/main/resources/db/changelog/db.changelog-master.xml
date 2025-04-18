@@ -13,4 +13,9 @@
     <!-- ratings -->
     <includeAll path="db/changelog/rating/rating-pro" context="test" contextFilter="rating-pro"/>
     <includeAll path="db/changelog/rating/rating-dev" context="test" contextFilter="rating-dev"/>
+
+    <!-- export bath -->
+    <includeAll path="db/changelog/export-batch/pro" context="export-batch-pro" contextFilter="export-batch"/>
+    <includeAll path="db/changelog/export-batch/dev" context="export-batch-dev" contextFilter="export-batch"/>
+    <includeAll path="db/changelog/export-batch/test" context="export-batch-test" contextFilter="export-batch"/>
 </databaseChangeLog>
