@@ -45,6 +45,12 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class BathConfig {
 
+    /** Nombre del trabajo de exportación de películas. */
+    public static final String MOVIE_EXPORT_JOB_NAME = "movieExportJob";
+
+    /** Nombre del paso del trabajo. */
+    public static final String STEP_NAME = "step";
+
     /** Listener para manejar eventos al completar el trabajo. */
     private final JobCompletionNotificationListener jobCompletionNotificationListener;
 
@@ -75,7 +81,7 @@ public class BathConfig {
         // Configura el idioma predeterminado de la aplicación
         Locale.setDefault(Locale.of(language));
 
-        return new JobBuilder("movieExportJob", jobRepository)
+        return new JobBuilder(MOVIE_EXPORT_JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(jobCompletionNotificationListener)
                 .start(chunkStep(jobRepository, transactionManager, movieItemReader, movieItemProcessor, movieItemWriter, exportFilmDbWriter))
@@ -101,7 +107,7 @@ public class BathConfig {
                           MovieItemWriter movieItemWriter,
                           ExportFilmDbWriter exportFilmDbWriter) {
 
-        return new StepBuilder("step", jobRepository).<Movie, ExportFilm>chunk(1, transactionManager)
+        return new StepBuilder(STEP_NAME, jobRepository).<Movie, ExportFilm>chunk(1, transactionManager)
                 .reader(movieItemReader)
                 .processor(movieItemProcessor)
                 .writer(compositeItemWriter(movieItemWriter, exportFilmDbWriter))
