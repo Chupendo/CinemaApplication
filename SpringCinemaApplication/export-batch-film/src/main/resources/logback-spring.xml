@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--
+        Configuración básica de Logback:
+        Incluye la configuración predeterminada proporcionada por Spring Boot.
+    -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"></include>
+
+    <!--
+        Propiedad de Spring:
+        Obtiene el nombre de la aplicación desde las propiedades de Spring.
+        Si no se encuentra, se utiliza "app" como valor predeterminado.
+    -->
+    <springProperty scope="context" name="application.name" source="spring.application.name" defaultValue="app"/>
+
+    <!--
+        Propiedades personalizadas:
+        Define el directorio donde se almacenarán los logs y el nombre del archivo de log.
+    -->
+    <property name="LOG_DIR" value="../logs" />
+    <property name="LOG_NAME" value="${application.name}" />
+
+    <!--
+        Patrón de log para la consola:
+        Define el formato de los mensajes de log que se mostrarán en la consola.
+    -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%thread]){faint} %clr(%-5level){highlight} %logger{36} %clr(--- Contexto:){faint} %clr(%C.%M:%L){cyan} - %msg%n%ex{full}"/>
+
+    <!--
+        Appender de consola:
+        Configura la salida de los logs en la consola.
+    -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Patrón de traza para la consola -->
+            <pattern>
+                ${CONSOLE_LOG_PATTERN}
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        Appender de archivo con rotación:
+        Configura la salida de los logs en un archivo con rotación basada en tamaño y tiempo.
+        Solo se aplica si el perfil activo no es "test".
+    -->
+    <springProfile name="!test">
+        <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/${application.name}.log</file>
+
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <outputPatternAsHeader>true</outputPatternAsHeader>
+                <withJansi>true</withJansi>
+            </encoder>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_DIR}/${LOG_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>10MB</maxFileSize>
+                <maxHistory>90</maxHistory>
+                <totalSizeCap>2GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <!-- Nivel de log para el appender de archivo -->
+        <root level="info">
+            <appender-ref ref="RollingFile" />
+        </root>
+    </springProfile>
+
+    <!--
+        Configuración del logger raíz:
+        Define el nivel de log y el appender para la consola.
+    -->
+
+    <root level="info">
+        <appender-ref ref="Console"/>
+    </root>
+
+
+    <!--
+        Configuración de niveles específicos:
+        Define niveles de log personalizados para paquetes y clases específicas.
+    -->
+    <logger name="com.tokioschool.filmapp" level="debug"/>
+    <logger name="liquibase.sqlgenerator" level="info"/>
+    <logger name="org.springframework.batch" level="debug"/>
+
+    <!--
+        Configuración de logs para consultas SQL y parámetros:
+        Incluye logs detallados de Hibernate.
+    -->
+    <logger name="org.hibernate.SQL" level="debug"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="trace"/>
+
+    <!--
+        Configuración adicional para el perfil "test":
+        Incluye logs detallados para H2.
+    -->
+    <springProfile name="test">
+        <logger name="org.h2" level="trace"/>
+    </springProfile>
+</configuration>

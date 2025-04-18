@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.repositories;
 
 import com.github.javafaker.Faker;
 import com.tokioschool.filmapp.domain.Artist;
+import com.tokioschool.filmapp.domain.ExportFilm;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.projections.ResultMovie;
@@ -16,15 +17,18 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 @DataJpaTest
-@ContextConfiguration(classes = {TestConfig.class,ArtistDao.class,MovieDao.class})
+@ContextConfiguration(classes = {TestConfig.class,ArtistDao.class,MovieDao.class,ExportFilmDao.class})
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MovieDaoUTest {
 
     @Autowired private MovieDao movieDao;
     @Autowired private ArtistDao artistDao;
+    @Autowired private ExportFilmDao exportFilmDao;
+
     @Autowired private Faker faker;
 
     List<Movie> movies;
@@ -113,6 +117,49 @@ class MovieDaoUTest {
                 .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
+    @Test
+    @Order(6)
+    void givenMovieNotExported_whenFinFilmsNotExported_thenReturnAListNoEmpty() {
+
+        List<Movie> moviesNotExported = movieDao.findFilmsNotExported();
+        Assertions.assertThat(moviesNotExported)
+                .isNotNull()
+                .isNotEmpty();
+    }
+
+    @Test
+    @Order(7)
+    void givenAExportedFilm_whenFinFilmsNotExported_thenReturnAListSizeEqualMoviesLessOne() {
+
+        ExportFilm exportFilm1 = ExportFilm.builder()
+                .movie(movies.getFirst())
+                .jobId(1L)
+                .build();
+        exportFilmDao.save(exportFilm1);
+
+        List<Movie> moviesNotExported = movieDao.findFilmsNotExported();
+        Assertions.assertThat(moviesNotExported)
+                .isNotEmpty()
+                .hasSizeGreaterThanOrEqualTo(movies.size()-1)
+                .satisfies(moviesNotExportedResult -> moviesNotExportedResult.getFirst().getId().equals(movies.getFirst().getId()));
+    }
+
+    @Test
+    @Order(8)
+    void givenAllExportedFilm_whenFinFilmsNotExported_thenReturnAListEmpty() {
+        LongStream.range(0,movies.size()).forEach(exportJobId -> {
+            ExportFilm exportFilm = ExportFilm.builder()
+                    .movie(movies.get( (int) exportJobId ))
+                    .jobId(exportJobId)
+                    .build();
+            exportFilmDao.save(exportFilm);
+        });
+
+        List<Movie> moviesNotExported = movieDao.findFilmsNotExported();
+        moviesNotExported.stream().forEach(System.out::println);
+        Assertions.assertThat(moviesNotExported)
+                .isEmpty();
+    }
     /**
      * Get a number random between [min,max]
      *

@@ -30,9 +30,9 @@
             </column>
 
             <!-- Columna para el póster -->
-            <column name="poster" type="UUID">
-                <constraints unique="true"/>
-            </column>
+<!--            <column name="poster" type="UUID">-->
+<!--                <constraints unique="true"/>-->
+<!--            </column>-->
         </createTable>
 
         <createTable tableName="movies_artists">

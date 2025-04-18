@@ -24,6 +24,7 @@
 		<module>dto-module</module>
 		<module>store-api</module>
         <module>rating-api</module>
+        <module>export-batch-film</module>
     </modules>
 	<packaging>pom</packaging>
 
@@ -104,6 +105,13 @@
 				<artifactId>rating-api</artifactId>
 				<version>${version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.tokioschool.ratingapp</groupId>
+				<artifactId>export-batch-film</artifactId>
+				<version>${version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

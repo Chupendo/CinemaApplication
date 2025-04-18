@@ -3,6 +3,7 @@ package com.tokioschool.filmapp.repositories;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.projections.ResultMovie;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -47,4 +48,17 @@ public interface MovieDao extends JpaRepository<Movie, Long> {
          * @return Una lista de proyecciones {@link ResultMovie} que coinciden con el criterio.
          */
         List<ResultMovie> findMovieByReleaseYearIs(Integer year);
+
+
+        /**
+         * Encuentra las películas que no han sido exportadas.
+         *
+         * Esta consulta selecciona todas las películas cuyo ID no está presente
+         * en la tabla `ExportFilms`.
+         *
+         * @return Lista de películas no exportadas.
+         */
+        @Query("SELECT m FROM Movie m WHERE m.id NOT IN (SELECT ef.movie.id FROM ExportFilm ef)")
+        // @Query("SELECT f FROM Film f LEFT JOIN ExportFilm ef ON ef.film = f WHERE ef.film IS NULL")
+        List<Movie> findFilmsNotExported();
 }

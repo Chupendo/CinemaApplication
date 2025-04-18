@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: film-export-batch
+    #language default application messages_LANGUAGE.properties
+    language:
+      es: es_ES
+      en: en_US
+  # Liguibase
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev,export-batch-test
+    #contexts: export-batch-test
+    label-filter: export-batch-test
+  # h2 database
+  datasource:
+    url: jdbc:h2:file:../film-bbdd/filmdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  sql:
+    init:
+      platform: h2
+    # Configuración de Spring Batch
+    batch:
+      jdbc:
+        initialize-schema: never
+server:
+  port: 9097
+
+#logging:
+#  level:
+#    org:
+#      h2: DEBUG
+#      hibernate: DEBUG
+#      springframework:
+#        web: DEBUG
