@@ -2,15 +2,35 @@
 spring:
   application:
     name: film-web
-  # Liguibase
+    # Liguibase
   liquibase:
-    enabled: false
-    # Debug queries
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev
+    label-filter: film-web-dev
+  # h2 database
+  datasource:
+    url: jdbc:h2:file:../film-bbdd/filmdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
     show-sql: true
+  sql:
+    init:
+      platform: h2
   web:
     locale: es
   messages:
     encoding: UTF-8
+
 server:
   port: 8083
 
@@ -25,3 +45,20 @@ management:
   endpoint:
     health:
       enabled: false
+
+logging:
+  level:
+    org:
+      h2: DEBUG
+      hibernate: DEBUG
+      springframework:
+        security: DEBUG
+        web: DEBUG
+#logging.level.org.hibernate.SQL=DEBUG
+#logging.level.org.hibernate.transaction=TRACE
+
+# Clave secreta del servidor que Spring Security usa para firmar y validar la cookie remember-me
+# si cambia, invalida todas las cookies remember-me
+security:
+  remember-me:
+    key: e2d453aa-909d-4f3e-8b20-b33c5177fb9c
