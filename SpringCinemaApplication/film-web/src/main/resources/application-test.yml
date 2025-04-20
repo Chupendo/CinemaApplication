@@ -28,13 +28,30 @@ spring:
       platform: h2
   web:
     locale: es
+    # evita que Spring sirva recursos estáticos por defecto desde /static, /publi
+#    resources:
+#      add-mappings: false
   messages:
     encoding: UTF-8
+  servlet:
+    # Session
+    session:
+      timeout: 15m
+      tracking-modes: COOKIE
+    # Multipart
+    multipart:
+      max-file-size: 2MB
+  # Hace que en lugar de devolver un 404 plano, Spring lance una excepción NoHandlerFoundException
+#  mvc:
+#    throw-exception-if-no-handler-found: true
 
 server:
   port: 8083
-
-# Actuator:
+  # Hace que en lugar de devolver un 404 plano, Spring lance una excepción NoHandlerFoundException, Spring Boot 3.x+
+  error:
+    whitelabel:
+      enabled: false
+      # Actuator:
 # Activar endpoints predefinidos: management.endpoints.web.exposure.include= .....
 # Desactivar un edpoint: management.endpoint.health.enable= false/true
 management:

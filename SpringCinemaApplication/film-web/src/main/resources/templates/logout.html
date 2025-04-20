@@ -20,7 +20,7 @@
             <!-- form logout -->
             <h1 th:text="#{logout.title}">Sign out to your account</h1>
             <hr>
-            <span th:text="#{logout.label.sign-out}">You are about to sign out of your account.</span>
+            <p th:text="#{logout.label.sign-out}">You are about to sign out of your account.</p>
             <br>
             <form th:action="@{/logout}" method="post">
                 <button type="submit"

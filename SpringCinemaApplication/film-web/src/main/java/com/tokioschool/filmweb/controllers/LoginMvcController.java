@@ -8,7 +8,7 @@ public class LoginMvcController {
 
     @GetMapping({"","/"})
     public String homeHandler() {
-        return "redirect:/login?lang=es";  // Redirige a la vista index
+        return "redirect:/web?lang=es";  // Redirige a la vista index
     }
 
     @GetMapping("/login")
