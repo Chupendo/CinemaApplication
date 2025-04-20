@@ -2,7 +2,9 @@
 <html lang="es"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
-      class="bg-light text-dark">
+      class="bg-light text-dark"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+>
 
 <head th:replace="~{/fragments/common/head :: head(#{login.title})}"></head>
 <body>
@@ -66,7 +68,7 @@
                                              style="padding-left: 2.5rem; padding-right: 2.5rem;" th:text="#{item.label.sign-in}">Login</button>
                                     <br>
                                     <p class="small fw-bold mt-2 pt-1 mb-0" th:text="#{login.label.no-account}">Don't have an account? </p>
-                                    <a th:href="@{/logout}" class="link-danger" th:text="#{item.label.sign-out}">Register</a>
+                                    <a th:href="@{/register}" class="link-danger" th:text="#{item.label.sign-up}">Register</a>
                                 </div>
 
                             </form>
