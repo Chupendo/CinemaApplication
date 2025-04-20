@@ -33,7 +33,7 @@
                             <a th:if="${resourceImageId != null}" th:href="@{/flight/removeImg(idFlight=${flight.id},rsc=${resourceImageId})}">Delete</a>
                         </div>
                         <div class="col-md-8">
-                            <form th:action="@{/users/save}" th:object="${user}" method="post"
+                            <form th:action="@{/web/users/save}" th:object="${user}" method="post"
                                   enctype="multipart/form-data"
                                   class="row g-3">
 
@@ -68,19 +68,19 @@
                                     <!--                                <label for="resourceId" class="form-label">ID Recurso</label>-->
                                     <!--                                <input type="text" id="resourceId" class="form-control" th:field="*{resourceId}">-->
                                     <!-- id of input equal to for label -->
-                                    <label for="image" class="col-md-2 col-form-label" th:text="Image"></label>
+                                    <label for="file" class="col-md-2 col-form-label" th:text="Image"></label>
                                     <div class="col">
-                                        <input type="file" class="form-control"  id="image" name="image">
+                                        <input type="file" class="form-control"  id="file" name="file">
                                     </div>
                                 </div>
 
                                 <div class="col-12">
                                     <label class="form-label">Roles</label>
                                     <select multiple class="form-select" th:field="*{roles}" size="4">
-                                        <option th:each="role : ${allRoles}"
+                                        <option th:each="role : ${allRolesName}"
                                                 th:value="${role}"
-                                                th:text="${role.name}"
-                                                th:selected="${userRoleIds.contains(role.id)}">
+                                                th:text="${role}"
+                                                th:selected="${allRolesName.contains(role)}">
                                         </option>
                                     </select>
                                     <div class="form-text italic">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
@@ -88,7 +88,7 @@
 
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
-                                    <a th:href="@{/users}" class="btn btn-secondary">Cancelar</a>
+                                    <a th:href="@{/web/index}" class="btn btn-secondary">Cancelar</a>
                                 </div>
                             </form>
                         </div>

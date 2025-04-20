@@ -5,6 +5,7 @@ import com.tokioschool.filmapp.validators.anotations.EnumListValid;
 import com.tokioschool.filmapp.validators.anotations.PasswordBis;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -93,7 +94,9 @@ public class UserFormDto {
      */
     @NonNull
     @Past
-    private LocalDate birthDate;
+    @Builder.Default
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // requerido para el formato de fecha en el formulario de tipo date
+    private LocalDate birthDate = LocalDate.now();
 
     /**
      * Lista de roles asociados al usuario.

@@ -44,7 +44,7 @@ public class FilmWebSecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .securityMatcher("/web/**")
                 .authorizeHttpRequests(auth -> auth.
-                        requestMatchers("/web/users/register").permitAll()
+                        requestMatchers("/web/users/register","/web/users/save").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .build();
