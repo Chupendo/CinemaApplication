@@ -16,8 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @RequiredArgsConstructor
-@Profile("!test")
-public class FilmWebSecurityConfiguration {
+@Profile("test")
+public class TestFilmWebSecurityConfiguration {
 
     @Value("${security.remember-me.key}")
     private String rememberMeKey;
@@ -49,8 +49,9 @@ public class FilmWebSecurityConfiguration {
     public SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .userDetailsService(userDetailsService)
-                .csrf(Customizer.withDefaults())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**")) // desativa el CSRF para /h2-console
                 .cors(Customizer.withDefaults())
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) //required for user wit h2
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/login", "/logout").permitAll()

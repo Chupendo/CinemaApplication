@@ -11,19 +11,33 @@
     <nav th:replace="~{/fragments/common/nav}"></nav>
 </header>
 
-<div class="container">
+<div class="container" th:if="${error}">
     <div class="row py-5 mb-3">
         <h1 class="border-bottom"><strong th:text="#{film.error.title}">Oppops, an error ocurred</strong></h1>
     </div>
-
-
-    <div class="row py-5">
+    <div class="container text-center">
         <dl>
             <dt  th:text="#{film.error.url}">Request URL:</dt>
             <dd th:text="${error.getUrl()}">url</dd>
             <dt  th:text="#{film.error.msg}">Exception message:</dt>
             <dd th:text="${error.getException()}">exception</dd>
         </dl>
+        <a th:href="@{/web/index}" class="btn btn-primary">Volver al inicio</a>
+    </div>
+</div>
+
+<div class="container" th:unless="${error}">
+    <div class="row py-5 mb-3">
+        <h1 class="border-bottom"><strong th:text="#{film.error.title}">Oppops, an error ocurred</strong></h1>
+    </div>
+    <div class="container text-center">
+        <dl>
+            <dt  th:text="#{film.error.code}">Código de error: </dt>
+            <dd th:text="${statusCode}">status code</dd>
+            <dt  th:text="#{film.error.msg}">Exception message:</dt>
+            <dd th:text="${errorMessage}">error message</dd>
+        </dl>
+        <a th:href="@{/web/index}" class="btn btn-primary">Volver al inicio</a>
     </div>
 </div>
 

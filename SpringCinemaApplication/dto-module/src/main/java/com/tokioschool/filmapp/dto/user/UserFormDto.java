@@ -56,14 +56,14 @@ public class UserFormDto {
      * Debe cumplir con un patrón que garantice seguridad (mínimo 8 caracteres,
      * al menos una letra mayúscula, una minúscula, un número y un carácter especial).
      */
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$", message = "Password invalid")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{user.password.pattern}" )
     private String password;
 
     /**
      * Confirmación de la contraseña del usuario.
      * Debe cumplir con el mismo patrón que la contraseña.
      */
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$", message = "Password invalid")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{user.password.pattern}" )
     private String passwordBis;
 
     /**

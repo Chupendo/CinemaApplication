@@ -49,15 +49,20 @@ public class MessageSourceConfiguration {
      */
     //@Bean // debe ser un Bean, si es el "messageSource es gestionado por spring"
     public ICUMessageSource icuMessageSource() {
-        ICUReloadableResourceBundleMessageSource messageSource = new ICUReloadableResourceBundleMessageSource();
-        messageSource.setBasenames(
-                "message/message",
-                //"org.hibernate.validator.ValidationMessages",
-                "icu-message/res" // mensajes i18n propios, el "classpath" es requerido
+        ICUReloadableResourceBundleMessageSource icuMessageSource = new ICUReloadableResourceBundleMessageSource();
+//        icuMessageSource.setBasenames(
+//                "message/message",
+//                "org.hibernate.validator.ValidationMessages",
+//                "icu-message/res" // mensajes i18n propios, el "classpath" es requerido
+//        );
+        icuMessageSource.setBasenames(
+                "classpath:message/message",
+                "classpath:org/hibernate/validator/ValidationMessages",
+                "classpath:icu-message/res"
         );
-        //messageSource.setUseCodeAsDefaultMessage(true);
-        //messageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
-        return messageSource;
+        //icuMessageSource.setUseCodeAsDefaultMessage(true);
+        //icuMessageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
+        return icuMessageSource;
     }
 
 }

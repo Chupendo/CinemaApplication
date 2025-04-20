@@ -36,32 +36,56 @@
                             <form th:action="@{/web/users/save}" th:object="${user}" method="post"
                                   enctype="multipart/form-data"
                                   class="row g-3">
+                                <!-- Div con lista de errores -->
+                                <div th:if="${#fields.hasErrors()}" class="alert alert-danger">
+                                    <h5>Se han encontrado errores:</h5>
+                                    <ul>
+                                        <li th:each="err : ${#fields.errors()}" th:text="${err}"></li>
+                                    </ul>
+                                </div>
 
                                 <input type="hidden" th:field="*{id}"/>
 
                                 <div class="col-md-6">
                                     <label for="name" class="form-label">Nombre</label>
                                     <input type="text" id="name" class="form-control" th:field="*{name}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="surname" class="form-label">Apellido</label>
                                     <input type="text" id="surname" class="form-control" th:field="*{surname}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="username" class="form-label">Usuario</label>
                                     <input type="text" id="username" class="form-control" th:field="*{username}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">Contraseña</label>
+                                    <input type="password" id="password" class="form-control" th:field="*{password}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="passwordBis" class="form-label">Contraseña Bis</label>
+                                    <input type="password" id="passwordBis" class="form-control" th:field="*{passwordBis}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('passwordBis')}" th:errors="*{passwordBis}"></div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="email" class="form-label">Correo Electrónico</label>
                                     <input type="email" id="email" class="form-control" th:field="*{email}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
                                     <input type="date" id="birthDate" class="form-control" th:field="*{birthDate}">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"></div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -84,6 +108,7 @@
                                         </option>
                                     </select>
                                     <div class="form-text italic">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></div>
                                 </div>
 
                                 <div class="col-12">
