@@ -41,7 +41,7 @@
                         <a class="nav-link" href="#">Contacto</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link" th:text="#{item.label.sign-up}" th:href="@{/register}">Sign up</a>
+                        <a class="nav-link" th:text="#{item.label.sign-up}" th:href="@{/web/users/register}">Sign up</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
                         <a class="nav-link" th:href="@{/login}" th:text="#{item.label.sign-in}">Sign in</a>

@@ -43,7 +43,9 @@ public class FilmWebSecurityConfiguration {
                 .csrf(Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
                 .securityMatcher("/web/**")
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth.
+                        requestMatchers("/web/users/register").permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .build();
     }
