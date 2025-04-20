@@ -1,34 +1,44 @@
 <!DOCTYPE html>
 <html lang="es"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      class="bg-light text-dark">
 
 <head th:replace="~{/fragments/common/head :: head(#{logout.title})}"></head>
 <body>
-    <header>
-        <nav th:replace="~{/fragments/common/nav}"></nav>
-    </header>
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
 
-    <div class="sm:ml-64">
-        <section class="w-screen bg-gray-50 dark:bg-gray-900 h-screen">
-            <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto">
-                <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
-                            th:text="#{logout.title}">Sign out to your account</h1>
-                        <form class="space-y-4 md:space-y-6" th:action="@{/logout}" method="post">
-                            <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" th:text="#{logout.label.sing-out}">Sign out</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2 d-none d-md-block">
+        <!-- Este div está oculto en md y visible en md o superior.-->
+        </div>
+        <div class="col-lg-8 col min-vh-100 py-3 text-center text-lg-start mt-4 pt-2" >
+            <!-- form logout -->
+            <h1 th:text="#{logout.title}">Sign out to your account</h1>
+            <hr>
+            <span th:text="#{logout.label.sign-out}">You are about to sign out of your account.</span>
+            <br>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit"
+                        data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                        style="padding-left: 2.5rem; padding-right: 2.5rem;"
+                        th:text="#{item.label.sign-out}">Sign out</button>
+            </form>
+        </div>
+        <div class="col-lg-2 d-none d-md-block">
+            <!-- Este div está oculto en md y visible en md o superior.-->
+        </div>
+
+        <div class="row">
+            <!-- Footer -->
+            <footer th:replace="~{/fragments/common/footer}"></footer>
+        </div>
     </div>
 
-
-
-
-    <footer th:replace="~{/fragments/common/footer}"></footer>
     <div th:replace="~{/fragments/common/scripts}"></div>
 </body>
 </html>
