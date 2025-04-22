@@ -6,7 +6,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
 >
 
-<head th:replace="~{/fragments/common/head :: head(#{login.title})}"></head>
+<head th:replace="~{/fragments/common/head :: head(#{form.user.label.register})}"></head>
 <body>
 <header>
     <nav th:replace="~{/fragments/common/nav}"></nav>
@@ -85,7 +85,10 @@
                                 <div class="col-md-6">
                                     <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
                                     <input type="date" id="birthDate" class="form-control" th:field="*{birthDate}">
-                                    <div class="text-danger" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}"></div>
+                                    <div class="text-danger"
+                                         th:if="${#fields.hasErrors('birthDate')}"
+                                         th:errors="*{birthDate}"
+                                         th:attr="max=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></div>
                                 </div>
 
                                 <div class="col-md-6">

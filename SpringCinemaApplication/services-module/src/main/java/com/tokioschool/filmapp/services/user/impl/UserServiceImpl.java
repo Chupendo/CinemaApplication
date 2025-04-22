@@ -292,6 +292,14 @@ public class UserServiceImpl implements UserService {
      */
     private Optional<User> whoAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(Objects.nonNull( authentication) && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
+            return Optional.of((org.springframework.security.core.userdetails.User) authentication.getPrincipal())
+                    .map(org.springframework.security.core.userdetails.User::getUsername)
+                    .map(userDao::findByUsernameOrEmailIgnoreCase)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get);
+        }
+
         return Optional.ofNullable(authentication)
                 .map(auth -> (Jwt) auth.getPrincipal())
                 .map(Jwt::getClaims)

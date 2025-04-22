@@ -56,14 +56,14 @@ public class UserFormDto {
      * Debe cumplir con un patrón que garantice seguridad (mínimo 8 caracteres,
      * al menos una letra mayúscula, una minúscula, un número y un carácter especial).
      */
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{user.password.pattern}" )
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{form.error.user.password.pattern}" )
     private String password;
 
     /**
      * Confirmación de la contraseña del usuario.
      * Debe cumplir con el mismo patrón que la contraseña.
      */
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{user.password.pattern}" )
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{form.error.user.password.pattern}" )
     private String passwordBis;
 
     /**
@@ -95,7 +95,7 @@ public class UserFormDto {
     @NonNull
     @Past
     @Builder.Default
-    @DateTimeFormat(pattern = "yyyy-MM-dd") // requerido para el formato de fecha en el formulario de tipo date
+    //@DateTimeFormat(pattern = "yyyy-MM-dd") // requerido para el formato de fecha en el formulario de tipo date
     private LocalDate birthDate = LocalDate.now();
 
     /**
@@ -114,5 +114,11 @@ public class UserFormDto {
     /**
      * Fecha y hora de creación del usuario.
      */
+    //@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // requerido para el formato de fecha en el formulario de tipo datetime-local
     private LocalDateTime created;
+
+    //@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // requerido para el formato de fecha en el formulario de tipo datetime-local
+    private LocalDateTime lastLogin;
+
+
 }

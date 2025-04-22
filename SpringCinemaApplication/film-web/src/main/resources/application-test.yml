@@ -10,6 +10,7 @@ spring:
     label-filter: film-web-dev
   # h2 database
   datasource:
+    # jdbc:h2:file:C:/Users/andre/Documents/SourceTree/SpringCinemaApplication/film-bbdd/filmdb
     url: jdbc:h2:file:../film-bbdd/filmdb
     driver-class-name: org.h2.Driver
     username: sa
@@ -44,7 +45,16 @@ spring:
   # Hace que en lugar de devolver un 404 plano, Spring lance una excepción NoHandlerFoundException
 #  mvc:
 #    throw-exception-if-no-handler-found: true
-
+# Spring aplica automáticamente esos formatos por defecto cuando hace binding de parámetros de formulario, query params, path variables o JSON hacia LocalDate, LocalDateTime y LocalTime, y viceversa
+# evita que tengamos que usar @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") en los los dto, entities, controladores
+# ya que lo tomara de la configuración
+# deprecado en Spring 6.0, o Spring Boot 3, pero se puede seguir usando
+# no recomendado desde Spirng boot 2.6+
+#mvc:
+#  format:
+#    date-time: "yyyy-MM-dd'T'HH:mm:ss"
+#    date: "yyyy-MM-dd"
+#    time: "HH:mm:ss"
 server:
   port: 8083
   # Hace que en lugar de devolver un 404 plano, Spring lance una excepción NoHandlerFoundException, Spring Boot 3.x+

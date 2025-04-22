@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      class="bg-light text-dark"
+>
+<!-- @thymesVar id="user" type="com.tokioschool.filmapp.dto.user.UserFormDto" -->
+
+
+<head th:replace="~{/fragments/common/head :: head(#{form.user.label.edit})}"></head>
+<body>
+<!-- Define una variable en thymeleaf a partir de un parámetro recibido del controlador -->
+<!-- Evita usar reiteradamente: th:attr="${profileMode} ? 'disabled' : null" -->
+
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col min-vh-100 py-3">
+            <!-- toggler -->
+            <button class="btn float-end d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+            </button>
+            <!-- form register -->
+            <section >
+                <div class="container h-custom">
+                    <div class="row d-flex justify-content-center align-items-center h-100">
+                        <h2 class="mb-4">Formulario de Usuario</h2>
+                        <div class="col-md-4">
+                            <img th:if="${resourceImageId == null}" th:src="@{/images/default-profile.svg}" class="card-img-top img-fluid" alt="image">
+                            <img th:if="${resourceImageId != null}" th:src="@{/flight/resources(rsc=${resourceImageId})}" class="card-img-top img-fluid" alt="image">
+                            <br>
+                            <a th:if="${resourceImageId != null}" th:href="@{/flight/resources/downloads(rsc=${resourceImageId})}">Download</a>
+                            <a th:if="${resourceImageId != null}" th:href="@{/flight/removeImg(idFlight=${flight.id},rsc=${resourceImageId})}">Delete</a>
+                        </div>
+                        <div class="col-md-8">
+                            <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
+                                <form th:action="@{/web/users/edit/{userId}(userId=*{id})}" th:object="${user}" method="post">
+                                    <input type="hidden" th:field="*{id}"/>
+
+                                    <!-- Nombre -->
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Nombre</label>
+                                        <input type="text" th:field="*{name}" class="form-control" id="name" required th:attrappend="disabled=${disabledAttr}">
+                                        <div th:if="${#fields.hasErrors('name')}" class="text-danger" th:errors="*{name}"></div>
+                                    </div>
+
+                                    <!-- Apellido -->
+                                    <div class="mb-3">
+                                        <label for="surname" class="form-label">Apellido</label>
+                                        <input type="text" th:field="*{surname}" class="form-control" id="surname" required th:attrappend="disabled=${disabledAttr}">
+                                        <div th:if="${#fields.hasErrors('surname')}" class="text-danger" th:errors="*{surname}"></div>
+                                    </div>
+
+                                    <!-- Username -->
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Usuario</label>
+                                        <input type="text" th:field="*{username}" class="form-control" id="username" required th:attrappend="disabled=${disabledAttr}">
+                                        <div th:if="${#fields.hasErrors('username')}" class="text-danger" th:errors="*{username}"></div>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" th:field="*{email}" class="form-control" id="email" th:attrappend="disabled=${disabledAttr}">
+                                        <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}"></div>
+                                    </div>
+
+                                    <!-- Fecha de Nacimiento -->
+                                    <div class="mb-3">
+                                        <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
+                                        <input type="date" th:field="*{birthDate}" class="form-control" id="birthDate" required th:attrappend="disabled=${disabledAttr}">
+                                        <div th:if="${#fields.hasErrors('birthDate')}" class="text-danger"
+                                             th:errors="*{birthDate}"
+                                             th:attr="max=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></div>
+                                    </div>
+
+                                    <!-- Imagen: si profileMode es true oculto -->
+                                    <div class="mb-3" th:if="${!(profileMode ?: false)}">
+                                        <label for="file" class="col-md-2 col-form-label" th:text="Image"></label>
+                                        <div class="col">
+                                            <input type="file" class="form-control"  id="file" name="file">
+                                        </div>
+                                    </div>
+
+                                    <!-- Roles -->
+                                    <div class="mb-3" th:unless="${!(profileMode ?: false)}">
+                                        <label for="roles-view" class="form-label">Roles</label>
+                                        <select multiple class="form-select" th:field="*{roles}" id="roles-view" required th:attrappend="disabled=${disabledAttr}">
+                                            <option th:each="role : *{roles}" th:value="${role}" th:text="${role}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3" th:if="${!(profileMode ?: false)}">
+                                        <label for="roles" class="form-label">Roles</label>
+                                        <select multiple class="form-select" th:field="*{roles}" size="4" id="roles">
+                                            <option th:each="role : ${allRolesName}"
+                                                    th:value="${role}"
+                                                    th:text="${role}"
+                                                    th:selected="${allRolesName.contains(role)}">
+                                            </option>
+                                        </select>
+                                        <div th:if="${#fields.hasErrors('roles')}" class="text-danger" th:errors="*{roles}"></div>
+                                        <div class="form-text italic">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></div>
+                                    </div>
+
+                                    <!-- Actualizar Contraseña -->
+                                    <div class="form-check mb-3" th:if="${!(profileMode ?: false)}">
+                                        <input class="form-check-input" type="checkbox" th:field="*{updatePassword}" id="updatePassword">
+                                        <label class="form-check-label" for="updatePassword">Actualizar Contraseña</label>
+                                    </div>
+
+                                    <!-- Contraseña -->
+                                    <div class="mb-3" th:if="${!(profileMode ?: false)}">
+                                        <label for="password" class="form-label">Nueva Contraseña</label>
+                                        <input type="password" th:field="*{password}" class="form-control" id="password">
+                                        <div th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="*{password}"></div>
+                                    </div>
+
+                                    <!-- Confirmar Contraseña -->
+                                    <div class="mb-3" th:if="${!(profileMode ?: false)}">
+                                        <label for="passwordBis" class="form-label">Confirmar Contraseña</label>
+                                        <input type="password" th:field="*{passwordBis}" class="form-control" id="passwordBis">
+                                        <div th:if="${#fields.hasErrors('passwordBis')}" class="text-danger" th:errors="*{passwordBis}"></div>
+                                    </div>
+
+                                    <!-- created date -->
+                                    <div class="mb-3" th:if="${profileMode}">
+                                        <label for="createAt" class="form-label">Cuanta creada</label>
+                                        <input type="datetime-local" th:field="*{created}" class="form-control" id="createAt" required disabled="disabled">
+                                    </div>
+                                    <!-- last login date -->
+                                    <div class="mb-3" th:if="${profileMode}">
+                                        <label for="lastLogin" class="form-label">Ultimo acceso</label>
+                                        <input type="datetime-local" th:field="*{lastLogin}" class="form-control" id="lastLogin" required disabled="disabled">
+                                    </div>
+                                    <!-- Botón -->
+                                    <button type="submit" class="btn btn-primary" th:if="${!(profileMode ?: false)}">Guardar Cambios</button>
+                                    <a class="btn btn-secondary"  th:unless="${!(profileMode ?: false)}" th:href="@{/web/users/edit/{userId}(userId=*{id})}">Editar</a>
+
+                                </form>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="row">
+            <!-- Footer -->
+            <footer th:replace="~{/fragments/common/footer}"></footer>
+        </div>
+    </div>
+</div>
+
+
+
+<div th:replace="~{/fragments/common/scripts}"></div>
+</body>
+</html>
