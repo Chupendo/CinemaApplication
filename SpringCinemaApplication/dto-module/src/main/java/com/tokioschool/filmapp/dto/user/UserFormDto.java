@@ -92,17 +92,17 @@ public class UserFormDto {
      * Debe ser una fecha en el pasado.
      * No puede ser nula.
      */
-    @NonNull
-    @Past
-    @Builder.Default
+    @NotNull(message = "{form.error.user.birthdate.notnull}")
+    @Past(message = "{form.error.user.birthdate.past}")
+    //@Builder.Default
     //@DateTimeFormat(pattern = "yyyy-MM-dd") // requerido para el formato de fecha en el formulario de tipo date
-    private LocalDate birthDate = LocalDate.now();
+    private LocalDate birthDate;
 
     /**
      * Lista de roles asociados al usuario.
      * Validada para garantizar que los valores pertenezcan al enumerado RoleEnum.
      */
-    @EnumListValid(target = RoleEnum.class, required = true, message = "Role don't allow")
+    @EnumListValid(target = RoleEnum.class, required = true, message = "{form.error.user.roles.notvalid}")
     private List<String> roles;
 
     /**

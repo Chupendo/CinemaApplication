@@ -1,5 +1,6 @@
 package com.tokioschool.filmweb.controllers;
 
+import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.dto.user.UserFormDto;
 import com.tokioschool.filmapp.enums.RoleEnum;
 import com.tokioschool.filmapp.services.role.RoleService;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,53 +19,62 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/web/users")
-@SessionAttributes("user")
 @RequiredArgsConstructor
+@SessionAttributes({"user"})
 public class UserMvcController {
 
     private final UserService userService;
-    private final RoleService roleService;
     private final ModelMapper modelMapper;
 
     private final String UPLOAD_DIR = "src/main/resources/static/images/";
 
-    @ModelAttribute("user")
-    public UserFormDto getUserDto() {
-        List<String> roleDtos = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
-        return UserFormDto.builder().name("Andres").birthDate(LocalDate.of(1992,07,06)).roles(roleDtos).build();
+    @GetMapping("/profile")
+    public String profileHandler(Model model) {
+        UserFormDto userFormDto = userService.findUserAuthenticated()
+                .map(userDto -> modelMapper.map(userDto, UserFormDto.class))
+                .orElseThrow( () -> new AuthenticationCredentialsNotFoundException("Usuario no autenticado") );
+        // reload user object
+        model.addAttribute("user",userFormDto);
+
+        // Devuelve la misma vista pero reenviando internamente (sin perder el binding result or info context of request)
+        return ("forward:/web/users/edit/%s?mode=%s".formatted(userFormDto.getId(),true) );
     }
 
     @GetMapping({"/register","/edit/{userId}"})
     public ModelAndView userCreateOrEditHandler(@PathVariable(name="userId",required = false) String userId,
+                                         @RequestParam(value="mode",defaultValue = "false",required = false) boolean profileMode,
                                          Model model) {
-        final Optional<UserFormDto> userFormDtoOptional = Optional.ofNullable(userId)
+        final UserFormDto userFormDto = Optional.ofNullable(userId)
                 .map(userService::findById)
-                .map(dto -> modelMapper.map(dto, UserFormDto.class));
+                .map(dto -> modelMapper.map(dto, UserFormDto.class))
+                .orElse(UserFormDto.builder().build());;
 
         final ModelAndView modelAndView =  new ModelAndView();
-
         modelAndView.addAllObjects(model.asMap());
-        if(userFormDtoOptional.isPresent()){
+
+        if( !model.containsAttribute("user")){
+            modelAndView.addObject("user", userFormDto );
+        }
+
+        if( Objects.nonNull(userId) ){
             modelAndView.setViewName("users/edit");
-            // si existe en el modelo
-            modelAndView.addObject("user", userFormDtoOptional.get());
         }else{
             modelAndView.setViewName("users/register");
         }
 
-        List<String> allRolesName = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
+        final List<String> allRolesName = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
 
         model.addAttribute("allRolesName", allRolesName);
         model.addAttribute("resourceImageId",null);
+        modelAndView.addObject("profileMode", profileMode);
 
         return modelAndView;
     }
@@ -91,7 +102,7 @@ public class UserMvcController {
 
             // se converte el model and view en elementos y lo adaptos a elemtentos redireccionables
             final String maybeParam = Optional.ofNullable(userId)
-                    .map("/%d"::formatted)
+                    .map("/%s"::formatted)
                     .orElse(StringUtils.EMPTY);
 
             // se añade el modelo al redirect
@@ -109,9 +120,9 @@ public class UserMvcController {
                 // TODO gestion de resoruse con facde
 
             }
-            //throw new IOException("No se ha subido la imagen"); //  TODO borrar
+
             // Guardar el usuario
-            userService.registerUser(user);
+            //userService.registerUser(user); // TODO Descomentar
 
             // Mensaje de éxito
             redirectAttributes.addFlashAttribute("message", "Usuario guardado correctamente!");

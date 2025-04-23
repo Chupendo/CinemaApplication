@@ -84,7 +84,9 @@
 
                                 <div class="col-md-6">
                                     <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
-                                    <input type="date" id="birthDate" class="form-control" th:field="*{birthDate}">
+                                    <input type="date" id="birthDate" class="form-control"
+                                           th:field="*{birthDate}">
+<!--                                           th:value="${user.birthDate != null ? #temporals.format(user.birthDate, 'yyyy-MM-dd') : ''}">-->
                                     <div class="text-danger"
                                          th:if="${#fields.hasErrors('birthDate')}"
                                          th:errors="*{birthDate}"
