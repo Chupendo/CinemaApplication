@@ -11,6 +11,7 @@ import com.tokioschool.filmapp.repositories.RoleDao;
 import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.filmapp.specifications.UserSpecification;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
         final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login"));
 
-        if (!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals(userAuth.getId())) {
+        if (isUserAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals(userAuth.getId())) {
             throw new AccessDeniedException("You don't authorized to information of user");
         }
 
@@ -104,7 +106,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto registerUser(UserFormDto userFormDTO) {
-        User user = User.builder().build();
+        User user = Optional.of(userFormDTO)
+                .map(UserFormDto::getId)
+                .map(userDao::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .orElseGet(() ->User.builder().build());
         return populationCreateOrEditUser(user, userFormDTO);
     }
 
@@ -165,7 +172,7 @@ public class UserServiceImpl implements UserService {
 
         final User userAuth = whoAuthenticated().orElseThrow(() -> new AccessDeniedException("Is required is login"));
 
-        if (!userIsAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals(userAuth.getId())) {
+        if (isUserAdmin(userAuth) && maybeUserDTO.isPresent() && !maybeUserDTO.get().getId().equals(userAuth.getId())) {
             throw new AccessDeniedException("You don't authorized to information of user");
         }
 
@@ -236,6 +243,38 @@ public class UserServiceImpl implements UserService {
                 .pageNumber(pageNumber)
                 .totalPages(totalPages)
                 .build();
+    }
+
+    /**
+     * Si el usuario autenticado es admin:
+     *  * Puede modificar al target si el target no es admin o si está modificándose a sí mismo.
+     *
+     * Si no es admin:
+     *  * Solo puede modificar su propio perfil.
+     *
+     *  @param userId
+     * @return
+     * @throws UsernameNotFoundException
+     */
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public boolean operationEditAllow(@NonNull String userId) throws AccessDeniedException, UsernameNotFoundException{
+        final User authUser = whoAuthenticated()
+                .orElseThrow(() -> new AccessDeniedException("Operation not allowed"));
+
+        final User targetUser = userDao.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User with id %s not found".formatted(userId)));
+
+        final boolean isAuthAdmin = isUserAdmin(authUser.getRoles());
+        final boolean isTargetAdmin = isUserAdmin(targetUser.getRoles());
+        final boolean isSameUser = Objects.equals(authUser.getId(), targetUser.getId());
+
+        // estrageia
+        if (isAuthAdmin) {
+            return !isTargetAdmin || isSameUser;
+        }
+
+        return isSameUser;
     }
 
     /**
@@ -352,7 +391,7 @@ public class UserServiceImpl implements UserService {
      * @param user Usuario.
      * @return true si el usuario tiene el rol de administrador, de lo contrario false.
      */
-    private boolean userIsAdmin(User user) {
-        return user.getRoles().stream().anyMatch(role -> role.getName().toUpperCase().contains("ADMIN"));
+    private boolean isUserAdmin(User user) {
+        return user.getRoles().stream().noneMatch(role -> role.getName().toUpperCase().contains("ADMIN"));
     }
 }

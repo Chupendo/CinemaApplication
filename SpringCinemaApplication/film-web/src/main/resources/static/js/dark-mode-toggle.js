@@ -16,6 +16,9 @@ const sidebarIconsDark = document.querySelectorAll('.sidebar-icon-dark');
 // Obtener el ícono de cerrar del offcanvas
 const iconClose = document.getElementById('iconClose');
 
+// OBtener la tabla del lisatdo de usuairo
+const table = document.getElementById('userTable');
+
 // Función para actualizar el botón y los elementos según el modo actual
 function actualizarBoton() {
     // Verificar si la página está en modo oscuro (si la clase 'dark-mode' está activa en el body)
@@ -41,6 +44,10 @@ function actualizarBoton() {
         iconClose.classList.remove('bi-x');
         iconClose.classList.add('bi-x-circle'); // o cualquier otro ícono de Bootstrap Icons
 
+        // Cambiar el fondo de la tabla
+        table.classList.remove('table-light');
+        table.classList.add('table-dark');
+
     } else {
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Oscuro';
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i>';
@@ -62,6 +69,10 @@ function actualizarBoton() {
         // Cambiar ícono del botón de cerrar al modo oscuro (negro)
         iconClose.classList.remove('bi-x-circle');
         iconClose.classList.add('bi-x');
+
+        // Cambiar el fondo de la tabla
+        table.classList.remove('table-dark');
+        table.classList.add('table-light');
     }
 }
 
@@ -71,7 +82,7 @@ if (localStorage.getItem('modo') === 'oscuro') {
     document.body.classList.add('dark-mode'); // Si se guardó "oscuro", aplica el modo oscuro
 }
 
-// Llamar a la función para inicializar el modo según la preferencia almacenada o el estado actual
+// // Llamar a la función para inicializar el modo según la preferencia almacenada o el estado actual
 actualizarBoton();
 
 // Agregar un event listener al botón para escuchar el clic

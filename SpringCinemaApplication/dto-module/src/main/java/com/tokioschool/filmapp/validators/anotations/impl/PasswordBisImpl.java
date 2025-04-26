@@ -44,16 +44,36 @@ public class PasswordBisImpl implements ConstraintValidator<PasswordBis, UserFor
      * y que la contraseña cumpla con el patrón definido.
      *
      * @param source                   El objeto {@link UserFormDto} a validar.
-     * @param constraintValidatorContext El contexto de validación.
+     * @param context El contexto de validación.
      * @return true si la validación es exitosa, false en caso contrario.
      */
     @Override
-    public boolean isValid(UserFormDto source, ConstraintValidatorContext constraintValidatorContext) {
-        return Optional.ofNullable(source)
-                .filter(user -> user.getCreated() == null || user.isUpdatePassword()) // Verifica si es necesario validar la contraseña.
-                .filter(user -> Objects.equals(user.getPassword(), user.getPasswordBis())) // Verifica que las contraseñas coincidan.
-                .map(UserFormDto::getPassword)
-                .map(password -> Pattern.matches(PASSWORD_PATTERN, password)) // Verifica que la contraseña cumpla con el patrón.
-                .orElseGet(() -> Boolean.FALSE); // Devuelve false si alguna validación falla.
+    public boolean isValid(UserFormDto source, ConstraintValidatorContext context) {
+        if(source == null) {
+            return false; // Si el objeto es nulo, no se considera válido.
+        }
+
+        // Validar si se requiere la contraseña
+        if (source.getCreated() == null || source.isUpdatePassword()) {
+            // Verificar que las contraseñas coincidan
+            if (!Objects.equals(source.getPassword(), source.getPasswordBis())) {
+                context.disableDefaultConstraintViolation(); //evita que el mensaje por defecto se aplique
+                context.buildConstraintViolationWithTemplate("{form.error.user.password.biss}")
+                        .addPropertyNode("passwordBis")
+                        .addConstraintViolation();
+                return false;
+            }
+
+            // Verificar que la contraseña cumpla con el patrón
+            if (!Pattern.matches(PASSWORD_PATTERN, source.getPassword())) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate("{form.error.user.password.pattern}")
+                        .addPropertyNode("password")
+                        .addConstraintViolation();
+                return false;
+            }
+        }
+        // Si todas las validaciones pasan, se considera válido
+        return true;
     }
 }

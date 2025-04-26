@@ -84,4 +84,7 @@ public interface UserService {
      * @return Un objeto {@link PageDTO} que contiene la lista de usuarios encontrados.
      */
     PageDTO<UserDto> searchUsers(int page, int pageSize, SearchUserRecord searchUserRecord);
+
+
+    boolean operationEditAllow(String userId);
 }

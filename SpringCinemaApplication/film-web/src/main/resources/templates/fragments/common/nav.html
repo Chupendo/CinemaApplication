@@ -57,6 +57,9 @@
                             <li>
                                 <a class="dropdown-item" th:href="@{/web/users/profile}" th:text="#{item.label.profile}">Profile</a>
                             </li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item" th:href="@{/web/users/list}" th:text="#{item.label.list}">List</a>
+                            </li>
                             <li>
                                 <a class="dropdown-item" th:href="@{/logout}" th:text="#{item.label.sign-out}">Sign Out</a>
                             </li>

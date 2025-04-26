@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.dto.user;
 
+import com.tokioschool.filmapp.enums.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -75,4 +76,9 @@ public class UserDto {
      * Identificador del recurso asociado al usuario.
      */
     private String resourceId;
+
+    public boolean isAdmin() {
+        return roles != null && roles.stream()
+                .anyMatch(role -> RoleEnum.ADMIN.toString().equalsIgnoreCase(role.getName()));
+    }
 }

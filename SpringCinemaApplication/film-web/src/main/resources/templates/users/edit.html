@@ -18,7 +18,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col min-vh-100 py-3">
+            <div class="col min-vh-100 py-3">
             <!-- toggler -->
             <button class="btn float-end d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
                 <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
@@ -39,6 +39,14 @@
                         <div class="col-md-8">
                             <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
                                 <form th:action="@{/web/users/edit/{userId}(userId=*{id})}" th:object="${user}" method="post">
+                                    <!-- Div con lista de errores -->
+                                    <div th:if="${#fields.hasErrors()}" class="alert alert-danger">
+                                        <h5>Se han encontrado errores:</h5>
+                                        <ul>
+                                            <li th:each="err : ${#fields.errors()}" th:text="${err}"></li>
+                                        </ul>
+                                    </div>
+
                                     <input type="hidden" th:field="*{id}"/>
 
                                     <!-- Nombre -->
