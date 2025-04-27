@@ -97,6 +97,17 @@ public class UserServiceImpl implements UserService {
         return maybeUserDTO;
     }
 
+    @Override
+    @Transactional
+    public UserDto registerOrUpdatedUser(UserFormDto userFormDTO) {
+        User user = Optional.of(userFormDTO)
+                .map(UserFormDto::getId)
+                .map(userDao::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .orElseGet(() ->User.builder().build());
+        return populationCreateOrEditUser(user, userFormDTO);
+    }
     /**
      * Registra un nuevo usuario en el sistema.
      *
@@ -106,12 +117,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto registerUser(UserFormDto userFormDTO) {
-        User user = Optional.of(userFormDTO)
-                .map(UserFormDto::getId)
-                .map(userDao::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .orElseGet(() ->User.builder().build());
+        User user = User.builder().build();
         return populationCreateOrEditUser(user, userFormDTO);
     }
 

@@ -1,4 +1,4 @@
-package com.tokioschool.filmweb.controllers;
+package com.tokioschool.filmweb.controllers.mvc;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;

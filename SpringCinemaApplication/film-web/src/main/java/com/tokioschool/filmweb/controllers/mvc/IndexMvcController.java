@@ -1,4 +1,4 @@
-package com.tokioschool.filmweb.controllers;
+package com.tokioschool.filmweb.controllers.mvc;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

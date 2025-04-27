@@ -37,6 +37,12 @@ public interface UserService {
     Optional<UserDto> findByEmail(String email);
 
     /**
+     *
+     * @param userFormDTO
+     * @return
+     */
+    UserDto registerOrUpdatedUser(UserFormDto userFormDTO);
+    /**
      * Registra un nuevo usuario en el sistema.
      *
      * @param userFormDTO Datos del usuario a registrar.

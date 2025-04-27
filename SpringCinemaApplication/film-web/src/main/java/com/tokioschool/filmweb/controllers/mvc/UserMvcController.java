@@ -1,4 +1,4 @@
-package com.tokioschool.filmweb.controllers;
+package com.tokioschool.filmweb.controllers.mvc;
 
 import com.tokioschool.core.exception.OperationNotAllowException;
 import com.tokioschool.filmapp.dto.common.PageDTO;
@@ -7,6 +7,9 @@ import com.tokioschool.filmapp.dto.user.UserFormDto;
 import com.tokioschool.filmapp.enums.RoleEnum;
 import com.tokioschool.filmapp.records.SearchUserRecord;
 import com.tokioschool.filmapp.services.user.UserService;
+import com.tokioschool.helpers.UUIDHelper;
+import com.tokioschool.store.dto.ResourceIdDto;
+import com.tokioschool.store.facade.StoreFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
 @SessionAttributes({"user"})
 public class UserMvcController {
 
+    private final StoreFacade storeFacade;
     private final UserService userService;
     private final ModelMapper modelMapper;
 
@@ -99,7 +103,7 @@ public class UserMvcController {
         final List<String> allRolesName = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
 
         model.addAttribute("allRolesName", allRolesName);
-        model.addAttribute("resourceImageId",null);
+        model.addAttribute("resourceImageId",userFormDto.getImage());
         modelAndView.addObject("profileMode", profileMode);
 
         return modelAndView;
@@ -144,11 +148,15 @@ public class UserMvcController {
 
         if (imageFile!=null && !imageFile.isEmpty()) {
             // TODO gestion de resoruse con facde
-
+            Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(imageFile,null);
+            resourceIdDtoOptional.ifPresent(resourceIdDto -> {
+                UUIDHelper.mapStringToUUID(  user.getImage() ).ifPresent(storeFacade::deleteResource);
+                user.setImage( resourceIdDto.resourceId().toString() );
+            });
         }
 
         // Guardar el usuario
-        UserDto userDto = userService.registerUser(user); // TODO Descomentar
+        UserDto userDto = userService.registerOrUpdatedUser(user); // TODO Descomentar
 
         // Mensaje de éxito
         redirectAttributes.addFlashAttribute("message", "Usuario guardado correctamente!");

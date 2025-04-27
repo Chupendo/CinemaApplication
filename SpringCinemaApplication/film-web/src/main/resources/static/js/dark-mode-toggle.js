@@ -45,8 +45,8 @@ function actualizarBoton() {
         iconClose.classList.add('bi-x-circle'); // o cualquier otro ícono de Bootstrap Icons
 
         // Cambiar el fondo de la tabla
-        table.classList.remove('table-light');
-        table.classList.add('table-dark');
+        table?.classList.remove('table-light');
+        table?.classList.add('table-dark');
 
     } else {
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Oscuro';
@@ -71,8 +71,8 @@ function actualizarBoton() {
         iconClose.classList.add('bi-x');
 
         // Cambiar el fondo de la tabla
-        table.classList.remove('table-dark');
-        table.classList.add('table-light');
+        table?.classList.remove('table-dark');
+        table?.classList.add('table-light');
     }
 }
 

@@ -31,14 +31,19 @@
                         <h2 class="mb-4">Formulario de Usuario</h2>
                         <div class="col-md-4">
                             <img th:if="${resourceImageId == null}" th:src="@{/images/default-profile.svg}" class="card-img-top img-fluid" alt="image">
-                            <img th:if="${resourceImageId != null}" th:src="@{/flight/resources(rsc=${resourceImageId})}" class="card-img-top img-fluid" alt="image">
+                            <img th:if="${resourceImageId != null}"
+                                 th:src="@{/web/resources(rsc=${resourceImageId})}"
+                                 class="card-img-top img-fluid"
+                                 alt="image">
                             <br>
-                            <a th:if="${resourceImageId != null}" th:href="@{/flight/resources/downloads(rsc=${resourceImageId})}">Download</a>
-                            <a th:if="${resourceImageId != null}" th:href="@{/flight/removeImg(idFlight=${flight.id},rsc=${resourceImageId})}">Delete</a>
+                            <a th:if="${resourceImageId != null}" th:href="@{/web/resources/downloads(rsc=${resourceImageId})}">Download</a>
                         </div>
                         <div class="col-md-8">
                             <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
-                                <form th:action="@{/web/users/edit/{userId}(userId=*{id})}" th:object="${user}" method="post">
+                                <form th:action="@{/web/users/edit/{userId}(userId=*{id})}"
+                                      th:object="${user}"
+                                      enctype="multipart/form-data"
+                                      method="post">
                                     <!-- Div con lista de errores -->
                                     <div th:if="${#fields.hasErrors()}" class="alert alert-danger">
                                         <h5>Se han encontrado errores:</h5>

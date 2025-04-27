@@ -89,3 +89,21 @@ logging:
 security:
   remember-me:
     key: e2d453aa-909d-4f3e-8b20-b33c5177fb9c
+
+  # Store client id and secret
+  # Store
+application:
+  # Store
+  store:
+    base-url: http://localhost:9091
+    # User in memory
+    login:
+      users:
+        - username: consumer
+          # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
+          # "password" in base64:: cGFzc3dvcmQ=
+          password: cGFzc3dvcmQ=
+        - username: producer
+          # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
+          # "password" in base64:: cGFzc3dvcmQ=
+          password: cGFzc3dvcmQ=
