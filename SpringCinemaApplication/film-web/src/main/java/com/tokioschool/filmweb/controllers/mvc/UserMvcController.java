@@ -147,7 +147,6 @@ public class UserMvcController {
         }
 
         if (imageFile!=null && !imageFile.isEmpty()) {
-            // TODO gestion de resoruse con facde
             Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(imageFile,null);
             resourceIdDtoOptional.ifPresent(resourceIdDto -> {
                 UUIDHelper.mapStringToUUID(  user.getImage() ).ifPresent(storeFacade::deleteResource);

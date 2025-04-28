@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.records;
 
 import lombok.Builder;
+import org.springframework.lang.NonNull;
 
 /**
  * Registro que representa los criterios de búsqueda de películas.
@@ -20,5 +21,5 @@ import lombok.Builder;
  * @version 1.0
  */
 @Builder
-public record SearchMovieRecord(String title, RangeReleaseYear rangeReleaseYear, int page, int pageSize) {
+public record SearchMovieRecord(String title, @NonNull RangeReleaseYear rangeReleaseYear, Integer page, Integer pageSize) {
 }

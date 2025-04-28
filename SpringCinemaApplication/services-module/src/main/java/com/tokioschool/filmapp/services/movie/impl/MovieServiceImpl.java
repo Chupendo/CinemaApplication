@@ -69,10 +69,13 @@ public class MovieServiceImpl implements MovieService {
      */
     @Override
     public PageDTO<MovieDto> searchMovie(SearchMovieRecord searchMovieRecord) {
-        if (searchMovieRecord == null) {
+        if ( searchMovieRecord == null || searchMovieRecord.page() == null || searchMovieRecord.pageSize() == null) {
+            final int pageDefault = searchMovieRecord.page() != null ? searchMovieRecord.page() : 0;
+            final int pageSizeDefault = searchMovieRecord.pageSize() != null ? searchMovieRecord.pageSize() : 5;
+
             searchMovieRecord = SearchMovieRecord.builder()
-                    .page(0)
-                    .pageSize(5)
+                    .page( pageDefault )
+                    .pageSize( pageSizeDefault )
                     .build();
         }
 

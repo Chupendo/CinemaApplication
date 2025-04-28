@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      class="bg-light text-dark"
+>
+<!-- @thymesVar id="user" type="com.tokioschool.filmapp.dto.user.UserFormDto" -->
+
+
+<head th:replace="~{/fragments/common/head :: head(#{form.user.label.edit})}"></head>
+<body>
+<!-- Define una variable en thymeleaf a partir de un parámetro recibido del controlador -->
+<!-- Evita usar reiteradamente: th:attr="${profileMode} ? 'disabled' : null" -->
+
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col min-vh-100 py-3">
+            <!-- toggler -->
+            <button class="btn float-end d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+            </button>
+
+            <div class="row my-4">
+                <!-- Filtro de Búsqueda -->
+                <div class="col-lg-3 mb-4">
+                    <div class="form-section">
+                        <h5 class="mb-4" th:text="#{film.search.title}">Buscar Pelíuclas</h5>
+                        <form th:action="@{/web/films/list}" th:object="${searchMovieRecord}" method="get">
+                            <div class="mb-3">
+                                <label for="name" class="form-label" th:text="#{film.label.title}">Titulo</label>
+                                <input type="text" id="name" class="form-control" th:field="*{title}" placeholder="Nombre">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="surname" class="form-label" th:text="#{film.label.release-year.max}">Añio maximo</label>
+                                <input type="number" step="1" id="surname" class="form-control" th:field="*{rangeReleaseYear.yearMax}" placeholder="Apellido">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label" th:text="#{film.label.release-year.min}">Añio mminimo</label>
+                                <input type="number" step="1"  id="username" class="form-control" th:field="*{rangeReleaseYear.yearMin}" placeholder="Usuario">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="pageSize" class="form-label" th:text="#{film.label.pageSize}">Peliculas por pagina</label>
+                                <input type="number" step="1" id="pageSize" class="form-control" name="pageSize" placeholder="10">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary" th:text="#{item.label.search}">Buscar</button>
+                                <a th:href="@{/web/films/list}" class="btn btn-secondary" th:text="#{item.label.clean}">Limpiar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de Usuarios -->
+                <div class="col-lg-9">
+                    <div class="table-section">
+                        <h2 class="mb-4 text-center" th:text="#{film.list.title}" >Listado de Peliculas</h2>
+
+                        <p th:if="${pageMovieDto.getItems().isEmpty()}"
+                           class="mb-4 text-center">No se han encontrado peliculas en el sistema</p>
+
+                        <div th:unless="${pageMovieDto.getItems().isEmpty()}"
+                             class="mb-4 text-center table-responsive">
+                            <table id="userTable" class="table  table-hover align-middle">
+                                <thead class="table-warning">
+                                <tr>
+                                    <th th:text="#{film.label.title}">Titulo</th>
+                                    <th th:text="#{film.label.release-year}">Año Publicado</th>
+                                    <th th:text="#{item.label.edit}">Editar</th>
+                                    <th th:text="#{item.label.profile}">Perfil</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="movie : ${pageMovieDto.items}">
+                                    <td th:text="${movie.title}">Titulo</td>
+                                    <td th:text="${movie.getReleaseYear()}">Año de publicado</td>
+                                    <td>
+                                        EDITAR
+                                    </td>
+
+                                    <td>
+                                        VER DETALLE
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        <nav class="mt-4" th:unless="${pageMovieDto.getItems().isEmpty()}">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${pageMovieDto.pageNumber == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|/web/films/list?page=${pageMovieDto.pageNumber - 1}&pageSize=${pageMovieDto.pageSize}|}" th:text="#{pagination.preview}">Anterior</a>
+                                </li>
+
+                                <li class="page-item disabled">
+                                    <span class="page-link" th:text="#{pagination.page(${pageMovieDto.pageNumber + 1}, ${pageMovieDto.totalPages})}"></span>
+                                </li>
+
+                                <li class="page-item" th:classappend="${pageMovieDto.pageNumber + 1 == pageMovieDto.totalPages} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|/web/films/list?page=${pageMovieDto.pageNumber + 1}&pageSize=${pageMovieDto.pageSize}|}" th:text="#{pagination.next}">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Footer -->
+        <footer th:replace="~{/fragments/common/footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{/fragments/common/scripts}"></div>
+</body>
+</html>

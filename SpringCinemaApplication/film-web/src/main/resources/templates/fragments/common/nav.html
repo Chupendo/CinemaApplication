@@ -37,6 +37,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Películas</a>
                     </li>
+                    <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"  th:text="#{item.label.films}">
+                            Movies
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/list}" th:text="#{item.label.list.movie}">Ver peliculas</a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Contacto</a>
                     </li>
@@ -58,7 +69,7 @@
                                 <a class="dropdown-item" th:href="@{/web/users/profile}" th:text="#{item.label.profile}">Profile</a>
                             </li>
                             <li sec:authorize="hasRole('ADMIN')">
-                                <a class="dropdown-item" th:href="@{/web/users/list}" th:text="#{item.label.list}">List</a>
+                                <a class="dropdown-item" th:href="@{/web/users/list}" th:text="#{item.label.list.user}">List</a>
                             </li>
                             <li>
                                 <a class="dropdown-item" th:href="@{/logout}" th:text="#{item.label.sign-out}">Sign Out</a>
