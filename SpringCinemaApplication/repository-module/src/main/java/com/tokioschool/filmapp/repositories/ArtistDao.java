@@ -3,6 +3,7 @@ package com.tokioschool.filmapp.repositories;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
  * @version 1.0
  */
 @Repository
-public interface ArtistDao extends JpaRepository<Artist, Long> {
+public interface ArtistDao extends JpaRepository<Artist, Long>, JpaSpecificationExecutor<Artist> {
 
     /**
      * Obtiene una lista de artistas filtrados por su tipo.

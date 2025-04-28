@@ -35,7 +35,7 @@
                         <a class="nav-link active" href="#" th:text="#{sidebar.label.home}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Películas</a>
+                        <a class="nav-link" th:href="@{/web/artists/list}" th:text="#{item.label.artist}">Artists</a>
                     </li>
                     <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

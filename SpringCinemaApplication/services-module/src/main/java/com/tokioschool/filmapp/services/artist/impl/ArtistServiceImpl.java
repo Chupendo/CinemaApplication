@@ -3,17 +3,24 @@ package com.tokioschool.filmapp.services.artist.impl;
 import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
+import com.tokioschool.filmapp.dto.common.PageDTO;
+import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
+import com.tokioschool.filmapp.records.SearchArtistRecord;
 import com.tokioschool.filmapp.repositories.ArtistDao;
 import com.tokioschool.filmapp.services.artist.ArtistService;
+import com.tokioschool.filmapp.specifications.ArtistSpecification;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * Implementación del servicio para gestionar artistas.
@@ -43,6 +50,50 @@ public class ArtistServiceImpl implements ArtistService {
     @Override
     public List<ArtistDto> findByAll() {
         return artistDao.findAll().stream().map(artist -> modelMapper.map(artist, ArtistDto.class)).toList();
+    }
+
+    @Override
+    public PageDTO<ArtistDto> searchArtist(int pageNumber, int pageSize, SearchArtistRecord searchArtistRecord) {
+        Specification<Artist> spec = Specification.allOf();
+
+        if (searchArtistRecord != null) {
+            spec = Specification
+                    .where(ArtistSpecification.containsName(searchArtistRecord.name()))
+                    .and(ArtistSpecification.containsSurname(searchArtistRecord.surname()))
+                    .and(ArtistSpecification.hasTypeArtist(searchArtistRecord.type()));
+        }
+
+        List<ArtistDto> artistDtos = artistDao.findAll(spec)
+                .stream()
+                .map(artist -> modelMapper.map(artist, ArtistDto.class))
+                .toList();
+
+        int startItem = pageNumber * pageSize;
+        final int totalPages = pageSize == NumberUtils.SHORT_ZERO ? NumberUtils.SHORT_ONE : (int) Math.ceil((artistDtos.size() / (double) pageSize));
+
+
+        if (startItem >= artistDtos.size()) {
+            return PageDTO.<ArtistDto>builder()
+                    .items(List.of())
+                    .pageSize(pageSize)
+                    .pageNumber(pageNumber)
+                    .totalPages(totalPages)
+                    .build();
+        } else {
+            if (pageSize == NumberUtils.SHORT_ZERO) {
+                artistDtos = (List<ArtistDto>) getItemsPageDto(artistDtos, startItem, artistDtos.size());
+            } else {
+                int end = Math.min(startItem + pageSize, artistDtos.size());
+                artistDtos = (List<ArtistDto>) getItemsPageDto(artistDtos, startItem, end);
+            }
+        }
+
+        return PageDTO.<ArtistDto>builder()
+                .items(artistDtos)
+                .pageSize(pageSize)
+                .pageNumber(pageNumber)
+                .totalPages(totalPages)
+                .build();
     }
 
     /**
@@ -91,5 +142,19 @@ public class ArtistServiceImpl implements ArtistService {
         artist = artistDao.save(artist);
 
         return modelMapper.map(artist, ArtistDto.class);
+    }
+
+    /**
+     * Obtiene una sublista de elementos para la paginación.
+     *
+     * @param items Lista de elementos.
+     * @param start Índice inicial.
+     * @param end Índice final.
+     * @return Sublista de elementos.
+     */
+    private static List<?> getItemsPageDto(List<?> items, int start, int end) {
+        return IntStream.range(start, end)
+                .mapToObj(items::get)
+                .toList();
     }
 }
