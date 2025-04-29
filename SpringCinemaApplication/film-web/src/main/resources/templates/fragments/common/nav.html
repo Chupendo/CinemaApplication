@@ -35,7 +35,21 @@
                         <a class="nav-link active" href="#" th:text="#{sidebar.label.home}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/web/artists/list}" th:text="#{item.label.artist}">Artists</a>
+                        <a class="nav-link"  th:text="#{item.label.artist}"></a>
+                    </li>
+                    <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"  th:text="#{item.label.artist}">
+                            Artists
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/artists/list}" th:text="#{item.label.list.artist}">Ver Artistas</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/artists/form}" th:text="#{item.label.new.artist}">Registrar Artistas</a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

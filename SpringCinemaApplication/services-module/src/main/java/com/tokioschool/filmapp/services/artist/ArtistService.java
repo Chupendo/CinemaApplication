@@ -3,7 +3,9 @@ package com.tokioschool.filmapp.services.artist;
 import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
+import com.tokioschool.filmapp.dto.movie.MovieDto;
 import com.tokioschool.filmapp.records.SearchArtistRecord;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -33,6 +35,7 @@ public interface ArtistService {
      */
     ArtistDto registerArtist(ArtistDto artistDto) throws IllegalArgumentException;
 
+    ArtistDto updatedArtist(@NonNull Long artistId, @NonNull ArtistDto artistDto);
     /**
      * Busca un artista por su ID.
      *
@@ -41,4 +44,6 @@ public interface ArtistService {
      * @throws NotFoundException Si no se encuentra un artista con el ID proporcionado.
      */
     ArtistDto findById(Long artistId) throws NotFoundException;
+
+    List<MovieDto> findMoviesByManagerById(@NonNull Long managerId);
 }

@@ -3,6 +3,9 @@ package com.tokioschool.filmapp.services.movie.impl;
 import com.github.javafaker.Faker;
 import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.core.exception.ValidacionException;
+import com.tokioschool.filmapp.converter.ArtistListToArtistDtoListConverter;
+import com.tokioschool.filmapp.converter.ArtistToArtistDtoConverter;
+import com.tokioschool.filmapp.converter.UUIDToStringConverter;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
@@ -81,7 +84,14 @@ class MovieServiceImplUTest {
 
     @BeforeEach
     public void initEach(){
-
+        // configuration of mapper
+        this.modelMapper.typeMap(Movie.class, MovieDto.class)
+                .addMappings(mapping -> mapping.using(new ArtistToArtistDtoConverter())
+                        .map(Movie::getManager,MovieDto::setManagerDto))
+                .addMappings(mapping -> mapping.using(new ArtistListToArtistDtoListConverter())
+                        .map(Movie::getArtists,MovieDto::setArtistDtos))
+                .addMappings(mapping -> mapping.using(new UUIDToStringConverter())
+                        .map(Movie::getImage,MovieDto::setResourceId));
     }
 
 

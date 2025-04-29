@@ -61,4 +61,6 @@ public interface MovieDao extends JpaRepository<Movie, Long> {
         @Query("SELECT m FROM Movie m WHERE m.id NOT IN (SELECT ef.movie.id FROM ExportFilm ef)")
         // @Query("SELECT f FROM Film f LEFT JOIN ExportFilm ef ON ef.film = f WHERE ef.film IS NULL")
         List<Movie> findFilmsNotExported();
+
+        List<Movie> findMovieByManagerId(Long id);
 }

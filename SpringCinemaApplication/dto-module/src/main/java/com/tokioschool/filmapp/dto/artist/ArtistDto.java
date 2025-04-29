@@ -2,6 +2,7 @@ package com.tokioschool.filmapp.dto.artist;
 
 import com.tokioschool.filmapp.enums.TYPE_ARTIS_DTO;
 import com.tokioschool.filmapp.validators.anotations.EnumValid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,14 +33,14 @@ public class ArtistDto {
      * Nombre del artista.
      * Este campo es obligatorio.
      */
-    @NotNull
+    @NotEmpty
     private String name;
 
     /**
      * Apellido del artista.
      * Este campo es obligatorio.
      */
-    @NotNull
+    @NotEmpty
     private String surname;
 
     /**

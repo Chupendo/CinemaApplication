@@ -1,20 +1,28 @@
 package com.tokioschool.filmapp.services.artist.impl;
 
 import com.tokioschool.core.exception.NotFoundException;
+import com.tokioschool.core.exception.OperationNotAllowException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
+import com.tokioschool.filmapp.dto.movie.MovieDto;
 import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.SearchArtistRecord;
 import com.tokioschool.filmapp.repositories.ArtistDao;
+import com.tokioschool.filmapp.repositories.MovieDao;
 import com.tokioschool.filmapp.services.artist.ArtistService;
+import com.tokioschool.filmapp.services.movie.MovieService;
 import com.tokioschool.filmapp.specifications.ArtistSpecification;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +48,8 @@ import java.util.stream.IntStream;
 public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistDao artistDao;
+    private final MovieDao movieDao;
+
     private final ModelMapper modelMapper;
 
     /**
@@ -111,6 +121,28 @@ public class ArtistServiceImpl implements ArtistService {
         return populationCreateOrEditArtist(artist, artistDto);
     }
 
+    @Override
+    public ArtistDto updatedArtist(@NonNull Long artistId,@NonNull ArtistDto artistDto) {
+        if(!findMoviesByManagerById(artistId).isEmpty()){
+            throw new OperationNotAllowException("This manager has been used");
+        }
+        final Artist artist = Optional.of(artistId)
+                .map(artistDao::findById)
+                .filter(Optional::isPresent)
+                .get()
+                .orElseThrow(() -> new UsernameNotFoundException("Artist no't found"));
+
+        return populationCreateOrEditArtist(artist, artistDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MovieDto> findMoviesByManagerById(@NonNull Long managerId) {
+        return movieDao.findMovieByManagerId(managerId)
+                .stream()
+                .map(movie -> modelMapper.map(movie,MovieDto.class))
+                .toList();
+    }
     /**
      * Busca un artista por su ID.
      *

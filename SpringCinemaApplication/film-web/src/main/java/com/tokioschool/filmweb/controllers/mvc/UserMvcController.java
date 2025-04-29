@@ -128,7 +128,7 @@ public class UserMvcController {
             List<String> allRolesName = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
 
             model.addAttribute("allRolesName", allRolesName);
-            model.addAttribute("resourceImageId",null);
+            model.addAttribute("resourceImageId",null); // TODO esto hay que corregirlo
 
             // se converte el model and view en elementos y lo adaptos a elemtentos redireccionables
             final String maybeParam = Optional.ofNullable(userId)

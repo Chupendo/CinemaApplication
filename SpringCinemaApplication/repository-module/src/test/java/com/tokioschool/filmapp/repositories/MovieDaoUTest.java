@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -160,6 +161,22 @@ class MovieDaoUTest {
         Assertions.assertThat(moviesNotExported)
                 .isEmpty();
     }
+
+    @Test
+    @Order(9)
+    void givenAnArtist_whenGetMovies_thenReturnOk(){
+        final Artist manager =  artists.stream().filter(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR))
+                .findAny().orElse(null);
+
+        final List<Movie> moviesManager = Optional.ofNullable(manager)
+                .map(Artist::getId)
+                .map(managerId -> movieDao.findMovieByManagerId( managerId ))
+                .orElse(List.of());
+
+        Assertions.assertThat(moviesManager)
+                .isNotEmpty();
+    }
+
     /**
      * Get a number random between [min,max]
      *

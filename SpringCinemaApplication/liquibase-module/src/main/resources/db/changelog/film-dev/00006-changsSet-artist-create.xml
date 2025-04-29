@@ -26,19 +26,19 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="insert-artist-table" author="andres.rpenuela" context="dev">
-        <!-- privileges values -->
-        <insert tableName="artists">
-            <column name="ID" value="1" />
-            <column name="NAME" value="John" />
-            <column name="SURNAME" value="Smith" />
-            <column name="TYPE_ARTIST" value="ACTOR" />
-        </insert>
-        <insert tableName="artists">
-            <column name="ID" value="2" />
-            <column name="NAME" value="William" />
-            <column name="SURNAME" value="Smith" />
-            <column name="TYPE_ARTIST" value="DIRECTOR" />
-        </insert>
-    </changeSet>
+<!--    <changeSet id="insert-artist-table" author="andres.rpenuela" context="dev">-->
+<!--        &lt;!&ndash; privileges values &ndash;&gt;-->
+<!--        <insert tableName="artists">-->
+<!--            <column name="ID" value="1" />-->
+<!--            <column name="NAME" value="John" />-->
+<!--            <column name="SURNAME" value="Smith" />-->
+<!--            <column name="TYPE_ARTIST" value="ACTOR" />-->
+<!--        </insert>-->
+<!--        <insert tableName="artists">-->
+<!--            <column name="ID" value="2" />-->
+<!--            <column name="NAME" value="William" />-->
+<!--            <column name="SURNAME" value="Smith" />-->
+<!--            <column name="TYPE_ARTIST" value="DIRECTOR" />-->
+<!--        </insert>-->
+<!--    </changeSet>-->
 </databaseChangeLog>

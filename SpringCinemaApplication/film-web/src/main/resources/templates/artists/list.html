@@ -91,11 +91,12 @@
                                     <td th:text="${artist.surname}">Apellidos</td>
                                     <td th:text="${artist.typeArtist}">Tipo</td>
                                     <td>
-                                        EDITAR
+                                        <a th:href="@{/web/artists/form/{artistId}(artistId=${artist.id})}"
+                                           class="btn btn-sm btn-warning" th:text="#{item.label.edit}">Editar</a>
                                     </td>
-
                                     <td>
-                                        VER DETALLE
+                                        <a th:href="@{/web/artists/profile/{artistId}(artistId=${artist.id})}"
+                                           class="btn btn-sm btn-info" th:text="#{item.label.profile}">Perfil</a>
                                     </td>
                                 </tr>
                                 </tbody>
