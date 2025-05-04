@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -156,6 +157,14 @@ public class ArtistServiceImpl implements ArtistService {
                 .map(artistDao::findById)
                 .map(artist -> modelMapper.map(artist, ArtistDto.class))
                 .orElseThrow(() -> new NotFoundException("Artist with id: %d not found".formatted(artistId)));
+    }
+
+    @Override
+    public List<ArtistDto> findByAllByTypeArtist(@NonNull TYPE_ARTIST typeArtist) {
+        return artistDao.findByTypeArtistIs(typeArtist)
+                .stream()
+                .map(artist -> modelMapper.map(artist, ArtistDto.class))
+                .toList();
     }
 
     /**

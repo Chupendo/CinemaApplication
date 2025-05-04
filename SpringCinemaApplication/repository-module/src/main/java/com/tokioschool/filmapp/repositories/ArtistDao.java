@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositorio para la entidad {@link Artist}.
@@ -32,4 +33,5 @@ public interface ArtistDao extends JpaRepository<Artist, Long>, JpaSpecification
      */
     List<Artist> getArtistsByTypeArtist(TYPE_ARTIST typeArtist);
 
+    List<Artist> findByTypeArtistIs(TYPE_ARTIST typeArtist);
 }

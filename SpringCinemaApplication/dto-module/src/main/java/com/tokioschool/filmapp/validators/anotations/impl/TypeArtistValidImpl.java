@@ -37,6 +37,6 @@ public class TypeArtistValidImpl implements ConstraintValidator<TypeArtistValid,
      */
     @Override
     public boolean isValid(ArtistDto artistDto, ConstraintValidatorContext constraintValidatorContext) {
-        return artistDto.getTypeArtist() != null && artistDto.getTypeArtist().equalsIgnoreCase(entry);
+        return artistDto != null && artistDto.getTypeArtist() != null && artistDto.getTypeArtist().equalsIgnoreCase(entry);
     }
 }

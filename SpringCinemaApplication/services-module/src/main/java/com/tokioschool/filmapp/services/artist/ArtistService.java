@@ -4,6 +4,7 @@ import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
+import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.SearchArtistRecord;
 import org.springframework.lang.NonNull;
 
@@ -45,5 +46,8 @@ public interface ArtistService {
      */
     ArtistDto findById(Long artistId) throws NotFoundException;
 
+    List<ArtistDto> findByAllByTypeArtist(@NonNull TYPE_ARTIST typeArtist);
     List<MovieDto> findMoviesByManagerById(@NonNull Long managerId);
+
+
 }

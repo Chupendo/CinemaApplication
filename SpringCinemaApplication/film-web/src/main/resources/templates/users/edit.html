@@ -32,11 +32,11 @@
                         <div class="col-md-4">
                             <img th:if="${resourceImageId == null}" th:src="@{/images/default-profile.svg}" class="card-img-top img-fluid" alt="image">
                             <img th:if="${resourceImageId != null}"
-                                 th:src="@{/web/resources(rsc=${resourceImageId})}"
+                                 th:src="@{/api/resources(rsc=${resourceImageId})}"
                                  class="card-img-top img-fluid"
                                  alt="image">
                             <br>
-                            <a th:if="${resourceImageId != null}" th:href="@{/web/resources/downloads(rsc=${resourceImageId})}">Download</a>
+                            <a th:if="${resourceImageId != null}" th:href="@{/api/resources/downloads(rsc=${resourceImageId})}">Download</a>
                         </div>
                         <div class="col-md-8">
                             <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">

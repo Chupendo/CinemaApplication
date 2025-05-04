@@ -34,17 +34,17 @@
                         <form th:action="@{/web/films/list}" th:object="${searchMovieRecord}" method="get">
                             <div class="mb-3">
                                 <label for="name" class="form-label" th:text="#{film.label.title}">Titulo</label>
-                                <input type="text" id="name" class="form-control" th:field="*{title}" placeholder="Nombre">
+                                <input type="text" id="name" class="form-control" th:field="*{title}" th:placeholder="#{film.label.title}">
                             </div>
 
                             <div class="mb-3">
                                 <label for="surname" class="form-label" th:text="#{film.label.release-year.max}">Añio maximo</label>
-                                <input type="number" step="1" id="surname" class="form-control" th:field="*{rangeReleaseYear.yearMax}" placeholder="Apellido">
+                                <input type="number" step="1" id="surname" class="form-control" th:field="*{rangeReleaseYear.yearMax}" th:placeholder="#{film.label.release-year.max}">
                             </div>
 
                             <div class="mb-3">
                                 <label for="username" class="form-label" th:text="#{film.label.release-year.min}">Añio mminimo</label>
-                                <input type="number" step="1"  id="username" class="form-control" th:field="*{rangeReleaseYear.yearMin}" placeholder="Usuario">
+                                <input type="number" step="1"  id="username" class="form-control" th:field="*{rangeReleaseYear.yearMin}" th:placeholder="#{film.label.release-year.min}">
                             </div>
 
                             <div class="mb-3">
@@ -74,7 +74,7 @@
                                 <tr>
                                     <th th:text="#{film.label.title}">Titulo</th>
                                     <th th:text="#{film.label.release-year}">Año Publicado</th>
-                                    <th th:text="#{item.label.edit}">Editar</th>
+                                    <th th:text="#{item.label.edit}" sec:authorize="hasRole('ADMIN')">Editar</th>
                                     <th th:text="#{item.label.profile}">Perfil</th>
                                 </tr>
                                 </thead>
@@ -82,12 +82,11 @@
                                 <tr th:each="movie : ${pageMovieDto.items}">
                                     <td th:text="${movie.title}">Titulo</td>
                                     <td th:text="${movie.getReleaseYear()}">Año de publicado</td>
-                                    <td>
-                                        EDITAR
+                                    <td sec:authorize="hasRole('ADMIN')">
+                                        <a th:href="@{/web/films/form/{movieId}(movieId=${movie.id})}" th:text="#{item.label.edit}"></a>
                                     </td>
-
                                     <td>
-                                        VER DETALLE
+                                        <a th:href="@{/web/films/detail/{movieId}(movieId=${movie.id})}" th:text="#{item.label.profile}"></a>
                                     </td>
                                 </tr>
                                 </tbody>

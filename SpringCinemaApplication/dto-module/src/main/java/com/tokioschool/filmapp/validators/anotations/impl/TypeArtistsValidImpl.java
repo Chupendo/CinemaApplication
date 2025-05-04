@@ -46,7 +46,7 @@ public class TypeArtistsValidImpl implements ConstraintValidator<TypeArtistsVali
         final Predicate<String> thereAreAnyManager = isArtis.negate();
 
         // Retorna true si la lista no es nula y no contiene elementos con un tipo diferente al objetivo.
-        return artistListDto != null && artistListDto.stream().map(ArtistDto::getTypeArtist)
+        return artistListDto != null && !artistListDto.isEmpty() && artistListDto.stream().map(ArtistDto::getTypeArtist)
                 .noneMatch(thereAreAnyManager);
     }
 }

@@ -76,8 +76,17 @@ public class MovieServiceImpl implements MovieService {
             final int pageSizeDefault = Optional.ofNullable( searchMovieRecord )
                     .map(SearchMovieRecord::pageSize)
                     .orElseGet( () -> 5);
+            final String maybeTittle = Optional.ofNullable( searchMovieRecord)
+                    .map(SearchMovieRecord::title)
+                    .orElseGet( () -> null);
+
+            final RangeReleaseYear rangeReleaseYear = Optional.ofNullable( searchMovieRecord )
+                    .map(SearchMovieRecord::rangeReleaseYear)
+                    .orElseGet( () -> RangeReleaseYear.builder().build() );
 
             searchMovieRecord = SearchMovieRecord.builder()
+                    .title( maybeTittle )
+                    .rangeReleaseYear( rangeReleaseYear )
                     .page( pageDefault )
                     .pageSize( pageSizeDefault )
                     .build();
