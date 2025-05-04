@@ -20,7 +20,7 @@
             <column name="SCORE" type="decimal(18,2)">
                 <constraints nullable="false" />
             </column>
-            <column name="USER_ID" type="BIGINT">
+            <column name="USER_ID" type="VARCHAR(13)">
                 <constraints nullable="false" />
             </column>
             <column name="FILM_ID" type="BIGINT">

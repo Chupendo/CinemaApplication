@@ -35,13 +35,13 @@ class RatingFilmDaoUTest {
     @BeforeEach
     public void init(){
         RatingFilm rating1 = new RatingFilm();
-        rating1.setUserId(1L);
+        rating1.setUserId("1L");
         rating1.setFilmId(1L);
         rating1.setScore(BigDecimal.valueOf(4.0));
         entityManager.persistAndFlush(rating1);
 
         RatingFilm rating2 = new RatingFilm();
-        rating2.setUserId(2L);
+        rating2.setUserId("2L");
         rating2.setFilmId(1L);
         rating2.setScore(BigDecimal.valueOf(5.0));
         entityManager.persistAndFlush(rating2);
@@ -49,14 +49,14 @@ class RatingFilmDaoUTest {
 
     @Test
     void findRatingFilmByUserIdAndFilmId_withInvalidUserIdAndFilmId_shouldReturnRegister() {
-        Optional<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId(1L, 1L);
+        Optional<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId("1L", 1L);
 
         assertThat(result).isNotNull();
         assertThat(result)
                 .isPresent()
                 .get()
                 .returns(1L,RatingFilm::getFilmId)
-                .returns(1L,RatingFilm::getUserId)
+                .returns("1L",RatingFilm::getUserId)
                 .satisfies(ratingFilm -> BigDecimal.valueOf(4.0).equals( ratingFilm.getScore() ));
     }
 
@@ -64,19 +64,19 @@ class RatingFilmDaoUTest {
     @Test
     void findRatingFilmByUserIdAndFilmId_withValidUserIdAndFilmIdRepeat_shouldReturnIncorrectResultSizeDataAccessException() {
         RatingFilm rating1 = new RatingFilm();
-        rating1.setUserId(1L);
+        rating1.setUserId("1L");
         rating1.setFilmId(1L);
         rating1.setScore(BigDecimal.valueOf(4.0));
         ratingFilmDao.saveAndFlush(rating1);
 
-        assertThatThrownBy( () -> ratingFilmDao.findRatingFilmByUserIdAndFilmId(1L, 1L) )
+        assertThatThrownBy( () -> ratingFilmDao.findRatingFilmByUserIdAndFilmId("1L", 1L) )
                 .isInstanceOf(IncorrectResultSizeDataAccessException.class);
 
     }
 
     @Test
     void findRatingFilmByUserIdAndFilmId_withInvalidUserIdAndFilmId_shouldReturnEmptyList() {
-        Optional<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId(3L, 999L);
+        Optional<RatingFilm> result = ratingFilmDao.findRatingFilmByUserIdAndFilmId("3L", 999L);
 
         assertThat(result).isNotNull();
         assertThat(result).isEmpty();

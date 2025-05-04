@@ -41,12 +41,32 @@ class MovieDaoUTest {
                 i ->{
                     // artist
                     TYPE_ARTIST[] types = TYPE_ARTIST.values();
-                    artists = IntStream.range(1,3).mapToObj(j ->
-                         Artist.builder()
-                                .name(faker.superhero().name())
-                                .surname(faker.superhero().prefix())
-                            .typeArtist(types[getRandom(0, types.length-1)])
-                                .build()
+                    artists = IntStream.range(1,10).mapToObj(j ->{
+                                Artist artist;
+                                if(j==1){
+                                    artist = Artist.builder()
+                                            .name(faker.superhero().name())
+                                            .surname(faker.superhero().prefix())
+                                            .typeArtist(TYPE_ARTIST.DIRECTOR)
+                                            .build();
+                                }else if(j==2){
+                                    artist = Artist.builder()
+                                            .name(faker.superhero().name())
+                                            .surname(faker.superhero().prefix())
+                                            .typeArtist(TYPE_ARTIST.ACTOR)
+                                            .build();
+
+                                }else{
+                                    artist= Artist.builder()
+                                            .name(faker.superhero().name())
+                                            .surname(faker.superhero().prefix())
+                                            .typeArtist(types[getRandom(0, types.length-1)])
+                                            .build();
+                                }
+
+                                return artist;
+                            }
+
                     ).toList();
 
                     artistDao.saveAll(artists);

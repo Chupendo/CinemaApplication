@@ -1,13 +1,17 @@
 package com.tokioschool.filmweb.controllers.mvc;
 
 import com.tokioschool.core.exception.OperationNotAllowException;
+import com.tokioschool.filmapp.domain.RatingFilm;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
+import com.tokioschool.filmapp.dto.ratings.RatingFilmDto;
+import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.RangeReleaseYear;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import com.tokioschool.filmapp.services.artist.ArtistService;
 import com.tokioschool.filmapp.services.movie.MovieService;
+import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.filmweb.core.propertyEditors.ArtistDtoEditor;
 import com.tokioschool.filmweb.helpers.TranslatedMessageHelper;
 import com.tokioschool.store.dto.ResourceIdDto;
@@ -16,8 +20,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,6 +47,7 @@ public class FilmMvcController {
 
     private final MovieService movieService;
     private final ArtistService artistService;
+    private final UserService userService;
     private final StoreFacade storeFacade;
     private final TranslatedMessageHelper translatedMessageHelper;
 
@@ -107,6 +115,12 @@ public class FilmMvcController {
         model.addAttribute("managers", managers);
         model.addAttribute("actors", actors);
         model.addAttribute("profileMode", profileMode);
+
+        if( profileMode ){
+            final String userId = getUserIdAuth().getId();
+            model.addAttribute("rating", RatingFilmDto.builder().filmId(movieId).userId( userId ).build() );
+        }
+
         return "movies/form";
     }
 
@@ -161,6 +175,8 @@ public class FilmMvcController {
             if (isEdit) {
                 movieService.updateMovie(movieId, movieDto);
             } else {
+                final UserDto userDto = userService.findUserAuthenticated().orElseThrow( () -> new AuthenticationCredentialsNotFoundException("User not auth!"));
+                movieDto.setCreateUser( userDto );
                 movieService.createMovie(movieDto);
             }
         } catch (Exception e) {
@@ -172,6 +188,25 @@ public class FilmMvcController {
         }
 
         return new RedirectView("/web/films/list");
+    }
+
+    private UserDto getUserIdAuth(){
+        return userService.findUserAuthenticated().orElseThrow( () -> new AuthenticationCredentialsNotFoundException("User not auth!"));
+    }
+
+    @PostMapping("/rate")
+    @PreAuthorize("isAuthenticated()")
+    public String rateMovie(@ModelAttribute("rating") RatingFilmDto ratingFilmDto, RedirectAttributes redirectAttributes) {
+        // Aquí iría la lógica para guardar la puntuación
+        // ratingService.save(ratingDto);
+
+        final String errorRate = translatedMessageHelper.getMessage("film.msg.rate.error");
+        redirectAttributes.addFlashAttribute("error", errorRate);
+
+        final String successRate = translatedMessageHelper.getMessage("film.msg.rate.success");
+        redirectAttributes.addFlashAttribute("message", successRate);
+
+        return "redirect:/web/films/detail/%s".formatted( ratingFilmDto.getFilmId() );
     }
 
     private boolean hasAdminRole() {

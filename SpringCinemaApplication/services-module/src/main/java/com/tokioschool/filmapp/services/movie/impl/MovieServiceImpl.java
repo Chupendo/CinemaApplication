@@ -4,15 +4,19 @@ import com.tokioschool.core.exception.NotFoundException;
 import com.tokioschool.core.exception.ValidacionException;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
+import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
+import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.RangeReleaseYear;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import com.tokioschool.filmapp.repositories.MovieDao;
+import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.artist.ArtistService;
 import com.tokioschool.filmapp.services.movie.MovieService;
+import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.helpers.UUIDHelper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +24,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +53,7 @@ public class MovieServiceImpl implements MovieService {
     private final MovieDao movieDao;
     private final ModelMapper modelMapper;
     private final ArtistService artistService;
+    private final UserService userService;
 
     /**
      * Busca películas en el sistema aplicando un filtro por defecto. Si el tamaño de página es 0,
@@ -287,6 +293,11 @@ public class MovieServiceImpl implements MovieService {
                 .map(artistDto -> getArtistById(artistDto.getId()))
                 .collect(Collectors.toList());
 
+        // Obtener el usuario que ha creado
+        if( movie.getCreateUser() == null) {
+             final User user = userService.getUserById( movieDto.getCreateUser().getId() );
+             movie.setCreateUser( user );
+        }
         // Validación
         if (artists.stream().anyMatch(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR))) {
             throw new NotFoundException("The artist list is strong");

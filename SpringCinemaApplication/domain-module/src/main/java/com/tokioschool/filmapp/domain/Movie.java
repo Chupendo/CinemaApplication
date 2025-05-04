@@ -74,4 +74,8 @@ public class Movie {
             inverseJoinColumns = {@JoinColumn(name = "artist_id")}
     )
     private List<Artist> artists;
+
+    @OneToOne
+    @JoinColumn(name = "users_id", referencedColumnName = "id")
+    public User createUser;
 }

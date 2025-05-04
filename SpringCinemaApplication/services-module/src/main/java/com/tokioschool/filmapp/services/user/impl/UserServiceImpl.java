@@ -283,6 +283,14 @@ public class UserServiceImpl implements UserService {
         return isSameUser;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserById(String id) {
+        return Optional.ofNullable(id)
+                .flatMap(userDao::findById)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+    }
+
     /**
      * Obtiene una sublista de elementos para la paginación.
      *

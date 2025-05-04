@@ -71,7 +71,7 @@
                         <h2 class="mb-4 text-center" th:text="#{artist.list.title}" >Listado de Peliculas</h2>
 
                         <p th:if="${pageArtistDto.getItems().isEmpty()}"
-                           class="mb-4 text-center">No se han encontrado peliculas en el sistema</p>
+                           class="mb-4 text-center" th:text="#{films.text.not-fount}">No se han encontrado peliculas en el sistema</p>
 
                         <div th:unless="${pageArtistDto.getItems().isEmpty()}"
                              class="mb-4 text-center table-responsive">

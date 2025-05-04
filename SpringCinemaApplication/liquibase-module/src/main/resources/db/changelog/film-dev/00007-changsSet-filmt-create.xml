@@ -29,6 +29,10 @@
                 <constraints nullable="false"/>
             </column>
 
+            <!-- Columna para el director -->
+            <column name="users_id" type="VARCHAR(13)">
+                <constraints nullable="false"/>
+            </column>
             <!-- Columna para el póster -->
 <!--            <column name="poster" type="UUID">-->
 <!--                <constraints unique="true"/>-->
@@ -52,6 +56,14 @@
                                  referencedTableName="artists"
                                  referencedColumnNames="id"
                                  constraintName="fk_manager"
+                                 deferrable="false"
+                                 initiallyDeferred="false"/>
+
+        <addForeignKeyConstraint baseTableName="movies"
+                                 baseColumnNames="users_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_users"
                                  deferrable="false"
                                  initiallyDeferred="false"/>
 

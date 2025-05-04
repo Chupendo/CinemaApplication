@@ -38,7 +38,7 @@ public class RatingFilmDto {
     /**
      * Identificador del usuario que realizó la calificación.
      */
-    private Long userId;
+    private String userId;
 
     /**
      * Identificador de la película calificada.

@@ -8,14 +8,18 @@ import com.tokioschool.filmapp.converter.ArtistToArtistDtoConverter;
 import com.tokioschool.filmapp.converter.UUIDToStringConverter;
 import com.tokioschool.filmapp.domain.Artist;
 import com.tokioschool.filmapp.domain.Movie;
+import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
+import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import com.tokioschool.filmapp.repositories.MovieDao;
+import com.tokioschool.filmapp.repositories.UserDao;
 import com.tokioschool.filmapp.services.artist.impl.ArtistServiceImpl;
 import com.tokioschool.filmapp.services.movie.MovieService;
+import com.tokioschool.filmapp.services.user.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +34,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -40,8 +45,12 @@ class MovieServiceImplUTest {
 
     @Mock
     private MovieDao movieDao;
+
     @Mock
     private ArtistServiceImpl artistService;
+
+    @Mock
+    private UserService userService;
 
     @Spy
     private ModelMapper modelMapper;
@@ -282,6 +291,7 @@ class MovieServiceImplUTest {
         movieDto.setManagerDto(new ArtistDto(1L, "Manager", "Surname", "DIRECTOR"));
         movieDto.setArtistDtos(List.of(new ArtistDto(2L, "Actor", "Surname", "ACTOR")));
         movieDto.setReleaseYear(2020);
+        movieDto.setCreateUser( UserDto.builder().id("1L").build());
         movieDto.setResourceId("123e4567-e89b-12d3-a456-426614174000");
 
         Movie movie = new Movie();
@@ -296,6 +306,7 @@ class MovieServiceImplUTest {
         //Mockito.when(modelMapper.map(Mockito.any(Movie.class), Mockito.eq(MovieDto.class))).thenReturn(movieDto);
         Mockito.when(artistService.findById(1L)).thenReturn(new ArtistDto(1L, "Manager", "Surname", "DIRECTOR"));
         Mockito.when(artistService.findById(2L)).thenReturn(new ArtistDto(2L, "Actor", "Surname", "ACTOR"));
+        Mockito.when(userService.getUserById("1L")).thenReturn(User.builder().id("1L").name("test name").surname("test surname").build() );
 
         MovieDto result = movieService.createMovie(movieDto);
 

@@ -47,7 +47,7 @@ public interface RatingFilmService {
      * @return Un objeto {@link RatingFilmDto} con los detalles de la calificación actualizada.
      * @throws IncorrectResultSizeDataAccessException Si ocurre un error al acceder a los datos.
      */
-    RatingFilmDto update(@NonNull Long filmId, @NonNull Long userId, @NonNull RequestRatingFilmDto requestRatingFilmDto) throws IncorrectResultSizeDataAccessException;
+    RatingFilmDto update(@NonNull Long filmId, @NonNull String userId, @NonNull RequestRatingFilmDto requestRatingFilmDto) throws IncorrectResultSizeDataAccessException;
 
     /**
      * Encuentra una calificación de película por el ID de la película y el ID del usuario.
@@ -57,7 +57,7 @@ public interface RatingFilmService {
      * @return Un objeto {@link RatingFilmDto} con los detalles de la calificación encontrada.
      * @throws IncorrectResultSizeDataAccessException Si ocurre un error al acceder a los datos.
      */
-    RatingFilmDto findRatingByFilmAndUserHandler(@NonNull Long filmId, @NonNull Long userId) throws IncorrectResultSizeDataAccessException;
+    RatingFilmDto findRatingByFilmAndUserHandler(@NonNull Long filmId, @NonNull String userId) throws IncorrectResultSizeDataAccessException;
 
     /**
      * Elimina una calificación de película por el ID de la película y el ID del usuario.
@@ -66,7 +66,7 @@ public interface RatingFilmService {
      * @param userId ID del usuario.
      * @throws IncorrectResultSizeDataAccessException Si ocurre un error al acceder a los datos.
      */
-    void deleteByFilmIdAndUserId(@NonNull Long filmId, @NonNull Long userId) throws IncorrectResultSizeDataAccessException;
+    void deleteByFilmIdAndUserId(@NonNull Long filmId, @NonNull String userId) throws IncorrectResultSizeDataAccessException;
 
     /**
      * Calcula el promedio de calificaciones para una película.

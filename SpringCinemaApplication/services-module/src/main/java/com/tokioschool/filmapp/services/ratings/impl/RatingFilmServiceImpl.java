@@ -91,7 +91,7 @@ public class RatingFilmServiceImpl implements RatingFilmService {
     @Override
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public RatingFilmDto update(@NonNull Long filmId, @NonNull Long userId, @NonNull RequestRatingFilmDto requestRatingFilmDto) throws IncorrectResultSizeDataAccessException {
+    public RatingFilmDto update(@NonNull Long filmId, @NonNull String userId, @NonNull RequestRatingFilmDto requestRatingFilmDto) throws IncorrectResultSizeDataAccessException {
         RatingFilm ratingFilm = ratingFilmDao.findRatingFilmByUserIdAndFilmId(userId, filmId)
                 .orElseThrow(() -> new NotFoundException("Register with film id %d and user id %d not found".formatted(filmId, userId)));
 
@@ -132,7 +132,7 @@ public class RatingFilmServiceImpl implements RatingFilmService {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("isAuthenticated()")
-    public RatingFilmDto findRatingByFilmAndUserHandler(@NonNull Long filmId, @NonNull Long userId) throws IncorrectResultSizeDataAccessException {
+    public RatingFilmDto findRatingByFilmAndUserHandler(@NonNull Long filmId, @NonNull String userId) throws IncorrectResultSizeDataAccessException {
         RatingFilm ratingFilm = ratingFilmDao.findRatingFilmByUserIdAndFilmId(userId, filmId)
                 .orElseThrow(() -> new NotFoundException("Rating Film not found!"));
         return buildRatingFilmDto(ratingFilm);
@@ -149,7 +149,7 @@ public class RatingFilmServiceImpl implements RatingFilmService {
     @Override
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public void deleteByFilmIdAndUserId(@NonNull Long filmId, @NonNull Long userId) throws IncorrectResultSizeDataAccessException {
+    public void deleteByFilmIdAndUserId(@NonNull Long filmId, @NonNull String userId) throws IncorrectResultSizeDataAccessException {
         RatingFilm ratingFilm = ratingFilmDao.findRatingFilmByUserIdAndFilmId(userId, filmId).orElseThrow(
                 () -> new NotFoundException("Ratings not found!")
         );

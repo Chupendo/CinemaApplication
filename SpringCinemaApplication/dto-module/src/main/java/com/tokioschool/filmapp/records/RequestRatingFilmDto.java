@@ -25,7 +25,7 @@ import java.math.BigDecimal;
  * @version 1.0
  */
 public record RequestRatingFilmDto(Long id,
-                                   @NotNull @Positive Long userId,
+                                   @NotNull @Positive String userId,
                                    @NotNull @Positive Long filmId,
                                    @NotNull @PositiveOrZero @Max(100) BigDecimal score) {
 }

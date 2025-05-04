@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.services.user;
 
+import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.dto.user.UserFormDto;
@@ -93,4 +94,6 @@ public interface UserService {
 
 
     boolean operationEditAllow(String userId);
+
+    User getUserById(String id);
 }

@@ -129,7 +129,7 @@ public class RatingApiController {
     @PutMapping("/updated/films/{filmId}/users/{userId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RatingFilmDto> updatedARatingHandler(@PathVariable(value = "filmId") Long filmId,
-                                                               @PathVariable(value = "userId") Long userId,
+                                                               @PathVariable(value = "userId") String userId,
                                                                @Valid @RequestBody RequestRatingFilmDto requestRatingFilmDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -163,7 +163,7 @@ public class RatingApiController {
     @DeleteMapping("/deleted/films/{filmId}/users/{userId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deletedRatingHandler(@PathVariable(value = "filmId") Long filmId,
-                                                     @PathVariable(name = "userId") Long userId) {
+                                                     @PathVariable(name = "userId") String userId) {
         ratingFilmService.deleteByFilmIdAndUserId(filmId, userId);
         return ResponseEntity.ok().build();
     }
@@ -189,7 +189,7 @@ public class RatingApiController {
     @GetMapping("/films/{filmId}/users/{userId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RatingFilmDto> findRatingByFilmAndUserHandler(@PathVariable(name = "filmId") Long filmId,
-                                                                        @PathVariable(name = "userId") Long userId) {
+                                                                        @PathVariable(name = "userId") String userId) {
         RatingFilmDto requestRatingFilmDto = ratingFilmService.findRatingByFilmAndUserHandler(filmId, userId);
         return ResponseEntity.ok(requestRatingFilmDto);
     }
