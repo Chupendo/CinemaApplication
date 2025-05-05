@@ -70,7 +70,7 @@ public class LogRequestFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
             // Actualiza el último tiempo de inicio de sesión si la solicitud es exitosa y corresponde a rutas específicas
-            if (response.getStatus() == 200 &&
+                if (response.getStatus() == 200 &&
                     (getRequestPath(request).equals("/api/ratings/login") ||
                             getRequestPath(request).contains("/login/oauth2/code") ) ) {
                 userService.updateLastLoginTime();

@@ -14,6 +14,7 @@ import com.tokioschool.filmapp.services.movie.MovieService;
 import com.tokioschool.filmapp.services.user.UserService;
 import com.tokioschool.filmweb.core.propertyEditors.ArtistDtoEditor;
 import com.tokioschool.filmweb.helpers.TranslatedMessageHelper;
+import com.tokioschool.ratings.facade.RatingFacade;
 import com.tokioschool.store.dto.ResourceIdDto;
 import com.tokioschool.store.facade.StoreFacade;
 import jakarta.validation.Valid;
@@ -49,6 +50,8 @@ public class FilmMvcController {
     private final ArtistService artistService;
     private final UserService userService;
     private final StoreFacade storeFacade;
+    private final RatingFacade ratingFacade;
+
     private final TranslatedMessageHelper translatedMessageHelper;
 
     @InitBinder
@@ -118,7 +121,9 @@ public class FilmMvcController {
 
         if( profileMode ){
             final String userId = getUserIdAuth().getId();
-            model.addAttribute("rating", RatingFilmDto.builder().filmId(movieId).userId( userId ).build() );
+            RatingFilmDto ratingFilmDto = ratingFacade.findRatingByUserIdAndMovieId(userId,movieId)
+                            .orElseGet( () ->  RatingFilmDto.builder().filmId(movieId).userId( userId ).build());
+            model.addAttribute("rating", ratingFilmDto );
         }
 
         return "movies/form";
@@ -200,11 +205,17 @@ public class FilmMvcController {
         // Aquí iría la lógica para guardar la puntuación
         // ratingService.save(ratingDto);
 
-        final String errorRate = translatedMessageHelper.getMessage("film.msg.rate.error");
-        redirectAttributes.addFlashAttribute("error", errorRate);
+        try{
+            ratingFacade.registerRating(ratingFilmDto);
+            final String successRate = translatedMessageHelper.getMessage("film.msg.rate.success");
 
-        final String successRate = translatedMessageHelper.getMessage("film.msg.rate.success");
-        redirectAttributes.addFlashAttribute("message", successRate);
+            redirectAttributes.addFlashAttribute("message", successRate);
+
+        }catch (Exception e){
+            final String errorRate = translatedMessageHelper.getMessage("film.msg.rate.error");
+            log.error(errorRate, e);
+            redirectAttributes.addFlashAttribute("error", errorRate);
+        }
 
         return "redirect:/web/films/detail/%s".formatted( ratingFilmDto.getFilmId() );
     }

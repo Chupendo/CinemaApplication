@@ -60,7 +60,7 @@ public class JwtBlackListFilter extends OncePerRequestFilter {
                 return;
             }
         }catch (RedisConnectionFailureException ex ){
-            log.error("Error de conexión a Redis: {}", ex.getMessage(),ex);
+            log.warn("Error de conexión a Redis: {}", ex.getMessage(),ex);
         }
 
         // Continuar con el filtro de autenticación

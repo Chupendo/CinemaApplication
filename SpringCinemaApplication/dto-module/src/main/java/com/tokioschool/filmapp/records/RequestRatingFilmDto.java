@@ -1,9 +1,6 @@
 package com.tokioschool.filmapp.records;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
@@ -25,7 +22,7 @@ import java.math.BigDecimal;
  * @version 1.0
  */
 public record RequestRatingFilmDto(Long id,
-                                   @NotNull @Positive String userId,
+                                   @NotEmpty String userId,
                                    @NotNull @Positive Long filmId,
                                    @NotNull @PositiveOrZero @Max(100) BigDecimal score) {
 }

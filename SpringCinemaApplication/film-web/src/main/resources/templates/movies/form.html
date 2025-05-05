@@ -119,8 +119,8 @@
                         <div th:unless="${rating.score}">
                             <h4 th:text="#{film.label.rate.title}">Puntuar película</h4>
                             <form th:action="@{/web/films/rate}" th:object="${rating}" method="post">
-                                <input type="hidden" th:field="*{filmId}" th:value="${movie.id}" />
-
+                                <input type="hidden" th:field="*{userId}" th:value="*{userId}" />
+                                <input type="hidden" th:field="*{filmId}" th:value="*{filmId}" />
                                 <div class="mb-3">
                                     <label for="score" class="form-label" th:text="#{film.label.rate.range}">Puntuación (1 a 5)</label>
                                     <select class="form-select" th:field="*{score}" id="score" required>
@@ -129,7 +129,6 @@
                                         <option th:value="3">3 - Regular</option>
                                         <option th:value="4">4 - Buena</option>
                                         <option th:value="5">5 - Excelente</option>
-
                                     </select>
                                 </div>
                                 <div class="alert alert-danger mt-3" th:if="${error}" th:text="${error}"></div>
