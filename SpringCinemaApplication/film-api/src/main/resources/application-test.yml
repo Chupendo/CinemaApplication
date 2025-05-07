@@ -4,10 +4,13 @@ spring:
     name: film-api
 # Liguibase
   liquibase:
-    enabled: false
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev
+    label-filter: film-api-dev
   # maria db d
   datasource:
-    url: jdbc:h2:mem:test_mail_db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;
+    url: jdbc:h2:mem:filmdb_api;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;
     username: sa
     password: password
     driver-class-name: org.h2.Driver
@@ -17,7 +20,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
     #validate, none, update, create-drop
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     # Debug queries
     show-sql: true
   # redis connection
@@ -42,11 +45,11 @@ application:
     # User in memory
     login:
       users:
-        - username: consumer
+        - username: user
           # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
           # "password" in base64:: cGFzc3dvcmQ=
           password: cGFzc3dvcmQ=
-        - username: producer
+        - username: admin
           # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
           # "password" in base64:: cGFzc3dvcmQ=
           password: cGFzc3dvcmQ=

@@ -8,7 +8,7 @@ spring:
       port: 6379
 
 server:
-  port: 9092
+  port: 9091
 
 # Actuator:
 # Activar endpoints predefinidos: management.endpoints.web.exposure.include= .....
@@ -31,13 +31,13 @@ application:
     login:
       users:
         - username: user
-          # password = "password", https://bcrypt-generator.com/
-          password: "{bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
+          # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
+          password: "$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
           authorities: read-resource
-          roles: USER
+          roles: admin
         - username: admin
-          # password = "password", https://bcrypt-generator.com/
-          password: "{bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
+          # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
+          password: "$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m"
           authorities: read-resource, write-resource
           roles: USER, ADMIN
   # JWT Token

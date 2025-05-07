@@ -1,7 +1,6 @@
-package com.tokioschool.filmapp.confing;
+package com.tokioschool.filmapp.configs.binding;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -18,9 +17,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  */
 @Configuration
 @RequiredArgsConstructor
-public class LocalValidatorFactoryBeanConfiguration {
-
-    //private final MessageSource messageSource;
+public class FilmApiLocalValidatorFactoryBeanConfiguration {
 
     /**
      * Define un bean de \{@link LocalValidatorFactoryBean\} con configuración personalizada.
@@ -30,11 +27,9 @@ public class LocalValidatorFactoryBeanConfiguration {
      *
      * @return Una instancia de \{@link LocalValidatorFactoryBean\}.
      */
-    @Bean
+    @Bean(name = "filmApiLocalValidatorFactoryBean")
     public LocalValidatorFactoryBean localValidatorFactoryBean() {
         final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
-        // Define el origen de mensajes para las validaciones (descomentarlo si es necesario)
-        //localValidatorFactoryBean.setValidationMessageSource(messageSource);
 
         // Aplica configuraciones personalizadas después de inicializar las propiedades
         localValidatorFactoryBean.afterPropertiesSet();

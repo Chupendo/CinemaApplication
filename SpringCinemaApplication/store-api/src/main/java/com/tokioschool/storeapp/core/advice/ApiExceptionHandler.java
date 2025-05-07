@@ -4,6 +4,7 @@ import com.tokioschool.storeapp.core.exception.InternalErrorException;
 import com.tokioschool.storeapp.core.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 @RestControllerAdvice(annotations = RestController.class)
+@Slf4j
 public class ApiExceptionHandler {
 
     /**
@@ -137,6 +139,7 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public Map<String, String> handleExceptionError(Exception ex, HttpServletRequest request) {
+        log.error("Error interno del servidor", ex);
         return Map.of("message", ex.getMessage(), "request", request.getRequestURI());
     }
 }

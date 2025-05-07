@@ -4,6 +4,7 @@ import com.tokioschool.filmapp.dto.user.UserFormDto;
 import com.tokioschool.filmapp.records.SearchUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,6 +38,7 @@ public class RegisterUserValidation extends CustomValidatorBean {
     /**
      * Bean de validación local para realizar validaciones estándar.
      */
+    @Qualifier("filmApiLocalValidatorFactoryBean")
     private final LocalValidatorFactoryBean localValidatorFactoryBean;
 
     /**

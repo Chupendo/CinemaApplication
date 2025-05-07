@@ -124,6 +124,8 @@
                                 <div class="mb-3">
                                     <label for="score" class="form-label" th:text="#{film.label.rate.range}">Puntuación (1 a 5)</label>
                                     <select class="form-select" th:field="*{score}" id="score" required>
+                                        <option th:value="0">-- Rate</option>
+                                        <option th:value="6">6</option>
                                         <option th:value="1">1 - Muy mala</option>
                                         <option th:value="2">2 - Mala</option>
                                         <option th:value="3">3 - Regular</option>

@@ -36,9 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/web/films")
@@ -201,10 +199,17 @@ public class FilmMvcController {
 
     @PostMapping("/rate")
     @PreAuthorize("isAuthenticated()")
-    public String rateMovie(@ModelAttribute("rating") RatingFilmDto ratingFilmDto, RedirectAttributes redirectAttributes) {
+    public String rateMovie(@Valid @ModelAttribute("rating") RatingFilmDto ratingFilmDto, BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes) {
         // Aquí iría la lógica para guardar la puntuación
         // ratingService.save(ratingDto);
-
+        if( bindingResult.hasErrors() ){
+            Map<String,String> errorMsg = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(fieldError -> errorMsg.put(fieldError.getField(),fieldError.getDefaultMessage()));
+            final String errorRate = translatedMessageHelper.getMessage("film.msg.rate.error");
+            log.error(errorRate, errorMsg);
+            redirectAttributes.addFlashAttribute("error", errorRate);
+        }
         try{
             ratingFacade.registerRating(ratingFilmDto);
             final String successRate = translatedMessageHelper.getMessage("film.msg.rate.success");

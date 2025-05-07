@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,9 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
     /**
      * Nombre de usuario predeterminado para el inicio de sesión.
      */
-    private static final String USERNAME_LOGIN_DEFAULT = "consumer";
+    //private static final String USERNAME_LOGIN_DEFAULT = "consumer";
+    @Value("${application.store.login.users[0].username:consumer}")
+    private String USERNAME_LOGIN_DEFAULT;
 
     /**
      * Obtiene el token de acceso utilizando el nombre de usuario predeterminado.
@@ -90,6 +93,7 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
      */
     @Override
     public synchronized String getAccessToken(String userName) {
+        log.debug("getAccessToken: userName={}", userName);
         final String filterUserName = Optional.ofNullable(userName)
                 .map(StringUtils::trimToNull)
                 .map(String::toLowerCase)

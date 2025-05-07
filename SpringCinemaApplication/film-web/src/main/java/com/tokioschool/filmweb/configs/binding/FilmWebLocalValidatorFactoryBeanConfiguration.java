@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**
@@ -18,7 +19,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  */
 @Configuration
 @RequiredArgsConstructor
-public class LocalValidatorFactoryBeanConfiguration {
+public class FilmWebLocalValidatorFactoryBeanConfiguration {
 
     private final MessageSource messageSource;
 
@@ -31,6 +32,7 @@ public class LocalValidatorFactoryBeanConfiguration {
      * @return Una instancia de \{@link LocalValidatorFactoryBean\}.
      */
     @Bean
+    @Primary
     public LocalValidatorFactoryBean localValidatorFactoryBean() {
         final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
         // Define el origen de mensajes para las validaciones (descomentarlo si es necesario)

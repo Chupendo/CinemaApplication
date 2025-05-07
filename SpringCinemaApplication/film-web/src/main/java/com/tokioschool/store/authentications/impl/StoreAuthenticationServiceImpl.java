@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -47,7 +48,9 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
     /**
      * Nombre de usuario predeterminado para el inicio de sesión.
      */
-    private static final String USERNAME_LOGIN_DEFAULT = "consumer";
+    //private static final String USERNAME_LOGIN_DEFAULT = "consumer";
+    @Value("${application.store.login.users[0].username:consumer}")
+    private String USERNAME_LOGIN_DEFAULT;
 
     @Override
     public String getAccessToken() {
@@ -57,6 +60,7 @@ public class StoreAuthenticationServiceImpl implements StoreAuthenticationServic
 
     @Override
     public String getAccessToken(String userName) {
+        log.debug("getAccessToken: userName={}", userName);
         final String filterUserName = Optional.ofNullable(userName)
                 .map(StringUtils::trimToNull)
                 .map(String::toLowerCase)

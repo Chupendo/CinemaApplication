@@ -1,6 +1,9 @@
 package com.tokioschool.filmapp.dto.ratings;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,6 +52,7 @@ public class RatingFilmDto {
      * Puntuación asignada a la película.
      * Representada como un valor decimal.
      */
+    @NotNull @Min(0) @Max(5)
     private BigDecimal score;
 
     /**
