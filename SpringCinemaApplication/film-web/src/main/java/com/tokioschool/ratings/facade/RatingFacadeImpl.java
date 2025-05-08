@@ -2,7 +2,7 @@ package com.tokioschool.ratings.facade;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokioschool.filmapp.dto.ratings.RatingFilmDto;
-import com.tokioschool.store.dto.ResourceIdDto;
+import com.tokioschool.filmapp.records.AverageRating;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,7 +23,8 @@ public class RatingFacadeImpl implements RatingFacade{
     private final ObjectMapper objectMapper;
 
     private static final String REGISTER_URL = "/api/ratings/register/films";
-    private static final String FIND_RATING_UL = "/api/ratings/films/%d/users/%s";
+    private static final String FIND_RATING_URL = "/api/ratings/films/%d/users/%s";
+    private static final String AVERAGE_RATING_URL = "/api/ratings/ratings-average/films/%d";
 
     @Override
     public RatingFilmDto registerRating(RatingFilmDto ratingFilmDto) {
@@ -57,11 +58,35 @@ public class RatingFacadeImpl implements RatingFacade{
         try {
             // Lanza la petición POST con JSON
             RatingFilmDto response = restClient.get()
-                    .uri(FIND_RATING_UL.formatted(movieId,userId))
+                    .uri(FIND_RATING_URL.formatted(movieId,userId))
                     .retrieve()
                     .body(RatingFilmDto.class);                      // imperativo con RestClient
 
             return Optional.ofNullable(response);
+
+        } catch (RestClientResponseException e) {
+            // Captura 4xx/5xx
+            log.error("Error HTTP al buscar el recurso ({}): {}",
+                    e.getStatusCode().value(),
+                    e.getResponseBodyAsString(),e);
+            return Optional.empty();
+
+        } catch (Exception e) {
+            log.error("Error inesperado al buscar el recurso", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<AverageRating> findRatingAverageByMovieId(Long movieId) {
+        try {
+            // Lanza la petición POST con JSON
+            AverageRating averageRating = restClient.get()
+                    .uri(AVERAGE_RATING_URL.formatted(movieId))
+                    .retrieve()
+                    .body(AverageRating.class);                      // imperativo con RestClient
+
+            return Optional.ofNullable(averageRating);
 
         } catch (RestClientResponseException e) {
             // Captura 4xx/5xx

@@ -18,7 +18,55 @@
                 <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
                 <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
             </button>
-            Content..
+
+            <div class="container mt-4">
+                <!--- start -->
+                <!-- Carrusel de Cardas -->
+                <div>
+                    <div class="card-section">
+                        <h2 class="mb-4 text-center" th:text="#{film.film-app.name}" >Rating * Films</h2>
+
+                        <p th:if="${pageMovieDto.getItems().isEmpty()}"
+                           class="mb-4 text-center" th:text="#{films.text.not-fount}">No se han encontrado peliculas en el sistema</p>
+
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" th:unless="${pageMovieDto.items.isEmpty()}">
+                            <div class="col" th:each="movie : ${pageMovieDto.items}">
+                                <div class="card h-100" id="cardDiv">
+                                    <a th:href="@{/web/films/detail/{movieId}(movieId=${movie.id})}">
+                                        <img th:src="@{/api/resources(rsc=${movie.resourceId})}"
+                                             onerror="this.onerror=null; this.src='/images/default-movie-poster.png';"
+                                             class="card-img-top"
+                                             alt="Cartel de película">
+                                    </a>
+                                    <div class="card-body">
+                                        <h5 class="card-title" th:text="${movie.title}">Película</h5>
+                                        <p class="card-text" th:text="${movie.releaseYear}">Año</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paginación -->
+                        <nav class="mt-4" th:unless="${pageMovieDto.getItems().isEmpty()}">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${pageMovieDto.pageNumber == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|/web/films/list?page=${pageMovieDto.pageNumber - 1}&pageSize=${pageMovieDto.pageSize}|}" th:text="#{pagination.preview}">Anterior</a>
+                                </li>
+
+                                <li class="page-item disabled">
+                                    <span class="page-link" th:text="#{pagination.page(${pageMovieDto.pageNumber + 1}, ${pageMovieDto.totalPages})}"></span>
+                                </li>
+
+                                <li class="page-item" th:classappend="${pageMovieDto.pageNumber + 1 == pageMovieDto.totalPages} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|/web/films/list?page=${pageMovieDto.pageNumber + 1}&pageSize=${pageMovieDto.pageSize}|}" th:text="#{pagination.next}">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- end -->
+            </div>
         </div>
     </div>
     <div class="row">

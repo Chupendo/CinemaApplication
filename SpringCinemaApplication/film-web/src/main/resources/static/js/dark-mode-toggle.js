@@ -48,6 +48,12 @@ function actualizarBoton() {
         table?.classList.remove('table-light');
         table?.classList.add('table-dark');
 
+        // Cambiar el fondo de las tarjetas
+        document.querySelectorAll('.card').forEach(card => {
+            card.classList.remove('bg-light', 'text-dark');
+            card.classList.add('bg-dark', 'text-white');
+        });
+
     } else {
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Oscuro';
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i>';
@@ -73,6 +79,12 @@ function actualizarBoton() {
         // Cambiar el fondo de la tabla
         table?.classList.remove('table-dark');
         table?.classList.add('table-light');
+
+        // Cambiar el fondo de las tarjetas
+        document.querySelectorAll('.card').forEach(card => {
+            card.classList.remove('bg-dark', 'text-white');
+            card.classList.add('bg-light', 'text-dark');
+        });
     }
 }
 

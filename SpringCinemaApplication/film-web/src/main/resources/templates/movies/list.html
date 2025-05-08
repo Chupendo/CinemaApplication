@@ -64,11 +64,20 @@
                     <div class="table-section">
                         <h2 class="mb-4 text-center" th:text="#{film.list.title}" >Listado de Peliculas</h2>
 
+                        <!-- cambiar la vista -->
+                        <div class="d-flex justify-content-end mb-3">
+                            <button class="btn btn-sm border-0 bg-transparent text-primary" id="toggleViewBtn">
+                                <i class="bi bi-grid-fill"></i>
+                            </button>
+                        </div>
+
                         <p th:if="${pageMovieDto.getItems().isEmpty()}"
                            class="mb-4 text-center" th:text="#{films.text.not-fount}">No se han encontrado peliculas en el sistema</p>
 
+                        <!-- Vista en tabla -->
                         <div th:unless="${pageMovieDto.getItems().isEmpty()}"
-                             class="mb-4 text-center table-responsive">
+                             class="mb-4 text-center table-responsive"
+                             id="tableView">
                             <table id="userTable" class="table  table-hover align-middle">
                                 <thead class="table-warning">
                                 <tr>
@@ -91,6 +100,25 @@
                                 </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- Vista en tarjetas -->
+                        <div id="cardView" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4"
+                             th:unless="${pageMovieDto.items.isEmpty()}" style="display: none;">
+                            <div class="col" th:each="movie : ${pageMovieDto.items}">
+                                <div class="card h-100" id="cardDiv">
+                                    <a th:href="@{/web/films/detail/{movieId}(movieId=${movie.id})}">
+                                        <img th:src="@{/api/resources(rsc=${movie.resourceId})}"
+                                             onerror="this.onerror=null; this.src='/images/default-movie-poster.png';"
+                                             class="card-img-top"
+                                             alt="Cartel de película">
+                                    </a>
+                                    <div class="card-body">
+                                        <h5 class="card-title" th:text="${movie.title}">Película</h5>
+                                        <p class="card-text" th:text="${movie.releaseYear}">Año</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Paginación -->
@@ -120,5 +148,22 @@
     </div>
 </div>
 <div th:replace="~{/fragments/common/scripts}"></div>
+<!-- scprit para la vista de tarjetas -->
+<script>
+    const toggleViewButton = document.getElementById('toggleViewBtn');
+    const tableView = document.getElementById('tableView');
+    const cardView = document.getElementById('cardView');
+
+    toggleViewButton.addEventListener('click', () => {
+        const tableVisible = tableView.style.display !== 'none';
+
+        tableView.style.display = tableVisible ? 'none' : 'block';
+        cardView.style.display = tableVisible ? 'flex' : 'none';
+
+        toggleViewButton.innerHTML = tableVisible
+            ? '<i class="bi bi-table"></i>'
+            : '<i class="bi bi-grid-fill"></i>';
+    });
+</script>
 </body>
 </html>

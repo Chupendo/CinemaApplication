@@ -1,12 +1,12 @@
 package com.tokioschool.filmweb.controllers.mvc;
 
 import com.tokioschool.core.exception.OperationNotAllowException;
-import com.tokioschool.filmapp.domain.RatingFilm;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
 import com.tokioschool.filmapp.dto.ratings.RatingFilmDto;
 import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIST;
+import com.tokioschool.filmapp.records.AverageRating;
 import com.tokioschool.filmapp.records.RangeReleaseYear;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import com.tokioschool.filmapp.services.artist.ArtistService;
@@ -21,11 +21,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -122,6 +120,10 @@ public class FilmMvcController {
             RatingFilmDto ratingFilmDto = ratingFacade.findRatingByUserIdAndMovieId(userId,movieId)
                             .orElseGet( () ->  RatingFilmDto.builder().filmId(movieId).userId( userId ).build());
             model.addAttribute("rating", ratingFilmDto );
+            // todo añadir el average
+            AverageRating averageRating = ratingFacade.findRatingAverageByMovieId(movieId)
+                    .orElseGet(() -> AverageRating.builder().average(0.0).ratings(0L).build());
+            model.addAttribute("averageRating", averageRating );
         }
 
         return "movies/form";

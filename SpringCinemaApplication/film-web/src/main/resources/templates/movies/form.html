@@ -39,6 +39,14 @@
                         <div class="col-md-8">
                             <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
 
+                                <div class="row">
+                                    <div class="mb-3">
+                                            <span class="fw-bold" th:text="#{film.label.average} + ':'">Valoracion</span>
+                                            <span th:text="${averageRating.average}" th:if="${averageRating != null} and ${averageRating.average() != 0.0}">Rate average</span>
+                                            <span th:text="#{film.label.average-null}" th:unless="${averageRating != null} and ${averageRating.average != 0.0}">-- Rate average</span>
+                                    </div>
+                                </div>
+
                                 <form th:action="@{/web/films/form/{movieId}(movieId=*{id})}" th:object="${movie}" method="post"
                                       enctype="multipart/form-data"
                                       class="row g-3">
@@ -62,7 +70,7 @@
                                         <select  class="form-select" th:field="*{managerDto}" size="4" id="manager" th:attrappend="disabled=${disabledAttr}">
                                             <option th:each="manager : ${managers}"
                                                     th:value="${manager.id}"
-                                                    th:text="${manager.name}">Director
+                                                    th:text="${manager.name+' '+manager.surname}">Manager
                                             </option>
                                         </select>
                                         <div class="text-danger" th:if="${#fields.hasErrors('managerDto')}" th:errors="*{managerDto}"></div>
@@ -125,7 +133,6 @@
                                     <label for="score" class="form-label" th:text="#{film.label.rate.range}">Puntuación (1 a 5)</label>
                                     <select class="form-select" th:field="*{score}" id="score" required>
                                         <option th:value="0">-- Rate</option>
-                                        <option th:value="6">6</option>
                                         <option th:value="1">1 - Muy mala</option>
                                         <option th:value="2">2 - Mala</option>
                                         <option th:value="3">3 - Regular</option>
