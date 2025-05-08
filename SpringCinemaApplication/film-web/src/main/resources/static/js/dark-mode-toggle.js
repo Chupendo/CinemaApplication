@@ -16,8 +16,12 @@ const sidebarIconsDark = document.querySelectorAll('.sidebar-icon-dark');
 // Obtener el ícono de cerrar del offcanvas
 const iconClose = document.getElementById('iconClose');
 
-// OBtener la tabla del lisatdo de usuairo
+// Obtener la tabla del lisatdo de usuairo
 const table = document.getElementById('userTable');
+
+// Obtener el botón de cerrar del offcanvas
+const dropdownSidebarFilms = document.getElementById('dropdownSidebarFilms');
+const dropdownSidebarUsers = document.getElementById('dropdownSidebarUsers');
 
 // Función para actualizar el botón y los elementos según el modo actual
 function actualizarBoton() {
@@ -54,6 +58,12 @@ function actualizarBoton() {
             card.classList.add('bg-dark', 'text-white');
         });
 
+        // Cambiar el fondo de la tabla
+        // dropdownSidebarFilms?.classList.remove('dropdown-menu');
+        dropdownSidebarFilms?.classList.add('dropdown-menu-dark');
+        // dropdownSidebarUsers?.classList.remove('dropdown-menu');
+        dropdownSidebarUsers?.classList.add('dropdown-menu-dark');
+
     } else {
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Oscuro';
         // toggleButton.innerHTML = '<i class="bi bi-moon-fill"></i>';
@@ -85,6 +95,12 @@ function actualizarBoton() {
             card.classList.remove('bg-dark', 'text-white');
             card.classList.add('bg-light', 'text-dark');
         });
+
+        // Cambiar el fondo de la tabla
+        dropdownSidebarFilms?.classList.remove('dropdown-menu-dark');
+        // dropdownSidebarFilms?.classList.add('dropdown-menu');
+        dropdownSidebarUsers?.classList.remove('dropdown-menu-dark');
+        // dropdownSidebarUsers?.classList.add('dropdown-menu');
     }
 }
 

@@ -20,7 +20,7 @@
             <!-- Language selector -->
             <div class="d-flex">
                 <a class="nav-link text-white" th:href="@{''(lang='en')}" th:if="${#locale.language == 'es'}" th:text="#{film.language.en}">English</a>
-                <a class="nav-link text-white" th:href="@{''(lang='es')}" th:if="${#locale.language == 'en'}" th:text="#{film.language.es}">Castellano</a>
+                <a class="nav-link text-white" th:href="@{''(lang='es')}" th:unless="${#locale.language == 'es'}" th:text="#{film.language.es}">Castellano</a>
             </div>
 
             <!-- Botón responsive -->
@@ -32,10 +32,7 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#" th:text="#{sidebar.label.home}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link"  th:text="#{item.label.artist}"></a>
+                        <a class="nav-link active" th:href="@{/web/index}" th:text="#{sidebar.label.home}">Inicio</a>
                     </li>
                     <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -64,9 +61,6 @@
                                 <a class="dropdown-item" th:href="@{/web/films/form}" th:text="#{item.label.register.movie}">Registar peliculas</a>
                             </li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contacto</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
                         <a class="nav-link" th:text="#{item.label.sign-up}" th:href="@{/web/users/register}">Sign up</a>
@@ -114,45 +108,62 @@
         <div class="offcanvas-body px-0">
             <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link text-truncate">
-                        <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#submenu1" data-bs-toggle="collapse" class="nav-link text-truncate">
-                        <i class="fs-5 bi-speedometer2"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link text-truncate">
-                        <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Orders</span>
-                    </a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">Bootstrap</span>
-                    </a>
-                    <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdown">
-                        <li><a class="dropdown-item" href="#">New project...</a></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#" class="nav-link text-truncate">
-                        <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Products</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link text-truncate">
-                        <i class="fs-5 bi-people"></i><span class="ms-1 d-none d-sm-inline">Customers</span>
+                    <a th:href="@{/web/index}" class="nav-link text-truncate">
+                        <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline" th:text="#{sidebar.label.home}">Home</span>
                     </a>
                 </li>
             </ul>
+            <div sec:authorize="isAuthenticated()">
+                <hr>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu-movies">
+                    <li class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdownMovies" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fs-5 bi-film"></i><span class="ms-1 d-none d-sm-inline">Movies</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownMovies" id="dropdownSidebarFilms">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/list}" th:text="#{item.label.list.movie}">Ver películas</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/form}" th:text="#{item.label.register.movie}">Registrar películas</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu-people">
+                    <li sec:authorize="isAnonymous()">
+                        <a th:href="@{/web/users/register}" class="nav-link text-truncate">
+                            <i class="fs-5 bi bi-person-plus"></i><span class="ms-1 d-none d-sm-inline" th:text="#{item.label.sign-up}">Sign up</span>
+                        </a>
+                    </li>
+                    <li sec:authorize="isAnonymous()">
+                        <a th:href="@{/login}" class="nav-link text-truncate">
+                            <i class="fs-5 bi bi-door-open"></i><span class="ms-1 d-none d-sm-inline" th:text="#{item.label.sign-in}">Sign in</span>
+                        </a>
+                    </li>
+                    <li class="dropdown" sec:authorize="isAuthenticated()">
+                        <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fs-5 bi bi-person-circle"></i><span class="ms-1 d-none d-sm-inline" th:text="#{item.label.user}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown" id="dropdownSidebarUsers">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/users/profile}" th:text="#{item.label.profile}">Profile</a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item" th:href="@{/web/users/list}" th:text="#{item.label.list.user}">List</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/logout}" th:text="#{item.label.sign-out}">Sign Out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
         </div>
     </div>
 </nav>

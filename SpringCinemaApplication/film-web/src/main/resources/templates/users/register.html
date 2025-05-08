@@ -24,7 +24,7 @@
             <section >
                 <div class="container h-custom">
                     <div class="row d-flex justify-content-center align-items-center h-100">
-                        <h2 class="mb-4">Formulario de Usuario</h2>
+                        <h2 class="mb-4" th:text="#{form.user.title}">Formulario de Usuario</h2>
                         <div class="col-md-4">
                             <img th:if="${resourceImageId == null}" th:src="@{/images/default-profile.svg}" class="card-img-top img-fluid" alt="image">
                             <img th:if="${resourceImageId != null}" th:src="@{/flight/resources(rsc=${resourceImageId})}" class="card-img-top img-fluid" alt="image">
@@ -47,43 +47,43 @@
                                 <input type="hidden" th:field="*{id}"/>
 
                                 <div class="col-md-6">
-                                    <label for="name" class="form-label">Nombre</label>
+                                    <label for="name" class="form-label" th:text="#{user.label.name}">Nombre</label>
                                     <input type="text" id="name" class="form-control" th:field="*{name}" required>
                                     <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="surname" class="form-label">Apellido</label>
+                                    <label for="surname" class="form-label" th:text="#{user.label.surname}">Apellido</label>
                                     <input type="text" id="surname" class="form-control" th:field="*{surname}" required>
                                     <div class="text-danger" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="username" class="form-label">Usuario</label>
+                                    <label for="username" class="form-label" th:text="#{user.label.username}">Usuario</label>
                                     <input type="text" id="username" class="form-control" th:field="*{username}" required>
                                     <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="password" class="form-label">Contraseña</label>
+                                    <label for="password" class="form-label" th:text="#{user.label.password}">Contraseña</label>
                                     <input type="password" id="password" class="form-control" th:field="*{password}" required>
                                     <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="passwordBis" class="form-label">Contraseña Bis</label>
+                                    <label for="passwordBis" class="form-label" th:text="#{user.label.password.bis}">Contraseña Bis</label>
                                     <input type="password" id="passwordBis" class="form-control" th:field="*{passwordBis}" required>
                                     <div class="text-danger" th:if="${#fields.hasErrors('passwordBis')}" th:errors="*{passwordBis}"></div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="email" class="form-label">Correo Electrónico</label>
+                                    <label for="email" class="form-label" th:text="#{user.label.email}">Correo Electrónico</label>
                                     <input type="email" id="email" class="form-control" th:field="*{email}" required>
                                     <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
+                                    <label for="birthDate" class="form-label" th:text="#{user.label.birthdate}">Fecha de Nacimiento</label>
                                     <input type="date" id="birthDate" class="form-control"
                                            th:field="*{birthDate}">
 <!--                                           th:value="${user.birthDate != null ? #temporals.format(user.birthDate, 'yyyy-MM-dd') : ''}">-->
@@ -97,14 +97,14 @@
                                     <!--                                <label for="resourceId" class="form-label">ID Recurso</label>-->
                                     <!--                                <input type="text" id="resourceId" class="form-control" th:field="*{resourceId}">-->
                                     <!-- id of input equal to for label -->
-                                    <label for="file" class="col-md-2 col-form-label" th:text="Image"></label>
+                                    <label for="file" class="col-md-2 col-form-label" th:text="#{user.label.photo}"></label>
                                     <div class="col">
                                         <input type="file" class="form-control"  id="file" name="file">
                                     </div>
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Roles</label>
+                                    <label class="form-label" th:text="#{user.label.roles}">Roles</label>
                                     <select multiple class="form-select" th:field="*{roles}" size="4">
                                         <option th:each="role : ${allRolesName}"
                                                 th:value="${role}"
@@ -112,13 +112,13 @@
                                                 th:selected="${allRolesName.contains(role)}">
                                         </option>
                                     </select>
-                                    <div class="form-text italic">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
+                                    <div class="form-text italic" th:text="#{user.note.roles}">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
                                     <div class="text-danger" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></div>
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">Guardar</button>
-                                    <a th:href="@{/web/index}" class="btn btn-secondary">Cancelar</a>
+                                    <button type="submit" class="btn btn-primary" th:text="#{item.label.save}">Guardar</button>
+                                    <a th:href="@{/web/index}" class="btn btn-secondary" th:text="#{item.label.cancel}">Cancelar</a>
                                 </div>
                             </form>
                         </div>

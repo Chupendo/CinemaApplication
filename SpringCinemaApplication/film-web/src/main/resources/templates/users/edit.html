@@ -116,7 +116,7 @@
                                             </option>
                                         </select>
                                         <div th:if="${#fields.hasErrors('roles')}" class="text-danger" th:errors="*{roles}"></div>
-                                        <div class="form-text italic">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
+                                        <div class="form-text italic" th:text="#{user.note.roles}">Mantén pulsado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</div>
                                         <div class="text-danger" th:if="${#fields.hasErrors('roles')}" th:errors="*{roles}"></div>
                                     </div>
 
