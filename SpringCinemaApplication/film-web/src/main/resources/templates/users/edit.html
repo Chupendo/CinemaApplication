@@ -3,6 +3,7 @@
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       class="bg-light text-dark"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
 >
 <!-- @thymesVar id="user" type="com.tokioschool.filmapp.dto.user.UserFormDto" -->
 
@@ -56,35 +57,35 @@
 
                                     <!-- Nombre -->
                                     <div class="mb-3">
-                                        <label for="name" class="form-label">Nombre</label>
+                                        <label for="name" class="form-label" th:text="#{user.label.name}">Nombre</label>
                                         <input type="text" th:field="*{name}" class="form-control" id="name" required th:attrappend="disabled=${disabledAttr}">
                                         <div th:if="${#fields.hasErrors('name')}" class="text-danger" th:errors="*{name}"></div>
                                     </div>
 
                                     <!-- Apellido -->
                                     <div class="mb-3">
-                                        <label for="surname" class="form-label">Apellido</label>
+                                        <label for="surname" class="form-label" th:text="#{user.label.surname}">Apellido</label>
                                         <input type="text" th:field="*{surname}" class="form-control" id="surname" required th:attrappend="disabled=${disabledAttr}">
                                         <div th:if="${#fields.hasErrors('surname')}" class="text-danger" th:errors="*{surname}"></div>
                                     </div>
 
                                     <!-- Username -->
                                     <div class="mb-3">
-                                        <label for="username" class="form-label">Usuario</label>
+                                        <label for="username" class="form-label" th:text="#{user.label.username}">Usuario</label>
                                         <input type="text" th:field="*{username}" class="form-control" id="username" required th:attrappend="disabled=${disabledAttr}">
                                         <div th:if="${#fields.hasErrors('username')}" class="text-danger" th:errors="*{username}"></div>
                                     </div>
 
                                     <!-- Email -->
                                     <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
+                                        <label for="email" class="form-label" th:text="#{user.label.email}">Email</label>
                                         <input type="email" th:field="*{email}" class="form-control" id="email" th:attrappend="disabled=${disabledAttr}">
                                         <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}"></div>
                                     </div>
 
                                     <!-- Fecha de Nacimiento -->
                                     <div class="mb-3">
-                                        <label for="birthDate" class="form-label">Fecha de Nacimiento</label>
+                                        <label for="birthDate" class="form-label" th:text="#{user.label.birthdate}">Fecha de Nacimiento</label>
                                         <input type="date" th:field="*{birthDate}" class="form-control" id="birthDate" required th:attrappend="disabled=${disabledAttr}">
                                         <div th:if="${#fields.hasErrors('birthDate')}" class="text-danger"
                                              th:errors="*{birthDate}"
@@ -92,8 +93,8 @@
                                     </div>
 
                                     <!-- Imagen: si profileMode es true oculto -->
-                                    <div class="mb-3" th:if="${!(profileMode ?: false)}">
-                                        <label for="file" class="col-md-2 col-form-label" th:text="Image"></label>
+                                    <div class="mb-3" th:if="${!(profileMode ?: false)}" sec:authorize="isAuthenticated()">
+                                        <label for="file" class="col-md-2 col-form-label" th:text="#{user.label.photo}"></label>
                                         <div class="col">
                                             <input type="file" class="form-control"  id="file" name="file">
                                         </div>
@@ -101,13 +102,13 @@
 
                                     <!-- Roles -->
                                     <div class="mb-3" th:unless="${!(profileMode ?: false)}">
-                                        <label for="roles-view" class="form-label">Roles</label>
+                                        <label for="roles-view" class="form-label" th:text="#{user.label.roles}">Roles</label>
                                         <select multiple class="form-select" th:field="*{roles}" id="roles-view" required th:attrappend="disabled=${disabledAttr}">
                                             <option th:each="role : *{roles}" th:value="${role}" th:text="${role}"></option>
                                         </select>
                                     </div>
                                     <div class="mb-3" th:if="${!(profileMode ?: false)}">
-                                        <label for="roles" class="form-label">Roles</label>
+                                        <label for="roles" class="form-label" th:text="#{user.label.roles}">Roles</label>
                                         <select multiple class="form-select" th:field="*{roles}" size="4" id="roles">
                                             <option th:each="role : ${allRolesName}"
                                                     th:value="${role}"

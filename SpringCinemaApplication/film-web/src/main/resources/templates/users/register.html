@@ -92,7 +92,7 @@
                                          th:attr="max=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-6" sec:authorize="isAuthenticated()">
                                     <!--                                <label for="resourceId" class="form-label">ID Recurso</label>-->
                                     <!--                                <input type="text" id="resourceId" class="form-control" th:field="*{resourceId}">-->
                                     <!-- id of input equal to for label -->
