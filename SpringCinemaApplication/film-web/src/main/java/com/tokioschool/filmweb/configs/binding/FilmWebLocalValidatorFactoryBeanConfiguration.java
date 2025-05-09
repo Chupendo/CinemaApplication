@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.util.Optional;
+
 /**
  * Configuración para el bean de \{@link LocalValidatorFactoryBean\} utilizado en la validación de datos.
  *
@@ -35,8 +37,10 @@ public class FilmWebLocalValidatorFactoryBeanConfiguration {
     @Primary
     public LocalValidatorFactoryBean localValidatorFactoryBean() {
         final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+
         // Define el origen de mensajes para las validaciones (descomentarlo si es necesario)
-        localValidatorFactoryBean.setValidationMessageSource(messageSource);
+        //localValidatorFactoryBean.setValidationMessageSource(messageSource); // Illegal Argument: MessageSource must not be null
+        Optional.ofNullable(messageSource).ifPresent(localValidatorFactoryBean::setValidationMessageSource);
 
         // Aplica configuraciones personalizadas después de inicializar las propiedades
         localValidatorFactoryBean.afterPropertiesSet();

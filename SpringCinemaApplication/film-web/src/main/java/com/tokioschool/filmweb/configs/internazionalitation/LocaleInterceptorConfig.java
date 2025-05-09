@@ -47,7 +47,8 @@ public class LocaleInterceptorConfig implements WebMvcConfigurer {
     public LocaleResolver localeResolver() {
         log.info("LocaleInterceptorConfig.localeResolver() -> defaultLocale: {}", defaultLocale);
         CookieLocaleResolver localeResolver = new CookieLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.of(defaultLocale));
+        String localeToSet = (defaultLocale != null && !defaultLocale.isBlank()) ? defaultLocale : "en";
+        localeResolver.setDefaultLocale(Locale.forLanguageTag(localeToSet));
         return localeResolver;
     }
 

@@ -51,7 +51,7 @@ public class ArtistMvcController {
      */
     @GetMapping("/list")
     @PreAuthorize("isAuthenticated()")
-    public String listPageArtis(
+    public String listPageArtisHandler(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
             @ModelAttribute("searchArtistRecord") SearchArtistRecord searchArtistRecord,

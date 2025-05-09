@@ -1,6 +1,7 @@
 package com.tokioschool.store.authentications.impl;
 
 import com.tokioschool.store.properties.StorePropertiesFilm;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,6 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClient;
 
@@ -37,7 +39,12 @@ class StoreAuthenticationServiceImplUTest {
     public StoreAuthenticationServiceImpl storeAuthenticationService;
 
     private static final String RESOURCE_PATH = "/store/api/auth";
-    private static final String USERNAME_LOGIN_DEFAULT  =   "consumer";
+    private static final String USERNAME_LOGIN_DEFAULT  =   "user";
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(storeAuthenticationService, "USERNAME_LOGIN_DEFAULT", "user");
+    }
 
     @Test
     void givenNewAuthenticationByDefault_whenGetAccessToken_thenTokenIsGenerated() {

@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 public class FormatterRegisterConfig implements WebMvcConfigurer {
 
     /**
-     * Sobrescribe el método para agregar formateadores al registro.
+     * Sobrescribe el metodo para agregar formateadores al registro.
      *
      * @param registry El registro de formateadores donde se agregan los personalizados.
      */
