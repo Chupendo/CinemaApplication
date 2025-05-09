@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.services.user;
 
+import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.dto.user.UserFormDto;
@@ -36,6 +37,12 @@ public interface UserService {
      */
     Optional<UserDto> findByEmail(String email);
 
+    /**
+     *
+     * @param userFormDTO
+     * @return
+     */
+    UserDto registerOrUpdatedUser(UserFormDto userFormDTO);
     /**
      * Registra un nuevo usuario en el sistema.
      *
@@ -84,4 +91,9 @@ public interface UserService {
      * @return Un objeto {@link PageDTO} que contiene la lista de usuarios encontrados.
      */
     PageDTO<UserDto> searchUsers(int page, int pageSize, SearchUserRecord searchUserRecord);
+
+
+    boolean operationEditAllow(String userId);
+
+    User getUserById(String id);
 }

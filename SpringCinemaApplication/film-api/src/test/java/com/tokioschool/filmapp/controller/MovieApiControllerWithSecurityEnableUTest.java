@@ -36,7 +36,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @TestPropertySource(properties = {
         "logging.level.org.springframework.security=DEBUG",
         "jwt.secret=secretos123123",
-        "jwt.expiration=PT1H"
+        "jwt.expiration=PT1H",
+        "spring.liquibase.enabled=false",
+        "spring.jpa.hibernate.ddl-auto=create-drop"
 })
 class MovieApiControllerWithSecurityEnableUTest {
 

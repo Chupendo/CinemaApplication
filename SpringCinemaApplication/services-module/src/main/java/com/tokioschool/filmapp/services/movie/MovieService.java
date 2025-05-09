@@ -5,6 +5,10 @@ import com.tokioschool.filmapp.dto.common.PageDTO;
 import com.tokioschool.filmapp.dto.movie.MovieDto;
 import com.tokioschool.filmapp.records.SearchMovieRecord;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Interfaz para el servicio de gestión de películas.

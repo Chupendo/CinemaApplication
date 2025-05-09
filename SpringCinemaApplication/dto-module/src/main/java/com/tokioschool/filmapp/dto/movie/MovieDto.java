@@ -1,6 +1,7 @@
 package com.tokioschool.filmapp.dto.movie;
 
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
+import com.tokioschool.filmapp.dto.user.UserDto;
 import com.tokioschool.filmapp.enums.TYPE_ARTIS_DTO;
 import com.tokioschool.filmapp.validators.anotations.TypeArtistValid;
 import com.tokioschool.filmapp.validators.anotations.TypeArtistsValid;
@@ -71,4 +72,6 @@ public class MovieDto {
      */
     @Size(min = 36, max = 36)
     private String resourceId;
+
+    private UserDto createUser;
 }

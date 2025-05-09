@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -40,12 +41,32 @@ class MovieDaoUTest {
                 i ->{
                     // artist
                     TYPE_ARTIST[] types = TYPE_ARTIST.values();
-                    artists = IntStream.range(1,3).mapToObj(j ->
-                         Artist.builder()
-                                .name(faker.superhero().name())
-                                .surname(faker.superhero().prefix())
-                            .typeArtist(types[getRandom(0, types.length-1)])
-                                .build()
+                    artists = IntStream.range(1,10).mapToObj(j ->{
+                                Artist artist;
+                                if(j==1){
+                                    artist = Artist.builder()
+                                            .name(faker.superhero().name())
+                                            .surname(faker.superhero().prefix())
+                                            .typeArtist(TYPE_ARTIST.DIRECTOR)
+                                            .build();
+                                }else if(j==2){
+                                    artist = Artist.builder()
+                                            .name(faker.superhero().name())
+                                            .surname(faker.superhero().prefix())
+                                            .typeArtist(TYPE_ARTIST.ACTOR)
+                                            .build();
+
+                                }else{
+                                    artist= Artist.builder()
+                                            .name(faker.superhero().name())
+                                            .surname(faker.superhero().prefix())
+                                            .typeArtist(types[getRandom(0, types.length-1)])
+                                            .build();
+                                }
+
+                                return artist;
+                            }
+
                     ).toList();
 
                     artistDao.saveAll(artists);
@@ -160,6 +181,22 @@ class MovieDaoUTest {
         Assertions.assertThat(moviesNotExported)
                 .isEmpty();
     }
+
+    @Test
+    @Order(9)
+    void givenAnArtist_whenGetMovies_thenReturnOk(){
+        final Artist manager =  artists.stream().filter(artist -> artist.getTypeArtist().equals(TYPE_ARTIST.DIRECTOR))
+                .findAny().orElse(null);
+
+        final List<Movie> moviesManager = Optional.ofNullable(manager)
+                .map(Artist::getId)
+                .map(managerId -> movieDao.findMovieByManagerId( managerId ))
+                .orElse(List.of());
+
+        Assertions.assertThat(moviesManager)
+                .isNotEmpty();
+    }
+
     /**
      * Get a number random between [min,max]
      *

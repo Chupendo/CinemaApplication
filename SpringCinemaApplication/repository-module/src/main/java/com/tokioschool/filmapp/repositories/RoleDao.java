@@ -4,6 +4,8 @@ import com.tokioschool.filmapp.domain.Role;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Repositorio para la entidad {@link Role}.
  *
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoleDao extends CrudRepository<Role, Long> {
 
+    List<Role> findAll();
     /**
      * Busca un rol por su nombre, ignorando mayúsculas y minúsculas.
      *

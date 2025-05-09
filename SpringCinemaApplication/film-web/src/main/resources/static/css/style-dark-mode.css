@@ -1,0 +1,71 @@
+body.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+/* Navbar y offcanvas en bg-light */
+.navbar.bg-light,
+.offcanvas.bg-light {
+    font-weight: bold;
+    color: #212529;
+}
+
+.navbar.bg-light .nav-link,
+.offcanvas.bg-light .nav-link {
+    color: #212529;
+    font-weight: bold;
+}
+
+.navbar.bg-light .nav-link:hover,
+.offcanvas.bg-light .nav-link:hover {
+    color: #0d6efd; /* color hover en modo light */
+}
+
+/* Navbar y offcanvas en bg-dark */
+.navbar.bg-dark,
+.offcanvas.bg-dark {
+    color: #f8f9fa;
+}
+
+.navbar.bg-dark .nav-link,
+.offcanvas.bg-dark .nav-link {
+    color: #f8f9fa;
+}
+
+.navbar.bg-dark .nav-link:hover,
+.offcanvas.bg-dark .nav-link:hover {
+    color: #ffc107; /* color hover en modo dark */
+}
+
+/* asegurarnos de que el ícono mantenga colores apropiados en función del fondo oscuro o claro */
+/* Ícono claro (modo claro) */
+#darkModeToggle .bi-brightness-high-fill {
+    color: #f8f9fa; /* Ícono claro */
+}
+
+/* Ícono oscuro (modo oscuro) */
+#darkModeToggle .bi-moon-fill {
+    color: #f8f9fa; /* Ícono de luna en color claro */
+}
+
+
+/* Cuando el modo oscuro esté activado */
+body.dark-mode .sidebar-icon-dark {
+    display: block;  /* Mostrar el ícono del modo oscuro */
+    color: white;    /* Puedes ajustar el color si es necesario */
+}
+
+body.dark-mode .sidebar-icon-light {
+    display: none;   /* Ocultar el ícono del modo claro */
+}
+
+/* Cuando el modo claro esté activado */
+body:not(.dark-mode) .sidebar-icon-dark {
+    display: none;   /* Ocultar el ícono del modo oscuro */
+}
+
+body:not(.dark-mode) .sidebar-icon-light {
+    display: block;  /* Mostrar el ícono del modo claro */
+    color: black;    /* Puedes ajustar el color si es necesario */
+}
+

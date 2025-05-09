@@ -53,7 +53,7 @@ public class RatingFilm {
      * Este campo no puede ser nulo.
      */
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private String userId;
 
     /**
      * Marca de tiempo de creación de la calificación.

@@ -1,0 +1,7 @@
+# JWT Token
+rating:
+  base-url: http://localhost:9095
+  grant-type: client_credentials
+  client:
+    user: oauth-client
+    password: c2VjcmV0Mw==

@@ -35,7 +35,9 @@ import java.util.List;
 @TestPropertySource(properties = {
         "logging.level.org.springframework.security=DEBUG",
         "jwt.secret=secretos123123",
-        "jwt.expiration=PT1H"
+        "jwt.expiration=PT1H",
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.liquibase.enabled=false"
 })
 class AuthenticationApiControllerWithSecurityEnableUTest {
 

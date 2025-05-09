@@ -1,0 +1,169 @@
+<nav th:fragment="nav()"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+
+            <!-- Logo -->
+            <img th:src="@{/images/logo.webp}" alt="Icono" class="img-fluid" style="width: 30px; height: 30px;">
+            <a class="navbar-brand d-flex align-items-center" th:href="@{/web/index}" th:text="#{film.film-app.name}">Mi Sitio</a>
+
+            <!-- Botón modo oscuro/claro -->
+            <button id="darkModeToggle" class="btn btn-dark ms-auto me-2">
+                <i id="iconMode" class="bi bi-brightness-high-fill"></i>
+            </button>
+
+            <!-- Language selector -->
+            <div class="d-flex">
+                <a class="nav-link text-white" th:href="@{''(lang='en')}" th:if="${#locale.language == 'es'}" th:text="#{film.language.en}">English</a>
+                <a class="nav-link text-white" th:href="@{''(lang='es')}" th:unless="${#locale.language == 'es'}" th:text="#{film.language.es}">Castellano</a>
+            </div>
+
+            <!-- Botón responsive -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Enlaces del menú -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/web/index}" th:text="#{sidebar.label.home}">Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"  th:text="#{item.label.artist}">
+                            Artists
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/artists/list}" th:text="#{item.label.list.artist}">Ver Artistas</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/artists/form}" th:text="#{item.label.new.artist}">Registrar Artistas</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"  th:text="#{item.label.films}">
+                            Movies
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/list}" th:text="#{item.label.list.movie}">Ver peliculas</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/form}" th:text="#{item.label.register.movie}">Registar peliculas</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:text="#{item.label.sign-up}" th:href="@{/web/users/register}">Sign up</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/login}" th:text="#{item.label.sign-in}">Sign in</a>
+                    </li>
+                    <li class="nav-item dropdown dropstart" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false"  th:text="#{item.label.user}">
+                            User
+                        </a>
+                        <ul class="dropdown-menu  dropdown-menu-dark">
+                            <li><a class="dropdown-item disabled text-white-50" sec:authentication="name"></a></li>
+                            <li><hr class="dropdown dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/users/profile}" th:text="#{item.label.profile}">Profile</a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item" th:href="@{/web/users/list}" th:text="#{item.label.list.user}">List</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/logout}" th:text="#{item.label.sign-out}">Sign Out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="offcanvas offcanvas-start w-25" tabindex="-1" id="offcanvas" data-bs-keyboard="false" data-bs-backdrop="false">
+        <div class="offcanvas-header">
+            <div class="flex flex-row">
+                <img th:src="@{/images/logo.webp}" alt="Icono" class="img-fluid" style="width: 30px; height: 30px;">
+                <span class="ms-1 d-none d-sm-inline" th:text="#{film.film-app.name}"></span>
+                <button type="button" data-bs-dismiss="offcanvas" th:aria-label="#{btn.label.close}">
+                    <i id="iconClose" class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+        <hr>
+        <div class="offcanvas-body px-0">
+            <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+                <li class="nav-item">
+                    <a th:href="@{/web/index}" class="nav-link text-truncate">
+                        <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline" th:text="#{sidebar.label.home}">Home</span>
+                    </a>
+                </li>
+            </ul>
+            <div sec:authorize="isAuthenticated()">
+                <hr>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu-movies">
+                    <li class="dropdown">
+                        <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdownMovies" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fs-5 bi-film"></i><span class="ms-1 d-none d-sm-inline">Movies</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownMovies" id="dropdownSidebarFilms">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/list}" th:text="#{item.label.list.movie}">Ver películas</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/films/form}" th:text="#{item.label.register.movie}">Registrar películas</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <hr>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu-people">
+                    <li sec:authorize="isAnonymous()">
+                        <a th:href="@{/web/users/register}" class="nav-link text-truncate">
+                            <i class="fs-5 bi bi-person-plus"></i><span class="ms-1 d-none d-sm-inline" th:text="#{item.label.sign-up}">Sign up</span>
+                        </a>
+                    </li>
+                    <li sec:authorize="isAnonymous()">
+                        <a th:href="@{/login}" class="nav-link text-truncate">
+                            <i class="fs-5 bi bi-door-open"></i><span class="ms-1 d-none d-sm-inline" th:text="#{item.label.sign-in}">Sign in</span>
+                        </a>
+                    </li>
+                    <li class="dropdown" sec:authorize="isAuthenticated()">
+                        <a href="#" class="nav-link dropdown-toggle text-truncate" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fs-5 bi bi-person-circle"></i><span class="ms-1 d-none d-sm-inline" th:text="#{item.label.user}">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown" id="dropdownSidebarUsers">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/web/users/profile}" th:text="#{item.label.profile}">Profile</a>
+                            </li>
+                            <li sec:authorize="hasRole('ADMIN')">
+                                <a class="dropdown-item" th:href="@{/web/users/list}" th:text="#{item.label.list.user}">List</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/logout}" th:text="#{item.label.sign-out}">Sign Out</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</nav>

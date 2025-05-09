@@ -5,6 +5,7 @@ import com.tokioschool.filmapp.validators.anotations.EnumListValid;
 import com.tokioschool.filmapp.validators.anotations.PasswordBis;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,15 +55,18 @@ public class UserFormDto {
      * Contraseña del usuario.
      * Debe cumplir con un patrón que garantice seguridad (mínimo 8 caracteres,
      * al menos una letra mayúscula, una minúscula, un número y un carácter especial).
+     *
+     *      * Verificado en {@link PasswordBis} para garantizar que coincida con la contraseña.
      */
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$", message = "Password invalid")
+    //@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{form.error.user.password.pattern}" )
     private String password;
 
     /**
      * Confirmación de la contraseña del usuario.
      * Debe cumplir con el mismo patrón que la contraseña.
+     * Verificado en {@link PasswordBis} para garantizar que coincida con la contraseña.
      */
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$", message = "Password invalid")
+    //@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=]).{8,}$",     message = "{form.error.user.password.pattern}" )
     private String passwordBis;
 
     /**
@@ -91,15 +95,17 @@ public class UserFormDto {
      * Debe ser una fecha en el pasado.
      * No puede ser nula.
      */
-    @NonNull
-    @Past
+    @NotNull(message = "{form.error.user.birthdate.notnull}")
+    @Past(message = "{form.error.user.birthdate.past}")
+    //@Builder.Default
+    //@DateTimeFormat(pattern = "yyyy-MM-dd") // requerido para el formato de fecha en el formulario de tipo date
     private LocalDate birthDate;
 
     /**
      * Lista de roles asociados al usuario.
      * Validada para garantizar que los valores pertenezcan al enumerado RoleEnum.
      */
-    @EnumListValid(target = RoleEnum.class, required = true, message = "Role don't allow")
+    @EnumListValid(target = RoleEnum.class, required = true, message = "{form.error.user.roles.notvalid}")
     private List<String> roles;
 
     /**
@@ -111,5 +117,11 @@ public class UserFormDto {
     /**
      * Fecha y hora de creación del usuario.
      */
+    //@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // requerido para el formato de fecha en el formulario de tipo datetime-local
     private LocalDateTime created;
+
+    //@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // requerido para el formato de fecha en el formulario de tipo datetime-local
+    private LocalDateTime lastLogin;
+
+
 }

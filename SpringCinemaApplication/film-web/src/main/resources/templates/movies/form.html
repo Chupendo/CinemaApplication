@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      class="bg-light text-dark"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+>
+
+<head th:replace="~{/fragments/common/head :: head(#{form.films.label.form})}"></head>
+<body>
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col min-vh-100 py-3">
+            <!-- toggler -->
+            <button class="btn float-end d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+            </button>
+            <!-- form register -->
+            <section >
+                <div class="container h-custom">
+                    <div class="row d-flex justify-content-center align-items-center h-100">
+                        <h2 class="mb-4" th:text="#{form.films.label.form}">Películas</h2>
+                        <div class="col-md-4">
+                            <img th:src="@{/api/resources(rsc=${movie.getResourceId()})}"
+                                 onerror="this.onerror=null; this.src='/images/default-movie-poster.png';"
+                                 class="card-img-top img-fluid"
+                                 alt="Cartel de película por defecto">
+                        </div>
+                        <div class="col-md-8">
+                            <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
+
+                                <div class="row">
+                                    <div class="mb-3">
+                                            <span class="fw-bold" th:text="#{film.label.average} + ':'">Valoracion</span>
+                                            <span th:text="${averageRating.average}" th:if="${averageRating != null} and ${averageRating.average() != 0.0}">Rate average</span>
+                                            <span th:text="#{film.label.average-null}" th:unless="${averageRating != null} and ${averageRating.average != 0.0}">-- Rate average</span>
+                                    </div>
+                                </div>
+
+                                <form th:action="@{/web/films/form/{movieId}(movieId=*{id})}" th:object="${movie}" method="post"
+                                      enctype="multipart/form-data"
+                                      class="row g-3">
+
+                                    <input type="hidden" th:field="*{id}"/>
+
+                                    <div class="col-md-6">
+                                        <label for="name" class="form-label" th:text="#{film.label.title}">Titulo</label>
+                                        <input type="text" id="name" class="form-control" th:field="*{title}" th:attrappend="disabled=${disabledAttr}" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="releaseYear" class="form-label" th:text="#{film.label.release-year}">Año de publicación</label>
+                                        <input type="number" step="1" min="1895" id="releaseYear" class="form-control" th:field="*{releaseYear}" th:attrappend="disabled=${disabledAttr}" required>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('releaseYear')}" th:errors="*{releaseYear}"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="manager" class="form-label" th:text="#{film.label.manager}">Director</label>
+                                        <!--                                <input type="text"   id="typeArtist" class="form-control" th:field="*{type}" placeholder="Usuario">-->
+                                        <select  class="form-select" th:field="*{managerDto}" size="4" id="manager" th:attrappend="disabled=${disabledAttr}">
+                                            <option th:each="manager : ${managers}"
+                                                    th:value="${manager.id}"
+                                                    th:text="${manager.name+' '+manager.surname}">Manager
+                                            </option>
+                                        </select>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('managerDto')}" th:errors="*{managerDto}"></div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="actor" class="form-label" th:text="#{film.label.actors}">Actores</label>
+                                        <select multiple class="form-select" th:field="*{artistDtos}" size="4" id="actor" th:attrappend="disabled=${disabledAttr}">
+                                            <option th:each="actor : ${actors}"
+                                                    th:value="${actor.id}"
+                                                    th:text="${actor.name+' '+actor.surname}">Actor
+                                            </option>
+                                        </select>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('artistDtos')}" th:errors="*{artistDtos}"></div>
+                                    </div>
+
+                                    <!-- Imagen: si profileMode es true oculto -->
+                                    <div class="mb-3" th:if="${!profileMode}">
+                                        <label for="file" class="col-md-2 col-form-label" th:text="#{film.label.image}"></label>
+                                        <div class="col">
+                                            <input type="file" class="form-control" id="file" name="file">
+                                            <p th:if="${file}" class="form-text text-muted">
+                                                Imagen cargada: <span th:text="${file.name}">nombre.jpg</span>
+                                            </p>
+                                        </div>
+                                        <div class="text-danger" th:if="${#fields.hasErrors('resourceId')}" th:errors="*{resourceId}"></div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary" th:text="#{item.label.save}" th:if="${!profileMode}">Guardar</button>
+                                        <a th:href="@{/web/films/form/{filmdId}(filmdId=*{id})}" class="btn btn-warning" th:if="${profileMode}" sec:authorize="hasRole('ADMIN')" th:text="#{item.label.edit}">Editar</a>
+                                        <a th:href="@{/web/index}" class="btn btn-secondary" th:text="#{item.label.cancel}">Cancelar</a>
+                                    </div>
+                                </form>
+                            </th:block>
+                        </div>
+                    </div>
+
+                    <div class="container mt-4" th:if="${profileMode}">
+                        <div class="mb-3">
+                            <p>
+                                <span class="fw-bold" th:text="#{film.label.created-by} + ':'">Creado por:</span>
+                                <span th:text="${movie.createUser.name + ' ' + movie.createUser.surname}">Nombre Apellido</span>
+                            </p>
+                        </div>
+                        <hr>
+                        <h4 th:text="#{film.label.rate}">Tu Puntuacion</h4>
+                        <p th:unless="${rating.score}" th:text="#{film.label.rate.pending}">
+                            Pendiente
+                        </p>
+                        <div th:if="${rating.score}" th:text="${rating.score}">
+                            Puntuiación
+                        </div>
+                        <div th:unless="${rating.score}">
+                            <h4 th:text="#{film.label.rate.title}">Puntuar película</h4>
+                            <form th:action="@{/web/films/rate}" th:object="${rating}" method="post">
+                                <input type="hidden" th:field="*{userId}" th:value="*{userId}" />
+                                <input type="hidden" th:field="*{filmId}" th:value="*{filmId}" />
+                                <div class="mb-3">
+                                    <label for="score" class="form-label" th:text="#{film.label.rate.range}">Puntuación (1 a 5)</label>
+                                    <select class="form-select" th:field="*{score}" id="score" required>
+                                        <option th:value="0">-- Rate</option>
+                                        <option th:value="1">1 - Muy mala</option>
+                                        <option th:value="2">2 - Mala</option>
+                                        <option th:value="3">3 - Regular</option>
+                                        <option th:value="4">4 - Buena</option>
+                                        <option th:value="5">5 - Excelente</option>
+                                    </select>
+                                </div>
+                                <div class="alert alert-danger mt-3" th:if="${error}" th:text="${error}"></div>
+                                <div class="alert alert-success mt-3" th:if="${success}" th:text="${success}"></div>
+
+                                <button type="submit" class="btn btn-primary">Enviar</button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="row">
+            <!-- Footer -->
+            <footer th:replace="~{/fragments/common/footer}"></footer>
+        </div>
+    </div>
+</div>
+
+
+
+<div th:replace="~{/fragments/common/scripts}"></div>
+</body>
+</html>

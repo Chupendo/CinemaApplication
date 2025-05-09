@@ -1,0 +1,25 @@
+
+spring:
+  application:
+    name: film-web
+  # Liguibase
+  liquibase:
+    enabled: false
+    # Debug queries
+    show-sql: true
+  web:
+    locale: es
+
+# Actuator:
+# Activar endpoints predefinidos: management.endpoints.web.exposure.include= .....
+# Desactivar un edpoint: management.endpoint.health.enable= false/true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, bean, info, auditevents, env, sessions, shutdown, metrics, prometheus, logfile, loggers, configprops, conditions
+  endpoint:
+    health:
+      enabled: false
+server:
+  port: 8081

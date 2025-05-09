@@ -1,5 +1,7 @@
 package com.tokioschool.filmapp.records;
 
+import lombok.Builder;
+
 /**
  * Registro que representa un rango de años de lanzamiento de películas.
  *
@@ -14,5 +16,6 @@ package com.tokioschool.filmapp.records;
  * @author andres.rpenuela
  * @version 1.0
  */
+@Builder
 public record RangeReleaseYear(Integer yearMin, Integer yearMax) {
 }

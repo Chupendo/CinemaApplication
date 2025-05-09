@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      class="bg-light text-dark">
+
+<head th:replace="~{/fragments/common/head :: head(#{logout.title})}"></head>
+<body>
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2 d-none d-md-block">
+        <!-- Este div está oculto en md y visible en md o superior.-->
+        </div>
+        <div class="col-lg-8 col min-vh-100 py-3 text-center text-lg-start mt-4 pt-2" >
+            <!-- form logout -->
+            <h1 th:text="#{logout.title}">Sign out to your account</h1>
+            <hr>
+            <p th:text="#{logout.label.sign-out}">You are about to sign out of your account.</p>
+            <br>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit"
+                        data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                        style="padding-left: 2.5rem; padding-right: 2.5rem;"
+                        th:text="#{item.label.sign-out}">Sign out</button>
+            </form>
+        </div>
+        <div class="col-lg-2 d-none d-md-block">
+            <!-- Este div está oculto en md y visible en md o superior.-->
+        </div>
+
+        <div class="row">
+            <!-- Footer -->
+            <footer th:replace="~{/fragments/common/footer}"></footer>
+        </div>
+    </div>
+
+    <div th:replace="~{/fragments/common/scripts}"></div>
+</body>
+</html>

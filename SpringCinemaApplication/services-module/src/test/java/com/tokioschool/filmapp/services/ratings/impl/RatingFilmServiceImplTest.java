@@ -34,7 +34,7 @@ class RatingFilmServiceImplTest {
 
     @Test
     void saveFilmRating_withExitsRegister_shouldReturnOperationNotAllowException() {
-        final Long userId = 1L;
+        final String userId = "1L";
         final Long filmId = 1L;
         final BigDecimal score = BigDecimal.ONE;
         final RequestRatingFilmDto requestRatingFilmDto = new RequestRatingFilmDto(null,userId,filmId,score);
@@ -57,7 +57,7 @@ class RatingFilmServiceImplTest {
 
     @Test
     void saveFilmRating_withNotExitsRegister_shouldOk() {
-        final Long userId = 1L;
+        final String userId = "1L";
         final Long filmId = 1L;
         final BigDecimal score = BigDecimal.ONE;
         final RequestRatingFilmDto requestRatingFilmDto = new RequestRatingFilmDto(null,userId,filmId,score);

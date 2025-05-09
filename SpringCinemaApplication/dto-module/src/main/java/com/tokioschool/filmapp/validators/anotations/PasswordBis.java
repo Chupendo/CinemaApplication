@@ -30,7 +30,7 @@ public @interface PasswordBis {
      *
      * @return El mensaje de error.
      */
-    String message() default "Invalid password";
+    String message() default "{form.error.user.password.biss}";
 
     /**
      * Grupos de validación a los que pertenece esta restricción.

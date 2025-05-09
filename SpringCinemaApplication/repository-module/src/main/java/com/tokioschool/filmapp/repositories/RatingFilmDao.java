@@ -30,7 +30,7 @@ public interface RatingFilmDao extends JpaRepository<RatingFilm, Long> {
      * @param filmId El ID de la película calificada.
      * @return Un {@link Optional} que contiene la calificación si existe.
      */
-    Optional<RatingFilm> findRatingFilmByUserIdAndFilmId(Long userId, Long filmId);
+    Optional<RatingFilm> findRatingFilmByUserIdAndFilmId(String userId, Long filmId);
 
     /**
      * Calcula el puntaje promedio y el número total de calificaciones para una película específica.

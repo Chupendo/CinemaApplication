@@ -59,7 +59,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "jwt.secret=secretos123123",
-        "jwt.expiration=PT1H"
+        "jwt.expiration=PT1H",
+        "spring.liquibase.enabled=false",
+        "spring.jpa.hibernate.ddl-auto=create-drop",
 })
 public class ResourceApiControllerWithSecurityEnableUTest {
 

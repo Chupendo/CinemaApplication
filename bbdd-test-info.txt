@@ -1,0 +1,31 @@
+################################
+Test BBDD
+Generic HD (Embedded)
+
+Configuraciones: Se crean una instancia de base de datos especifica 
+para cada servicio en el modo Test y poder probar de forma independiente
+
+En el caso sería 
+################################
+
+
+Film Web	http://localhost:9095/h2-console/
+jdbc:h2:file:C:/Users/andre/Documents/SourceTree/SpringCinemaApplication/film-bbdd/filmdb
+sa / password
+Base de datos embebida
+
+Film Api	http://localhost:9090/h2-console/l
+jdbc:h2:mem:filmdb_api
+sa / password
+Crea un fichero en un nivel inferior del directorio del proyecto:	../film-bbdd/filmdb
+
+Film Rating Api		http://localhost:9095/h2-console/
+jdbc:h2:file:../rating-bbdd/testdb
+sa / password
+Crea un fichero en un nivel inferior del directorio del proyecto: ../film-bbdd/filmdb
+
+Export Bath			http://localhost:9097/h2-console/
+jdbc:h2:file:C:/Users/andre/Documents/SourceTree/SpringCinemaApplication/film-bbdd/filmdb
+sa / password
+nota: (para usar export bath en el perfil test, film web application, debe estar desconectada)
+En el perfitl de test, no se van han exportar pelicuas, para ello se debe usar el perfil dev
