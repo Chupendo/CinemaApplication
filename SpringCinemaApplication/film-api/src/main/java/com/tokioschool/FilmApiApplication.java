@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * @version 1.0
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.tokioschool"})
+///@ComponentScan(basePackages = {"com.tokioschool"})
 @EntityScan(basePackages = "com.tokioschool.filmapp.domain")
 @EnableJpaRepositories(basePackages = "com.tokioschool.filmapp.repositories")
 public class FilmApiApplication {

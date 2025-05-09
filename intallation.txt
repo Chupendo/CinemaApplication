@@ -1,0 +1,55 @@
+Structura
+------------------------------
+SpringCinemaApplication
+	| - core-film
+	| - domain-module
+	| - dto-module
+	| - export-batch-film
+	| - film-api
+	| - film-web
+	| - liquibase-module
+	| - rating-api
+	| - repository-module
+	| - services-module
+	| - store-api
+	| - logs 				(se crea cuando se ejeucte con perfil != test, las apps)
+	| - export 				(se ceea cuando se ejecte export-batch-film)
+	| - docker-compose.yml
+	| - pom.xml
+	
+
+Para el perftil docker y test, comparten los mismos puertos.
+	- El perfil de docker es necesario tener ejctuar "docker-compose.yml" previo para instalar una instnacia de mariadb y redis
+	- El perfil de test usa h2 embebido (no es necesario que tenga redis)
+
+Nota: El perfil pro no se ha definicio configuración alguna.
+
+
+Para ejecutar los proyectos en un entorno de Windows con Java 21:
+	1º Descargar proyecto
+	2º Editar "start-all.bat" y cambiar "C:\Users\andre\Documents\SourceTree\SpringCinemaApplication\SpringCinemaApplication" por la ruta donde lo ha descargado
+	3º Abrir terminal y lanzar "start-all.bat"
+	4º Para exportar las peliculas repteri paso 1 y 2, y lanzar en un temrinarl "export-film-run.bat"
+
+Aplicaciones
+===================================
+Film Web
+Puerto 8083
+Desde el directorio film-web/
+	mvn spring-boot:run -Dspring-boot.run.profiles=docker
+
+Film Api
+Puerto 9090
+Desde el directorio film-api/
+	mvn spring-boot:run -Dspring-boot.run.profiles=docker
+
+Rating Api
+Puerto 9095
+Desde el directorio rating-api/
+	mvn spring-boot:run -Dspring-boot.run.profiles=docker
+	
+File Api Store
+Puerto 9091
+Desde el directorio store-api/
+	mvn spring-boot:run -Dspring-boot.run.profiles=docker
+	
