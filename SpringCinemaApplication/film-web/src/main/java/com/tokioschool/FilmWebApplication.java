@@ -9,15 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Esta clase inicializa y ejecuta la aplicación Spring Boot.
  *
  * Anotaciones:
- * - {@link SpringBootApplication}: Marca esta clase como la configuración principal de Spring Boot,
- *   habilitando la configuración automática, el escaneo de componentes y otras características.
+ * - {@link SpringBootApplication}: Marca esta clase como la configuración principal de Spring Boot.
  *
  * @author andres.rpenuela
  * @version 1.0
  */
 @SpringBootApplication
-//@EntityScan(basePackages = "com.tokioschool.filmapp.domain")
-//@EnableJpaRepositories(basePackages = "com.tokioschool.filmapp.repositories")
 public class FilmWebApplication {
 
     /**
