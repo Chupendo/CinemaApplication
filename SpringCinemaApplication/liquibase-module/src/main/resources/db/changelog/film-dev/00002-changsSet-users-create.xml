@@ -10,7 +10,7 @@
     <changeSet id="users-created-table" author="andres.rpenuela" context="dev">
         <createTable tableName="users">
             <column name="ID" type="VARCHAR(13)">
-                <constraints nullable="false" unique="true" />
+                <constraints primaryKey="true" />
             </column>
             <column name="USERNAME" type="VARCHAR(255)">
                 <constraints nullable="false" unique="true" />
