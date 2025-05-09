@@ -1,0 +1,1267 @@
+{
+	"info": {
+		"_postman_id": "dd315ce4-013d-447f-ac44-c5129f12c39f",
+		"name": "FilmAppliiaction",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "6232761"
+	},
+	"item": [
+		{
+			"name": "StoreApi",
+			"item": [
+				{
+					"name": "Post Atuhenticated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// other perfom\r",
+									"var data = JSON.parse(pm.response.text());\r",
+									"\r",
+									"//pm.setGlobalVariable(\"jwt_token\", data2.access_token);\r",
+									"//pm.environment.set(\"local\", data2.access_token);\r",
+									"\r",
+									"// clean and create collection variable\r",
+									"pm.collectionVariables.unset(\"store_jwt_token\");\r",
+									"pm.collectionVariables.set(\"store_jwt_token\",  data2.access_token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"consumer\",\r\n    \"password\":\"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:9091/store/api/auth"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Atuhenticated",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{store_jwt_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"consumer\",\r\n    \"password\":\"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:9091/store/api/auth/me"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3Mzc2NzQ2NTksInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.5LqdQrw7S0MLCy86Ro6E3_FQCdhS4jhdCFf2SL0dPFI"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:9091/store/api/auth/logout"
+					},
+					"response": []
+				},
+				{
+					"name": "Post Upload Resoruce",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3Mzg2MDczNTcsInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.L5XEKMFv5rIsVuc0Jx0gCezxYyUDRe4z0GA3OcGUt6Q"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"contentType": "",
+									"type": "file",
+									"src": "postman-cloud:///1efddc5e-c678-4dc0-a387-a22f638da8c9"
+								},
+								{
+									"key": "description",
+									"value": "flight image",
+									"contentType": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": "http://localhost:9091/store/api/resource"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Resource by Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzgxMDYzMDQsInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.t61QXw3GLiqoedcsaJ3p0hToPLFOMCUtgxk-XB3sRsg"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:9091/store/api/resource/f9afbadf-378b-4223-a213-c4d0ec5f01e5"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Resource",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzgxMDYzMDQsInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.t61QXw3GLiqoedcsaJ3p0hToPLFOMCUtgxk-XB3sRsg"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:9091/store/api/resource/3a101023-d477-4c7c-88ec-51cc7ef776e7"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "FilmApi",
+			"item": [
+				{
+					"name": "Resources",
+					"item": [
+						{
+							"name": "Get Recover content of resource by id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9090/film/api/resources?resourceId=4888138f-4a56-42a7-9bd6-da2751ded046",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"film",
+										"api",
+										"resources"
+									],
+									"query": [
+										{
+											"key": "resourceId",
+											"value": "4888138f-4a56-42a7-9bd6-da2751ded046"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Download resoruce by id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:9090/film/api/resources/download?resourceId=4888138f-4a56-42a7-9bd6-da2751ded046",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"film",
+										"api",
+										"resources",
+										"download"
+									],
+									"query": [
+										{
+											"key": "resourceId",
+											"value": "4888138f-4a56-42a7-9bd6-da2751ded046"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Post Register Users With Img",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userFormDto",
+											"value": "{  \n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe\",\n  \"email\": \"johndoe@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"roles\": [\"USER\"]\n}",
+											"contentType": "application/json",
+											"description": "{  \n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe2\",\n  \"email\": \"johndoe2@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"roles\": [\"USER\"]\n}",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"contentType": "application/octet-stream",
+											"type": "file",
+											"src": "/C:/Users/andre/Pictures/user.jpg",
+											"disabled": true
+										},
+										{
+											"key": "description",
+											"value": "test",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": "http://localhost:9090/film/api/users/register"
+							},
+							"response": []
+						},
+						{
+							"name": "Post Register Users With Img As User Register",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userFormDto",
+											"value": "{  \n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe2\",\n  \"email\": \"johndoe2@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"roles\": [\"ADMIN\"]\n}",
+											"contentType": "application/json",
+											"description": "{  \n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe2\",\n  \"email\": \"johndoe2@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"roles\": [\"USER\"]\n}",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"contentType": "application/octet-stream",
+											"type": "file",
+											"src": "postman-cloud:///1efddc5e-c678-4dc0-a387-a22f638da8c9"
+										},
+										{
+											"key": "description",
+											"value": "test",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": "http://localhost:9090/film/api/users/register"
+							},
+							"response": []
+						},
+						{
+							"name": "Put Updated User With Img",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "userFormDto",
+											"value": "{  \"id\":\"0JVSBXXPSWX06\",\n  \"name\": \"Andrew\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"adnew\",\n  \"email\": \"andrew@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"roles\": [\"ADMIN\"]\n}",
+											"contentType": "application/json",
+											"description": "{  \"id\":\"0JRF98MRMX471\",\n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe2\",\n  \"email\": \"johndoe2@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"roles\": [\"USER\"]\n}",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"contentType": "application/octet-stream",
+											"type": "file",
+											"src": "/C:/Users/andre/Pictures/flight.jpeg"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:9090/film/api/users/update/0JVSBXXPSWX06",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "9090",
+									"path": [
+										"film",
+										"api",
+										"users",
+										"update",
+										"0JVSBXXPSWX06"
+									],
+									"query": [
+										{
+											"key": "image",
+											"value": null,
+											"disabled": true
+										},
+										{
+											"key": "userFromDto",
+											"value": "{\n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe2\",\n  \"email\": \"johndoe2@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"role\": \"USER\"\n}",
+											"description": "{\n  \"name\": \"John2\",\n  \"surname\": \"Doe\",\n  \"password\": \"Contraseña1@\",\n  \"passwordBis\": \"Contraseña1@\",\n  \"username\": \"johndoe2\",\n  \"email\": \"johndoe2@example.com\",\n  \"birthDate\": \"1990-01-01\",\n  \"role\": \"USER\"\n}",
+											"disabled": true
+										},
+										{
+											"key": "description",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put Update User - old",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzYxODQ5NjEsInN1YiI6ImphbmUuc21pdGhAZXhhbXBsZS5jb20iLCJhdXRob3JpdGllcyI6WyJSRUFEIiwiUk9MRV9BRE1JTiIsIldSSVRFUiJdfQ.dceMn6kxX3kzNWxW2ChFWBedfcfSjhdXgB6QwUyOMnE"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"id\":\"0JDVZ5YWR3WS9\",\r\n  \"name\": \"John\",\r\n  \"surname\": \"Doe\",\r\n  \"password\": \"Contraseña1@\",\r\n  \"passwordBis\": \"Contraseña1@\",\r\n  \"username\": \"johndoe\",\r\n  \"email\": \"johndoe@example.com\",\r\n  \"birthDate\": \"1990-01-01\",\r\n  \"role\": \"USER\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9090/film/api/users/update/0JDVZ5YWR3WS9"
+							},
+							"response": []
+						},
+						{
+							"name": "Post Register User - old",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzYxODM1MzksInN1YiI6ImphbmUuc21pdGhAZXhhbXBsZS5jb20iLCJhdXRob3JpdGllcyI6WyJSRUFEIiwiUk9MRV9BRE1JTiIsIldSSVRFUiJdfQ.8KYW_mXSWTFdbeWVjLiDkt_utqnKmi885VzTBrWXpIo"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"name\": \"John\",\r\n  \"surname\": \"Doe\",\r\n  \"password\": \"Contraseña1@\",\r\n  \"passwordBis\": \"Contraseña1@\",\r\n  \"username\": \"johndoe\",\r\n  \"email\": \"johndoe@example.com\",\r\n  \"birthDate\": \"1990-01-01\",\r\n  \"role\": \"USER\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9090/film/api/users/register"
+							},
+							"response": []
+						},
+						{
+							"name": "Get User Datils By Id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9090/film/api/users/detail/0JVSBXXPSWX06"
+							},
+							"response": []
+						},
+						{
+							"name": "Post Search User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "search-user-record",
+											"value": "{ \n  \"email\": \"johnd\"\n}",
+											"contentType": "application/json",
+											"description": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe\",\n  \"username\": \"johndoe\",\n  \"email\": \"johndoe@example.com\"\n}",
+											"type": "text"
+										},
+										{
+											"key": "page",
+											"value": "3",
+											"contentType": "text/plai",
+											"type": "text"
+										},
+										{
+											"key": "page-size",
+											"value": "1",
+											"contentType": "text/plain",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://localhost:9090/film/api/users/search"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Artist",
+					"item": [
+						{
+							"name": "Get Find All Artist",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9090/film/api/artists/find-all"
+							},
+							"response": []
+						},
+						{
+							"name": "Post Register Artist",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n        \"name\": \"John\",\r\n        \"surname\": \"Smith\",\r\n        \"typeArtist\": \"ACTOR\"\r\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9090/film/api/artists"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Authentication",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// custom perfom\r",
+											"var data = JSON.parse(responseBody); \r",
+											"postman.clearGlobalVariable(\"jwt_token\"); \r",
+											"postman.setGlobalVariable(\"jwt_token\", data.access_token);\r",
+											"\r",
+											"let localVar = pm.variables.get(\"localVar\");\r",
+											"\r",
+											"// other perfom\r",
+											"var data2 = JSON.parse(pm.response.text());\r",
+											"\r",
+											"//pm.setGlobalVariable(\"jwt_token\", data2.access_token);\r",
+											"//pm.environment.set(\"local\", data2.access_token);\r",
+											"\r",
+											"// clean and create collection variable\r",
+											"pm.collectionVariables.unset(\"film_jwt_token\");\r",
+											"pm.collectionVariables.set(\"film_jwt_token\",  data2.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\":\"user\",\r\n    \"password\":\"user\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9090/film/api/auth/login"
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"url": "http://localhost:9090/film/api/auth/logout"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Auth Me",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9090/film/api/auth/me"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Movies",
+					"item": [
+						{
+							"name": "Get Search Movie by Filter",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "multipart/form-data",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "page",
+											"value": "0",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "pageSize",
+											"value": "2",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "filter",
+											"value": "{\n  \"title\": \"Inception\",\n  \"yearMin\": 2000,\n  \"yearMax\": 2010\n}",
+											"contentType": "application/json",
+											"description": "filter full",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "filter",
+											"value": "{\n  \"yearMin\": 2000,\n  \"yearMax\": 2010\n}",
+											"contentType": "application/json",
+											"description": "filter witouht title",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "filter",
+											"value": "{\n  \"title\": \"a\"\n}",
+											"contentType": "application/json",
+											"description": "filter witouht range year",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": "http://localhost:9090/film/api/movies"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Movie by Id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9090/film/api/movies/1"
+							},
+							"response": []
+						},
+						{
+							"name": "Post Register Movie",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"contentType": "application/octet-stream",
+											"type": "file",
+											"src": "postman-cloud:///1efddc5e-c678-4dc0-a387-a22f638da8c9"
+										},
+										{
+											"key": "movieFormDto",
+											"value": "{\n    \"title\": \"game of trons\",\n    \"releaseYear\": 1992,\n    \"managerDto\": {\n        \"id\": 2,\n        \"name\": \"William\",\n        \"surname\": \"Smith\",\n        \"typeArtist\": \"DIRECTOR\"\n    },\n    \"artistDtos\": [\n        {\n            \"id\": 1,\n            \"name\": \"John\",\n            \"surname\": \"Smith\",\n            \"typeArtist\": \"ACTOR\"\n        }\n    ],\n    \"resourceId\": null\n}",
+											"contentType": "application/json",
+											"description": "{\n    \"title\": \"game of trons\",\n    \"releaseYear\": 1992,\n    \"managerDto\": {\n        \"id\": 2,\n        \"name\": \"William\",\n        \"surname\": \"Smith\",\n        \"typeArtist\": \"DIRECTOR\"\n    },\n    \"artistDtos\": [\n        {\n            \"id\": 1,\n            \"name\": \"John\",\n            \"surname\": \"Smith\",\n            \"typeArtist\": \"ACTOR\"\n        }\n    ],\n    \"resourceId\": null\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://localhost:9090/film/api/movies/register"
+							},
+							"response": []
+						},
+						{
+							"name": "Put Updated Movie",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{film_jwt_token}}"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "image",
+											"contentType": "application/octet-stream",
+											"type": "file",
+											"src": "/C:/Users/andre/Pictures/user.jpg"
+										},
+										{
+											"key": "description",
+											"value": "",
+											"contentType": "application/json",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "movieFormDto",
+											"value": "{\n    \"title\": \"game of trons\",\n    \"releaseYear\": 1992,\n    \"managerDto\": {\n        \"id\": 2,\n        \"name\": \"William\",\n        \"surname\": \"Smith\",\n        \"typeArtist\": \"DIRECTOR\"\n    },\n    \"artistDtos\": [\n        {\n            \"id\": 1,\n            \"name\": \"John\",\n            \"surname\": \"Smith\",\n            \"typeArtist\": \"ACTOR\"\n        }\n    ],\n    \"resourceId\": null\n}",
+											"contentType": "application/json",
+											"description": "{\n    \"title\": \"game of trons\",\n    \"releaseYear\": 1992,\n    \"managerDto\": {\n        \"id\": 2,\n        \"name\": \"William\",\n        \"surname\": \"Smith\",\n        \"typeArtist\": \"DIRECTOR\"\n    },\n    \"artistDtos\": [\n        {\n            \"id\": 1,\n            \"name\": \"John\",\n            \"surname\": \"Smith\",\n            \"typeArtist\": \"ACTOR\"\n        }\n    ],\n    \"resourceId\": null\n}",
+											"type": "text"
+										}
+									]
+								},
+								"url": "http://localhost:9090/film/api/movies/updated/15"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "RatingsApi",
+			"item": [
+				{
+					"name": "Oauth20",
+					"item": [
+						{
+							"name": "Code",
+							"item": [
+								{
+									"name": "Get Code OAuth2 ",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://127.0.0.1:9095/oauth2/authorize?response_type=code&client_id=oidc-client&redirect_uri=http://127.0.0.1:9095/login/oauth2/code/oidc-client&scope=openid",
+											"protocol": "http",
+											"host": [
+												"127",
+												"0",
+												"0",
+												"1"
+											],
+											"port": "9095",
+											"path": [
+												"oauth2",
+												"authorize"
+											],
+											"query": [
+												{
+													"key": "response_type",
+													"value": "code"
+												},
+												{
+													"key": "client_id",
+													"value": "oidc-client"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "http://127.0.0.1:9095/login/oauth2/code/oidc-client"
+												},
+												{
+													"key": "scope",
+													"value": "openid"
+												}
+											]
+										},
+										"description": "Copiar URL para hacer Login en el navegador y obtener el código que debe ser usado para generar el token en la petición \"Get Token by Code Ouath2\""
+									},
+									"response": []
+								},
+								{
+									"name": "Get Token by Code Oauth2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"//  extrac tocken\r",
+													"var data = JSON.parse(pm.response.text());\r",
+													"// clean and create collection variable\r",
+													"//pm.collectionVariables.unset(\"ratgins_jwt_token\");\r",
+													"pm.collectionVariables.set(\"ratings_jwt_token\",  data.access_token);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "basic",
+											"basic": {
+												"username": "oidc-client",
+												"password": "secret3"
+											}
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "grant_type",
+													"value": "authorization_code",
+													"type": "text"
+												},
+												{
+													"key": "code",
+													"value": "x77JDSvgJSTkjiI93lIJLvSKqD8rTxYouWYoYiqxFA5P_sh8m55dvv_-IDXEkflqqJqf40FEnDwSAVsTEOBfbeuj7vgqPqZPbxzQ_O_IbY0y0CH9zJMUYu_j8q4bBUZi",
+													"type": "text"
+												},
+												{
+													"key": "redirect_uri",
+													"value": "http://127.0.0.1:9095/login/oauth2/code/oidc-client",
+													"type": "text"
+												}
+											]
+										},
+										"url": "http://127.0.0.1:9095/oauth2/token",
+										"description": "Copiar el código una vez generado tras logerse en el servidor OAuth2, y enviar peición"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Openid-Configuration",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "http://127.0.0.1:9095/.well-known/openid-configuration"
+							},
+							"response": []
+						},
+						{
+							"name": "Post OAuth 2.0 Token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//  extrac tocken\r",
+											"var data = JSON.parse(pm.response.text());\r",
+											"// clean and create collection variable\r",
+											"//pm.collectionVariables.unset(\"ratgins_jwt_token\");\r",
+											"pm.collectionVariables.set(\"ratings_jwt_token\",  data.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": {
+										"username": "oauth-client",
+										"password": "secret3"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"description": "authorization_code, client_credentials,refresh_token",
+											"type": "text"
+										},
+										{
+											"key": "scope",
+											"value": "read",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "refresh_token",
+											"value": "eyJraWQiOiJiNzlkZmMzMi0xYzYyLTQwOGQtYWU1My00OGFhOGZlOTVhODciLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjkwOTUiLCJzdWIiOiJqYW5lLnNtaXRoQGV4YW1wbGUuY29tIiwiZXhwIjoxNzQxOTczMzk4LCJpYXQiOjE3NDE5Njk3OTgsImF1dGhvcml0aWVzIjpbIlJFQUQiLCJST0xFX0FETUlOIiwiV1JJVEVSIl0sImp0aSI6ImE0MTRjNzYyLTYyZDktNDM3Yi1iZWRkLTBjNGQyY2U2MDZkMyJ9.p5E2YfnzVaMhWWu8ohXZpYP7QXLs9HG5o91ImM2GVE5ZJDfIonBsGArnJPgL6IurPKzGryKNDryo_VCBSLdJWRdnTPaHz1CJiTqnoX1SHJEWqQBZj4JpAVBYSwhzJcmGiDfDSQzdUh5QsJ_FXEFstpYKLuDQibv8SNZtBgdFEA3cl2Ta1QlE8kLKvGsOekbMQjv2F4sUCogYwq2WRLFo6P7O7OtXsAIa9F_6LmYwi01SFTjgAKmyK6tCtO0oTmmMIn8P51XfmAvvHJXevujYIBPx2Rya6quV7n4uE4CVSnUmneKFNFUEyAD_txaSRbkY87hjBg1RduTE6O3u7UQtWQ",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": "http://127.0.0.1:9095/oauth2/token"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Oauth2 Authenticate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//  extrac tocken\r",
+											"var data = JSON.parse(pm.response.text());\r",
+											"// clean and create collection variable\r",
+											"//pm.collectionVariables.unset(\"ratgins_jwt_token\");\r",
+											"pm.collectionVariables.set(\"ratings_jwt_token\",  data.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": {
+										"username": "oauth-client",
+										"password": "secret3"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://127.0.0.1:9095/oauth2/authenticate?grant_type=client_credentials",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "9095",
+									"path": [
+										"oauth2",
+										"authenticate"
+									],
+									"query": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "aut-web",
+							"item": [
+								{
+									"name": "Login Web Srring Security",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": "http://127.0.0.1:9095/login"
+									},
+									"response": []
+								},
+								{
+									"name": "Logout Web Spring Security",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": "http://127.0.0.1:9095/logout"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Post Atuhenticated",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//  extrac tocken\r",
+											"var data = JSON.parse(pm.response.text());\r",
+											"// clean and create collection variable\r",
+											"//pm.collectionVariables.unset(\"ratgins_jwt_token\");\r",
+											"pm.collectionVariables.set(\"ratings_jwt_token\",  data.access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\":\"admin\",\r\n    \"password\":\"admin\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9095/api/ratings/login"
+							},
+							"response": []
+						},
+						{
+							"name": "Ratings Auth Me",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": "http://127.0.0.1:9095/api/ratings/me"
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"url": "http://localhost:9095/api/ratings/logout"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Ratings",
+					"item": [
+						{
+							"name": "Post New Ratings",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": \"1\",\r\n    \"filmId\": \"6\",\r\n    \"score\": 5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9095/api/ratings/register/films"
+							},
+							"response": []
+						},
+						{
+							"name": "Put Updated Ratings",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\":\"3\",\r\n    \"userId\": \"1\",\r\n    \"filmId\": \"1\",\r\n    \"score\": \"4\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9095/api/ratings/updated/films/1/users/1"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Remove Rating By id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://localhost:9095/ratings/api/2"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Find Ratings By Film Id & User Id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9095/api/ratings/films/1/users/2"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Recover Film Ratings",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9095/api/ratings/register/films"
+							},
+							"response": []
+						},
+						{
+							"name": "Ratings Average",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{ratings_jwt_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "http://localhost:9095/api/ratings/ratings-average/films/1"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "film_jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ratings_jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "store_jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

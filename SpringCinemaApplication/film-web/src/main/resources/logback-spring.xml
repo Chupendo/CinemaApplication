@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Configuracion basica de logback: Carga la por defecto-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"></include>
+
+    <!-- acceder a una spring property -->
+    <springProperty scope="context" name="application.name" source="spring.application.name" defaultValue="app"/>
+
+    <!-- Configuracion personalizada de logback -->
+    <!-- Propiedades que se usarán para indicar dónde almacenar los logs y cómo se llama el fichero -->
+    <property name="LOG_DIR" value="../logs" />
+    <property name="LOG_NAME" value="${application.name}" />
+
+    <!-- para MDC se requiere una nueva propiedad, mismo que
+          org\springframework\boot\logging\logback\defaults.xml-->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}) %clr([%thread]){fait} %logger{36} %clr(%-5level){highlight} %clr(--- Contexto:){faint} %clr(user-ID:%X{user-ID}){blue} %clr(request-ID:%X{requestID}){blue} %clr(--- Localización:){faint} %clr(%C.%M:%L){cyan} - %msg %n"></property>
+
+    <!-- Configuración del log que aparece por consola: Console appender -->
+    <appender name="Console"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Configuración de la traza -->
+            <pattern>
+                ${CONSOLE_LOG_PATTERN}
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configuración para que se almacene el log en un fichero: File Appender -->
+    <springProfile name="!test">
+        <appender name="RollingFile"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/${application.name}.log</file>
+            <encoder
+                    class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
+            </encoder>
+            <!-- Política de rotado de logs: diario y cuando el fichero llegue a los 10 MB -->
+            <rollingPolicy
+                    class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_DIR}/${LOG_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy
+                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+            </rollingPolicy>
+        </appender>
+
+        <!-- Define el nivel de log para cada appender -->
+        <root level="info"> <!-- trace, debug, infor, warn, error -->
+            <appender-ref ref="RollingFile" />
+        </root>
+    </springProfile>
+
+
+
+    <!-- Define el nivel de log para cada appender -->
+    <root level="info"> <!-- trace, debug, infor, warn, error -->
+        <appender-ref ref="Console" />
+    </root>
+    <!--
+     seleccion de las trazas a mostrar y su nivel propios, (precede esto a lo inidcado en el root), es decir,
+    muestra el nivel que se indica para las trazas que se producen en los paquetes especificados, de lo contrario,
+    apica el level del root, además, esto puede ser definido a nivel de application.xml como propiedad -->
+    <logger name="com.tokioschool.flightapp.base" level="trace"/>
+    <logger name="org.h2" level="trace"/>
+    <logger name="liquibase.sqlgenerator" level="info"/>
+    <logger name="com.tokioschool.flightapp.flight.configuration.logging.LoggerConfiguration" level="debug"/>
+</configuration>

@@ -30,11 +30,6 @@
                                  onerror="this.onerror=null; this.src='/images/default-movie-poster.png';"
                                  class="card-img-top img-fluid"
                                  alt="Cartel de película por defecto">
-                            <!--                            <img th:if="${resourceImageId == null}" th:src="@{/images/default-profile.svg}" class="card-img-top img-fluid" alt="image">-->
-                            <!--                            <img th:if="${resourceImageId != null}" th:src="@{/flight/resources(rsc=${resourceImageId})}" class="card-img-top img-fluid" alt="image">-->
-                            <!--                            <br>-->
-                            <!--                            <a th:if="${resourceImageId != null}" th:href="@{/flight/resources/downloads(rsc=${resourceImageId})}">Download</a>-->
-                            <!--                            <a th:if="${resourceImageId != null}" th:href="@{/flight/removeImg(idFlight=${flight.id},rsc=${resourceImageId})}">Delete</a>-->
                         </div>
                         <div class="col-md-8">
                             <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
