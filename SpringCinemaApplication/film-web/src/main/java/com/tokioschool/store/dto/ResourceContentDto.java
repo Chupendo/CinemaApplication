@@ -24,7 +24,13 @@ import java.util.UUID;
  * - {@code description}: Descripción del recurso.
  * - {@code size}: Tamaño del recurso en bytes.
  *
+ * Métodos sobrescritos:
+ * - {@link #equals(Object)}: Compara este objeto con otro para determinar si son iguales.
+ * - {@link #hashCode()}: Calcula el código hash para este objeto.
+ * - {@link #toString()}: Devuelve una representación en forma de cadena de este objeto.
+ *
  * @author andres.rpenuela
+ * @version 1.0
  */
 @Builder
 @Jacksonized

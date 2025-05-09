@@ -36,25 +36,62 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.*;
 
+/**
+ * Controlador MVC para gestionar películas.
+ *
+ * Este controlador maneja las operaciones relacionadas con la visualización, creación,
+ * edición, calificación y detalles de películas en la aplicación web.
+ *
+ * Anotaciones utilizadas:
+ * - `@Controller`: Marca esta clase como un controlador de Spring MVC.
+ * - `@RequestMapping`: Define la ruta base para las solicitudes relacionadas con películas.
+ * - `@RequiredArgsConstructor`: Genera un constructor con los argumentos requeridos.
+ * - `@Slf4j`: Habilita el registro de logs utilizando Lombok.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/web/films")
 @RequiredArgsConstructor
 @Slf4j
 public class FilmMvcController {
 
+    /** Servicio para gestionar la lógica de negocio relacionada con películas. */
     private final MovieService movieService;
+
+    /** Servicio para gestionar la lógica de negocio relacionada con artistas. */
     private final ArtistService artistService;
+
+    /** Servicio para gestionar la lógica de negocio relacionada con usuarios. */
     private final UserService userService;
+
+    /** Fachada para gestionar recursos en el almacenamiento. */
     private final StoreFacade storeFacade;
+
+    /** Fachada para gestionar calificaciones de películas. */
     private final RatingFacade ratingFacade;
 
+    /** Ayudante para traducir mensajes en la aplicación. */
     private final TranslatedMessageHelper translatedMessageHelper;
 
+    /**
+     * Inicializa el `WebDataBinder` para registrar editores personalizados.
+     *
+     * @param binder El `WebDataBinder` utilizado para registrar editores personalizados.
+     */
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(ArtistDto.class, new ArtistDtoEditor(artistService));
     }
 
+    /**
+     * Maneja la visualización de la lista de películas con paginación y búsqueda.
+     *
+     * @param searchMovieRecord Objeto con los criterios de búsqueda.
+     * @param model Modelo para pasar datos a la vista.
+     * @return Nombre de la vista que muestra la lista de películas.
+     */
     @GetMapping("/list")
     @PreAuthorize("isAuthenticated()")
     public String getFilmsHandler(
@@ -62,30 +99,43 @@ public class FilmMvcController {
             Model model) {
         if (!model.containsAttribute("searchMovieRecord")) {
             searchMovieRecord = SearchMovieRecord.builder().page(0).pageSize(10).rangeReleaseYear(RangeReleaseYear.builder().build()).build();
-            model.addAttribute("searchMovieRecord",searchMovieRecord );
+            model.addAttribute("searchMovieRecord", searchMovieRecord);
         }
 
-        if(searchMovieRecord.rangeReleaseYear() == null){
+        if (searchMovieRecord.rangeReleaseYear() == null) {
             searchMovieRecord = SearchMovieRecord.builder()
                     .title(searchMovieRecord.title())
                     .page(searchMovieRecord.page())
                     .pageSize(searchMovieRecord.pageSize())
                     .rangeReleaseYear(RangeReleaseYear.builder().build())
                     .build();
-            model.addAttribute("searchMovieRecord",searchMovieRecord );
-
+            model.addAttribute("searchMovieRecord", searchMovieRecord);
         }
 
         model.addAttribute("pageMovieDto", movieService.searchMovie(searchMovieRecord));
         return "movies/list";
     }
 
+    /**
+     * Redirige a la vista de detalles de una película.
+     *
+     * @param movieId ID de la película.
+     * @return Redirección a la vista de detalles de la película.
+     */
     @GetMapping("/detail/{movieId}")
     @PreAuthorize("isAuthenticated()")
     public String getMovieDetail(@PathVariable Long movieId) {
-        return "forward:/web/films/form/%s?mode=%s".formatted(movieId,true); // nombre del archivo .html en templates/movies
+        return "forward:/web/films/form/%s?mode=%s".formatted(movieId, true);
     }
 
+    /**
+     * Maneja la visualización del formulario para crear o editar una película.
+     *
+     * @param movieId ID de la película (opcional).
+     * @param profileMode Indica si el formulario está en modo de perfil.
+     * @param model Modelo para pasar datos a la vista.
+     * @return Nombre de la vista del formulario de creación/edición.
+     */
     @GetMapping({"/form", "/form/{movieId}"})
     public String filmCreateOrEditHandler(@PathVariable(name = "movieId", required = false) Long movieId,
                                           @RequestParam(value = "mode", defaultValue = "false") boolean profileMode,
@@ -115,21 +165,31 @@ public class FilmMvcController {
         model.addAttribute("actors", actors);
         model.addAttribute("profileMode", profileMode);
 
-        if( profileMode ){
+        if (profileMode) {
             final String userId = getUserIdAuth().getId();
-            RatingFilmDto ratingFilmDto = ratingFacade.findRatingByUserIdAndMovieId(userId,movieId)
-                            .orElseGet( () ->  RatingFilmDto.builder().filmId(movieId).userId( userId ).build());
-            model.addAttribute("rating", ratingFilmDto );
-            // todo añadir el average
+            RatingFilmDto ratingFilmDto = ratingFacade.findRatingByUserIdAndMovieId(userId, movieId)
+                    .orElseGet(() -> RatingFilmDto.builder().filmId(movieId).userId(userId).build());
+            model.addAttribute("rating", ratingFilmDto);
+
             AverageRating averageRating = ratingFacade.findRatingAverageByMovieId(movieId)
                     .orElseGet(() -> AverageRating.builder().average(0.0).ratings(0L).build());
-            model.addAttribute("averageRating", averageRating );
+            model.addAttribute("averageRating", averageRating);
         }
 
         return "movies/form";
     }
 
-    @PostMapping({"/form","/form/", "/form/{movieId}"})
+    /**
+     * Maneja el registro o la edición de una película a través del formulario.
+     *
+     * @param movieId ID de la película (opcional).
+     * @param movieDto DTO de la película con los datos enviados.
+     * @param bindingResult Resultado de la validación del formulario.
+     * @param imageFile Archivo de imagen enviado (opcional).
+     * @param redirectAttributes Atributos para redirección.
+     * @return Redirección a la lista de películas o al formulario en caso de error.
+     */
+    @PostMapping({"/form", "/form/", "/form/{movieId}"})
     @PreAuthorize("isAuthenticated()")
     public RedirectView filmFormHandler(
             @PathVariable(name = "movieId", required = false) Long movieId,
@@ -137,27 +197,24 @@ public class FilmMvcController {
             BindingResult bindingResult,
             @RequestParam(value = "file", required = false) MultipartFile imageFile,
             RedirectAttributes redirectAttributes
-    ) {boolean isEdit = movieId != null;
+    ) {
+        boolean isEdit = movieId != null;
 
         if (isEdit && !hasAdminRole()) {
             throw new AccessDeniedException("No tienes permisos para editar películas.");
         }
 
-
-        // Validación imagen solo para creación o cambio de imagen
         if (!isEdit && (imageFile == null || imageFile.isEmpty())) {
             bindingResult.addError(new FieldError("movie", "resourceId",
                     translatedMessageHelper.getMessage("film.image.error.received")));
         }
 
-        // Si hay errores
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.movie", bindingResult);
             redirectAttributes.addFlashAttribute("movie", movieDto);
             return new RedirectView("/web/films/form" + (isEdit ? "/" + movieId : ""));
         }
 
-        // Subida y procesamiento de imagen si aplica
         if (imageFile != null && !imageFile.isEmpty()) {
             Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(imageFile, null);
             if (resourceIdDtoOptional.isEmpty()) {
@@ -180,8 +237,8 @@ public class FilmMvcController {
             if (isEdit) {
                 movieService.updateMovie(movieId, movieDto);
             } else {
-                final UserDto userDto = userService.findUserAuthenticated().orElseThrow( () -> new AuthenticationCredentialsNotFoundException("User not auth!"));
-                movieDto.setCreateUser( userDto );
+                final UserDto userDto = userService.findUserAuthenticated().orElseThrow(() -> new AuthenticationCredentialsNotFoundException("User not auth!"));
+                movieDto.setCreateUser(userDto);
                 movieService.createMovie(movieDto);
             }
         } catch (Exception e) {
@@ -195,38 +252,54 @@ public class FilmMvcController {
         return new RedirectView("/web/films/list");
     }
 
-    private UserDto getUserIdAuth(){
-        return userService.findUserAuthenticated().orElseThrow( () -> new AuthenticationCredentialsNotFoundException("User not auth!"));
+    /**
+     * Obtiene el usuario autenticado actual.
+     *
+     * @return DTO del usuario autenticado.
+     */
+    private UserDto getUserIdAuth() {
+        return userService.findUserAuthenticated().orElseThrow(() -> new AuthenticationCredentialsNotFoundException("User not auth!"));
     }
 
+    /**
+     * Maneja la calificación de una película.
+     *
+     * @param ratingFilmDto DTO con los datos de la calificación.
+     * @param bindingResult Resultado de la validación del formulario.
+     * @param redirectAttributes Atributos para redirección.
+     * @return Redirección a la vista de detalles de la película.
+     */
     @PostMapping("/rate")
     @PreAuthorize("isAuthenticated()")
     public String rateMovie(@Valid @ModelAttribute("rating") RatingFilmDto ratingFilmDto, BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
-        // Aquí iría la lógica para guardar la puntuación
-        // ratingService.save(ratingDto);
-        if( bindingResult.hasErrors() ){
-            Map<String,String> errorMsg = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(fieldError -> errorMsg.put(fieldError.getField(),fieldError.getDefaultMessage()));
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errorMsg = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(fieldError -> errorMsg.put(fieldError.getField(), fieldError.getDefaultMessage()));
             final String errorRate = translatedMessageHelper.getMessage("film.msg.rate.error");
             log.error(errorRate, errorMsg);
             redirectAttributes.addFlashAttribute("error", errorRate);
         }
-        try{
+        try {
             ratingFacade.registerRating(ratingFilmDto);
             final String successRate = translatedMessageHelper.getMessage("film.msg.rate.success");
 
             redirectAttributes.addFlashAttribute("message", successRate);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             final String errorRate = translatedMessageHelper.getMessage("film.msg.rate.error");
             log.error(errorRate, e);
             redirectAttributes.addFlashAttribute("error", errorRate);
         }
 
-        return "redirect:/web/films/detail/%s".formatted( ratingFilmDto.getFilmId() );
+        return "redirect:/web/films/detail/%s".formatted(ratingFilmDto.getFilmId());
     }
 
+    /**
+     * Verifica si el usuario autenticado tiene el rol de administrador.
+     *
+     * @return `true` si el usuario tiene el rol de administrador, de lo contrario `false`.
+     */
     private boolean hasAdminRole() {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));

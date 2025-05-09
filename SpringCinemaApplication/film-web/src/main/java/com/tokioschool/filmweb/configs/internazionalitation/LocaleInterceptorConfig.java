@@ -12,32 +12,52 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import java.util.Locale;
 
+/**
+ * Configuración para la internacionalización de la aplicación.
+ *
+ * Esta clase configura un interceptor para cambiar el idioma de la aplicación
+ * basado en un parámetro de la URL y define un resolutor de locales basado en cookies.
+ *
+ * Anotaciones utilizadas:
+ * - `@Configuration`: Marca esta clase como una clase de configuración de Spring.
+ * - `@Slf4j`: Habilita el registro de logs utilizando Lombok.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Configuration
 @Slf4j
 public class LocaleInterceptorConfig implements WebMvcConfigurer {
 
+    /** Nombre del parámetro utilizado por el interceptor para cambiar el idioma. */
     public static final String INTERCEPTOR_PARAM_NAME = "lang";
+
+    /** Idioma predeterminado configurado en las propiedades de la aplicación. */
     @Value("${spring.web.locale : en}")
-     private String defaultLocale;
+    private String defaultLocale;
 
     /**
-     * Created a Bean to LocalResolver based to Cookie and not of HTTP-HEADER
+     * Define un bean para el resolutor de locales basado en cookies.
      *
-     * @return instance of cookie locale resolver with default locale english
+     * Este resolutor utiliza cookies para almacenar el idioma seleccionado por el usuario.
+     *
+     * @return Una instancia de `CookieLocaleResolver` con el idioma predeterminado configurado.
      */
     @Bean
     public LocaleResolver localeResolver() {
         log.info("LocaleInterceptorConfig.localeResolver() -> defaultLocale: {}", defaultLocale);
         CookieLocaleResolver localeResolver = new CookieLocaleResolver();
-        localeResolver.setDefaultLocale( Locale.of( defaultLocale ) );
+        localeResolver.setDefaultLocale(Locale.of(defaultLocale));
         return localeResolver;
     }
 
     /**
-     * Created a Bean to locale interceptor, this read in the url to any controller the param "lang"
-     * and updated the locale
+     * Define un bean para el interceptor de cambio de idioma.
      *
-     * @return instance a locale change interceptor
+     * Este interceptor lee el parámetro "lang" en la URL de cualquier controlador
+     * y actualiza el idioma de la aplicación en consecuencia.
+     *
+     * @return Una instancia de `LocaleChangeInterceptor`.
      */
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
@@ -48,12 +68,12 @@ public class LocaleInterceptorConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Registrer to list of interceptors, own interceptor
+     * Registra el interceptor de cambio de idioma en la lista de interceptores de la aplicación.
      *
-     * @param registry injection of dependency of registry of interceptors of application
+     * @param registry El registro de interceptores donde se agrega el interceptor personalizado.
      */
     @Override
-    public void addInterceptors(InterceptorRegistry registry ) {
+    public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
     }
 }

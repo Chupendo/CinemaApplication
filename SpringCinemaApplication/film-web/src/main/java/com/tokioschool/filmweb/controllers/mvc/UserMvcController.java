@@ -32,49 +32,82 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador MVC para gestionar usuarios.
+ *
+ * Este controlador maneja las operaciones relacionadas con la visualización, creación,
+ * edición, registro y listado de usuarios en la aplicación web.
+ *
+ * Anotaciones utilizadas:
+ * - `@Controller`: Marca esta clase como un controlador de Spring MVC.
+ * - `@RequestMapping`: Define la ruta base para las solicitudes relacionadas con usuarios.
+ * - `@RequiredArgsConstructor`: Genera un constructor con los argumentos requeridos.
+ * - `@SessionAttributes`: Indica que el atributo "user" se almacena en la sesión.
+ *
+ * @author andres.repnuela
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/web/users")
 @RequiredArgsConstructor
 @SessionAttributes({"user"})
 public class UserMvcController {
 
+    /** Fachada para gestionar recursos en el almacenamiento. */
     private final StoreFacade storeFacade;
+
+    /** Servicio para gestionar la lógica de negocio relacionada con usuarios. */
     private final UserService userService;
+
+    /** Mapper para convertir entre entidades y DTOs. */
     private final ModelMapper modelMapper;
 
+    /** Directorio de subida de imágenes. */
     private final String UPLOAD_DIR = "src/main/resources/static/images/";
 
-    @GetMapping({"/profile","/profile/{userId}"})
+    /**
+     * Maneja la visualización del perfil de un usuario.
+     *
+     * @param userId ID del usuario (opcional).
+     * @param model Modelo para pasar datos a la vista.
+     * @return Redirección interna a la vista de edición del usuario.
+     */
+    @GetMapping({"/profile", "/profile/{userId}"})
     @PreAuthorize("isAuthenticated()")
-    public String profileHandler(@PathVariable(name="userId",required = false) String userId,
+    public String profileHandler(@PathVariable(name = "userId", required = false) String userId,
                                  Model model) {
         UserFormDto userFormDto;
-        if(userId != null){
+        if (userId != null) {
             userFormDto = Optional.of(userId)
                     .map(userService::findById)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .map(userDto -> modelMapper.map(userDto, UserFormDto.class))
-                    .orElseThrow( () -> new UsernameNotFoundException("Usuario no encontrado.") );
-        }else{
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado."));
+        } else {
             userFormDto = userService.findUserAuthenticated()
                     .map(userDto -> modelMapper.map(userDto, UserFormDto.class))
-                    .orElseThrow( () -> new AuthenticationCredentialsNotFoundException("Usuario no autenticado") );
+                    .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Usuario no autenticado"));
         }
 
-        // reload user object
-        model.addAttribute("user",userFormDto);
-
-        // Devuelve la misma vista pero reenviando internamente (sin perder el binding result or info context of request)
-        return ("forward:/web/users/edit/%s?mode=%s".formatted(userFormDto.getId(),true) );
+        model.addAttribute("user", userFormDto);
+        return ("forward:/web/users/edit/%s?mode=%s".formatted(userFormDto.getId(), true));
     }
 
-    @GetMapping({"/register","/edit/{userId}"})
-    public ModelAndView userCreateOrEditHandler(@PathVariable(name="userId",required = false) String userId,
-                                                @RequestParam(value="mode",defaultValue = "false",required = false) boolean profileMode,
+    /**
+     * Maneja la visualización del formulario para crear o editar un usuario.
+     *
+     * @param userId ID del usuario (opcional).
+     * @param profileMode Indica si el formulario está en modo de perfil.
+     * @param model Modelo para pasar datos a la vista.
+     * @return Modelo y vista con los datos del usuario y la vista correspondiente.
+     */
+    @GetMapping({"/register", "/edit/{userId}"})
+    public ModelAndView userCreateOrEditHandler(@PathVariable(name = "userId", required = false) String userId,
+                                                @RequestParam(value = "mode", defaultValue = "false", required = false) boolean profileMode,
                                                 Model model) {
-        final ModelAndView modelAndView =  new ModelAndView();
-        if( Objects.nonNull(userId) && !userService.operationEditAllow(userId) ) {
+        final ModelAndView modelAndView = new ModelAndView();
+        if (Objects.nonNull(userId) && !userService.operationEditAllow(userId)) {
             throw new OperationNotAllowException("Operation not allow");
         }
 
@@ -85,98 +118,107 @@ public class UserMvcController {
 
         modelAndView.addAllObjects(model.asMap());
 
-        if( !model.containsAttribute("user")){
-            modelAndView.addObject("user", userFormDto );
-        }else{
+        if (!model.containsAttribute("user")) {
+            modelAndView.addObject("user", userFormDto);
+        } else {
             UserFormDto userFormDtoInModel = (UserFormDto) model.getAttribute("user");
-            if( userFormDto.getId() != null && !Objects.equals( userFormDtoInModel.getId(),userFormDto.getId())){
-                modelAndView.addObject("user", userFormDto );
+            if (userFormDto.getId() != null && !Objects.equals(userFormDtoInModel.getId(), userFormDto.getId())) {
+                modelAndView.addObject("user", userFormDto);
             }
         }
 
-        if( Objects.nonNull(userId) ){
+        if (Objects.nonNull(userId)) {
             modelAndView.setViewName("users/edit");
-        }else{
+        } else {
             modelAndView.setViewName("users/register");
         }
 
         final List<String> allRolesName = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
 
         model.addAttribute("allRolesName", allRolesName);
-        model.addAttribute("resourceImageId",userFormDto.getImage());
+        model.addAttribute("resourceImageId", userFormDto.getImage());
         modelAndView.addObject("profileMode", profileMode);
 
         return modelAndView;
     }
 
-    @PostMapping({"/save","/edit/{userId}"})
+    /**
+     * Maneja el registro o la edición de un usuario a través del formulario.
+     *
+     * @param userId ID del usuario (opcional).
+     * @param user DTO del usuario con los datos enviados.
+     * @param bindingResult Resultado de la validación del formulario.
+     * @param imageFile Archivo de imagen enviado (opcional).
+     * @param redirectAttributes Atributos para redirección.
+     * @param model Modelo para pasar datos a la vista.
+     * @return Redirección a la vista de perfil del usuario o al formulario en caso de error.
+     */
+    @PostMapping({"/save", "/edit/{userId}"})
     public RedirectView userCreateOrEditHandler(
-            @PathVariable(name="userId",required = false) String userId,
-            @Valid  @ModelAttribute("user") UserFormDto user, BindingResult bindingResult,
-            @RequestParam(value = "file",required = false) MultipartFile imageFile,
+            @PathVariable(name = "userId", required = false) String userId,
+            @Valid @ModelAttribute("user") UserFormDto user, BindingResult bindingResult,
+            @RequestParam(value = "file", required = false) MultipartFile imageFile,
             RedirectAttributes redirectAttributes,
             Model model) {
 
-        if(bindingResult.hasErrors()){
-            // se crea un nuevo get a partir de los datos del formulario
-            final ModelAndView modelAndView =  new ModelAndView();
-
+        if (bindingResult.hasErrors()) {
+            final ModelAndView modelAndView = new ModelAndView();
             modelAndView.addAllObjects(model.asMap());
-            if(!model.containsAttribute("user") ){
+            if (!model.containsAttribute("user")) {
                 modelAndView.addObject("user", user);
             }
             List<String> allRolesName = Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toList());
 
             model.addAttribute("allRolesName", allRolesName);
-            model.addAttribute("resourceImageId",null); // TODO esto hay que corregirlo
+            model.addAttribute("resourceImageId", user.getImage());
 
-            // se converte el model and view en elementos y lo adaptos a elemtentos redireccionables
             final String maybeParam = Optional.ofNullable(userId)
                     .map("/%s"::formatted)
                     .orElse(StringUtils.EMPTY);
 
-            // se añade el modelo al redirect
             modelAndView.getModel().forEach(redirectAttributes::addFlashAttribute);
 
-            // se envia una peticion nueva
-            if( maybeParam.isEmpty() ){
+            if (maybeParam.isEmpty()) {
                 return new RedirectView("/web/users/register");
-            }else{
+            } else {
                 return new RedirectView("/web/users/edit%s".formatted(maybeParam));
             }
         }
 
-        if (imageFile!=null && !imageFile.isEmpty()) {
-            Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(imageFile,null);
+        if (imageFile != null && !imageFile.isEmpty()) {
+            Optional<ResourceIdDto> resourceIdDtoOptional = storeFacade.saveResource(imageFile, null);
             resourceIdDtoOptional.ifPresent(resourceIdDto -> {
-                UUIDHelper.mapStringToUUID(  user.getImage() ).ifPresent(storeFacade::deleteResource);
-                user.setImage( resourceIdDto.resourceId().toString() );
+                UUIDHelper.mapStringToUUID(user.getImage()).ifPresent(storeFacade::deleteResource);
+                user.setImage(resourceIdDto.resourceId().toString());
             });
         }
 
-        // Guardar el usuario
-        UserDto userDto = userService.registerOrUpdatedUser(user); // TODO Descomentar
+        UserDto userDto = userService.registerOrUpdatedUser(user);
 
-        // Mensaje de éxito
         redirectAttributes.addFlashAttribute("message", "Usuario guardado correctamente!");
-        return new RedirectView("/web/users/profile/%s".formatted( userDto.getId() )); // Redirigir a la lista de usuarios o página de éxito
+        return new RedirectView("/web/users/profile/%s".formatted(userDto.getId()));
     }
 
+    /**
+     * Maneja la visualización de la lista de usuarios con paginación y búsqueda.
+     *
+     * @param page Número de página solicitado (por defecto 0).
+     * @param pageSize Tamaño de la página (por defecto 10).
+     * @param searchUserRecord Objeto con los criterios de búsqueda.
+     * @param model Modelo para pasar datos a la vista.
+     * @return Nombre de la vista que muestra la lista de usuarios.
+     */
     @GetMapping("/list")
     @PreAuthorize("hasRole('ADMIN')")
     public String listPageUsersHandler(
-            @RequestParam(value = "page",required = false, defaultValue = "0") int page,
-            @RequestParam(value = "pageSize", required = false,defaultValue = "10") int pageSize,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
             @ModelAttribute("searchUserRecord") SearchUserRecord searchUserRecord,
             Model model) {
 
-        //     PageDTO<UserDto> searchUsers(int page, int pageSize, SearchUserRecord searchUserRecord);
-        //final Object attr = model.getAttribute("searchUserRecord") ;
-        //final SearchUserRecord searchUserRecord =  ( attr instanceof SearchUserRecord data )  ? data : null;
-
-        final PageDTO<UserDto> pageUserDTO = userService.searchUsers(page,pageSize, searchUserRecord);
-        model.addAttribute( "pageUserDto", pageUserDTO);
-        model.addAttribute( "userAuth", userService.findUserAuthenticated().get() );
+        final PageDTO<UserDto> pageUserDTO = userService.searchUsers(page, pageSize, searchUserRecord);
+        model.addAttribute("pageUserDto", pageUserDTO);
+        model.addAttribute("userAuth", userService.findUserAuthenticated().get());
         return "users/list";
     }
 }

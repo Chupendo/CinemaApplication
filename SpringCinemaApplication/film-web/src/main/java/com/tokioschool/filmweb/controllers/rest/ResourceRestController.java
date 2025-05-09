@@ -14,40 +14,69 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Controlador REST para gestionar recursos.
+ *
+ * Este controlador maneja las solicitudes relacionadas con la obtención y descarga
+ * de contenido de recursos almacenados en el sistema.
+ *
+ * Anotaciones utilizadas:
+ * - `@RestController`: Marca esta clase como un controlador REST, combinando `@Controller` y `@ResponseBody`.
+ * - `@RequestMapping`: Define la ruta base para las solicitudes relacionadas con recursos.
+ * - `@RequiredArgsConstructor`: Genera un constructor con los argumentos requeridos.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @RestController
 @RequestMapping("/api/resources")
 @RequiredArgsConstructor
 public class ResourceRestController {
 
+    /** Fachada para gestionar la lógica de negocio relacionada con recursos. */
     private final StoreFacade storeFacade;
 
-    @GetMapping({"","/"})
-    public ResponseEntity<byte[]> getResourceContentHandler(@RequestParam(value = "rsc") UUID resourceId){
+    /**
+     * Maneja la obtención del contenido de un recurso.
+     *
+     * @param resourceId ID del recurso solicitado.
+     * @return Una respuesta HTTP con el contenido del recurso en el cuerpo.
+     * @throws NotFoundException Si el recurso no se encuentra.
+     */
+    @GetMapping({"", "/"})
+    public ResponseEntity<byte[]> getResourceContentHandler(@RequestParam(value = "rsc") UUID resourceId) {
         final ResourceContentDto resourceContentDto = storeFacade.findResource(resourceId)
                 .orElseThrow(() -> new NotFoundException("Resource not found! "));
 
         return ResponseEntity.ok()
-                .contentType( MediaType.parseMediaType( resourceContentDto.contentType() ) )
-                .contentLength( resourceContentDto.size() )
-                .body( resourceContentDto.content() );
+                .contentType(MediaType.parseMediaType(resourceContentDto.contentType()))
+                .contentLength(resourceContentDto.size())
+                .body(resourceContentDto.content());
     }
 
-    // handlker para borrar
+    /**
+     * Maneja la descarga del contenido de un recurso.
+     *
+     * Este metodo fuerza la descarga del recurso, configurando las cabeceras HTTP
+     * necesarias para indicar el nombre del archivo y su tipo de contenido.
+     *
+     * @param resourceId ID del recurso solicitado.
+     * @return Una respuesta HTTP con el contenido del recurso y cabeceras para descarga.
+     * @throws NotFoundException Si el recurso no se encuentra.
+     */
     @GetMapping("/downloads")
-    public ResponseEntity<byte[]> downloadResourceContentHandler(@RequestParam(value = "rsc") UUID resourceId){
+    public ResponseEntity<byte[]> downloadResourceContentHandler(@RequestParam(value = "rsc") UUID resourceId) {
         final ResourceContentDto resresourceContentDtoourceDto = storeFacade.findResource(resourceId)
                 .orElseThrow(() -> new NotFoundException("Resource not found! "));
 
-        // wrapper para devoler objetos que Spring Serializa y los envía
+        // Configuración de cabeceras HTTP para forzar la descarga
         final HttpHeaders httpHeaders = new HttpHeaders();
-        // fuerza la descarga del cotenido y le ponemos el nombre del archivo
         httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename= "+ resresourceContentDtoourceDto.resourceName() );
-        // infromación del documenot en la cabecera (puede ponerse en el cuerpo)
-        httpHeaders.add(HttpHeaders.CONTENT_LENGTH,String.valueOf( resresourceContentDtoourceDto.size() ));
-        httpHeaders.add(HttpHeaders.CONTENT_TYPE,resresourceContentDtoourceDto.contentType() );
+                "attachment; filename= " + resresourceContentDtoourceDto.resourceName());
+        httpHeaders.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(resresourceContentDtoourceDto.size()));
+        httpHeaders.add(HttpHeaders.CONTENT_TYPE, resresourceContentDtoourceDto.contentType());
 
-        return  ResponseEntity.ok()
+        return ResponseEntity.ok()
                 .headers(httpHeaders)
                 .body(resresourceContentDtoourceDto.content());
     }

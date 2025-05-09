@@ -9,10 +9,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Patrón de diseño "Fachada" para interactuar con un sistema cuya implementación es desconocida.
+ * Interfaz que define el patrón de diseño "Fachada" para interactuar con un sistema de gestión de recursos.
  *
- * Esta interfaz actúa como un cliente externo de la API de Store, proporcionando métodos para
- * registrar, guardar, buscar, eliminar y actualizar recursos.
+ * Proporciona métodos para registrar, guardar, buscar, eliminar y actualizar recursos en el sistema.
+ * Actúa como un cliente externo de la API de Store, ocultando los detalles de implementación.
+ *
+ * Anotaciones:
+ * - {@link PreAuthorize}: Define restricciones de seguridad para los métodos que requieren autenticación.
+ *
+ * Métodos principales:
+ * - Registro de recursos.
+ * - Gestión de recursos (guardar, buscar, eliminar, actualizar).
  *
  * @author andres.rpenuela
  * @version 1.0

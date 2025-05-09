@@ -20,6 +20,9 @@ import lombok.extern.jackson.Jacksonized;
  * - {@link Builder}: Proporciona un patrón de construcción para instanciar objetos de esta clase.
  * - {@link Jacksonized}: Permite la deserialización de objetos utilizando Jackson.
  *
+ * Campos:
+ * - {@code description}: Descripción del recurso.
+ *
  * @author andres.rpenuela
  * @version 1.0
  */
@@ -30,6 +33,8 @@ public class ResourceDescriptionDto {
 
     /**
      * Descripción del recurso.
+     *
+     * Este campo contiene información textual que describe el recurso.
      */
     private String description;
 }

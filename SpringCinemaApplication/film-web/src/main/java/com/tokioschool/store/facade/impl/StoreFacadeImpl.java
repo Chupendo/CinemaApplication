@@ -26,15 +26,34 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Implementación de la fachada para gestionar recursos en el sistema.
+ *
+ * Esta clase proporciona métodos para registrar, guardar, buscar, eliminar y actualizar
+ * recursos en el sistema utilizando un cliente REST.
+ *
+ * Anotaciones:
+ * - {@link Service}: Marca esta clase como un componente de servicio de Spring.
+ * - {@link Slf4j}: Proporciona un logger para registrar mensajes de depuración y errores.
+ * - {@link RequiredArgsConstructor}: Genera un constructor con los argumentos requeridos
+ *   para las dependencias inyectadas.
+ *
+ * @author andres.rpenuela
+ * @version 1.0
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class StoreFacadeImpl implements StoreFacade {
 
+    /** Cliente REST para interactuar con el sistema de recursos. */
     @Qualifier("restClientCostumer")
     private final RestClient restClient;
+
+    /** Objeto para mapear datos a/desde JSON. */
     private final ObjectMapper objectMapper;
 
+    /** URL base para los recursos en el sistema. */
     private static final String RESOURCE_URL = "/store/api/resource";
 
     /**
@@ -45,7 +64,7 @@ public class StoreFacadeImpl implements StoreFacade {
      * @return Un {@link Optional} que contiene el identificador único del recurso registrado.
      */
     @Override
-    public Optional<ResourceIdDto> registerResource(@NonNull MultipartFile multipartFile,@Nullable String description) {
+    public Optional<ResourceIdDto> registerResource(@NonNull MultipartFile multipartFile, @Nullable String description) {
         // Simulación de la descripción como parte de la solicitud
         Map<String, String> descriptionMap = new HashMap<>();
         descriptionMap.put("description", description);
@@ -59,7 +78,7 @@ public class StoreFacadeImpl implements StoreFacade {
         // Simulación del archivo como parte de la solicitud
         MediaType mediaType = Optional.ofNullable(multipartFile.getContentType())
                 .map(MediaType::valueOf)
-                .orElseGet(()->MediaType.APPLICATION_OCTET_STREAM); // Por defecto como binario
+                .orElseGet(() -> MediaType.APPLICATION_OCTET_STREAM); // Por defecto como binario
 
         // Construcción de las partes de la solicitud
         final HttpEntity<Object> descriptionPart = buildHttpEntity(MediaType.APPLICATION_JSON, descriptionBody);
@@ -108,7 +127,7 @@ public class StoreFacadeImpl implements StoreFacade {
         // Simulación del archivo como parte de la solicitud
         MediaType mediaType = Optional.ofNullable(multipartFile.getContentType())
                 .map(MediaType::valueOf)
-                .orElseGet(()->MediaType.APPLICATION_OCTET_STREAM);
+                .orElseGet(() -> MediaType.APPLICATION_OCTET_STREAM);
 
         // Construcción de las partes de la solicitud
         final HttpEntity<Object> descriptionPart = buildHttpEntity(MediaType.APPLICATION_JSON, descriptionBody);

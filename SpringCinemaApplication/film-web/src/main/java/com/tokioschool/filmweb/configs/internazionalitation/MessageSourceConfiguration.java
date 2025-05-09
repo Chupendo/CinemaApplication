@@ -8,33 +8,50 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+/**
+ * Configuración de la fuente de mensajes para la internacionalización de la aplicación.
+ *
+ * Esta clase define los beans necesarios para gestionar los mensajes de la aplicación
+ * utilizando archivos de propiedades y soporte para pluralización con ICU.
+ *
+ * Anotaciones utilizadas:
+ * - `@Configuration`: Marca esta clase como una clase de configuración de Spring.
+ *
+ * @author andres.rpenuela
+ * @version 1.o
+ */
 @Configuration
 public class MessageSourceConfiguration {
 
     /**
-     * Gestion propipia de los resources bandle, donde la fuente de los mensajes
-     * serán los ficheros de propiedades
+     * Define el bean principal para la fuente de mensajes de la aplicación.
      *
-     * Requiere comentar el "message source" de application.properties
-     *   spring.messages.basename= message/message
-     *   spring.messages.fallback-to-system-locale= true
-     * @return
+     * Este metodo configura un `ResourceBundleMessageSource` que utiliza un
+     * `ICUMessageSource` como fuente principal para soportar pluralización.
+     *
+     * Nota: Requiere comentar las propiedades relacionadas con `message source` en
+     * el archivo `application.properties`:
+     * - `spring.messages.basename=message/message`
+     * - `spring.messages.fallback-to-system-locale=true`
+     *
+     * @return Una instancia de `MessageSource` configurada.
      */
     @Bean
     @Primary
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
-        // se carga un icu para soportar la plurarilzacion
+        // Configura el ICUMessageSource como fuente principal para soportar pluralización
         messageSource.setParentMessageSource(icuMessageSource());
+
         /*
-        // definicion de la fuente de mensajes
+        // Definición de las fuentes de mensajes
         messageSource.addBasenames(
-                "message/message" // mensajes i18n propios, no se puede cargar sintasis icu en una fuente que se carga en un ResourceBundleMessageSource
-                ,"org.hibernate.validator.ValidationMessages" // mensajes i18n de validacion de jakarta
+                "message/message", // Mensajes i18n propios (sin soporte ICU en ResourceBundleMessageSource)
+                "org.hibernate.validator.ValidationMessages" // Mensajes i18n de validación de Jakarta
         );
 
-        // configuracion
+        // Configuración adicional
         messageSource.setUseCodeAsDefaultMessage(true);
         messageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
         */
@@ -42,27 +59,32 @@ public class MessageSourceConfiguration {
     }
 
     /**
-     * Documentation:
-     * Spring MessageSource ICU Support {@see https://github.com/transferwise/spring-icu}
-     * Exmaple {@see https://lokalise.com/blog/spring-boot-internationalization/}
-     * @return
+     * Define un bean para la fuente de mensajes con soporte ICU.
+     *
+     * Este metodo configura un `ICUReloadableResourceBundleMessageSource` que permite
+     * manejar pluralización y otros formatos avanzados en los mensajes.
+     *
+     * Documentación adicional:
+     * - Soporte de Spring MessageSource ICU: {@see https://github.com/transferwise/spring-icu}
+     * - Ejemplo: {@see https://lokalise.com/blog/spring-boot-internationalization/}
+     *
+     * @return Una instancia de `ICUMessageSource` configurada.
      */
-    //@Bean // debe ser un Bean, si es el "messageSource es gestionado por spring"
+    //@Bean // Debe ser un Bean si "messageSource" es gestionado por Spring
     public ICUMessageSource icuMessageSource() {
         ICUReloadableResourceBundleMessageSource icuMessageSource = new ICUReloadableResourceBundleMessageSource();
-//        icuMessageSource.setBasenames(
-//                "message/message",
-//                "org.hibernate.validator.ValidationMessages",
-//                "icu-message/res" // mensajes i18n propios, el "classpath" es requerido
-//        );
+
+        // Configuración de las fuentes de mensajes con soporte ICU
         icuMessageSource.setBasenames(
-                "classpath:message/message",
-                "classpath:org/hibernate/validator/ValidationMessages",
-                "classpath:icu-message/res"
+                "classpath:message/message", // Mensajes i18n propios
+                "classpath:org/hibernate/validator/ValidationMessages", // Mensajes de validación de Hibernate
+                "classpath:icu-message/res" // Mensajes i18n adicionales
         );
-        //icuMessageSource.setUseCodeAsDefaultMessage(true);
-        //icuMessageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
+
+        // Configuración adicional (comentada por defecto)
+        // icuMessageSource.setUseCodeAsDefaultMessage(true);
+        // icuMessageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
+
         return icuMessageSource;
     }
-
 }
