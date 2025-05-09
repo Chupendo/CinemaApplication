@@ -121,4 +121,11 @@ public class User {
     )
     private Set<Role> roles;
 
+    @PrePersist
+    public void ensureId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString().substring(0, 13);
+        }
+    }
+
 }
