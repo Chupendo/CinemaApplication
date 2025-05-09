@@ -1,0 +1,104 @@
+
+spring:
+  application:
+    name: film-web
+    # Liguibase
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev
+    label-filter: film-web-dev
+  # maria db docker
+  datasource:
+    url: jdbc:mariadb://localhost:3307/film?createDatabaseIfNotExist=true
+    username: root
+    password: dbpw
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  sql:
+    init:
+      platform: h2
+  web:
+    locale: es
+    # evita que Spring sirva recursos estáticos por defecto desde /static, /publi
+#    resources:
+#      add-mappings: false
+  messages:
+    encoding: UTF-8
+  servlet:
+    # Session
+    session:
+      timeout: 15m
+      tracking-modes: COOKIE
+    # Multipart
+    multipart:
+      max-file-size: 2MB
+  # Hace que en lugar de devolver un 404 plano, Spring lance una excepción NoHandlerFoundException
+#  mvc:
+#    throw-exception-if-no-handler-found: true
+# Spring aplica automáticamente esos formatos por defecto cuando hace binding de parámetros de formulario, query params, path variables o JSON hacia LocalDate, LocalDateTime y LocalTime, y viceversa
+# evita que tengamos que usar @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") en los los dto, entities, controladores
+# ya que lo tomara de la configuración
+# deprecado en Spring 6.0, o Spring Boot 3, pero se puede seguir usando
+# no recomendado desde Spirng boot 2.6+
+#mvc:
+#  format:
+#    date-time: "yyyy-MM-dd'T'HH:mm:ss"
+#    date: "yyyy-MM-dd"
+#    time: "HH:mm:ss"
+server:
+  port: 8083
+  # Hace que en lugar de devolver un 404 plano, Spring lance una excepción NoHandlerFoundException, Spring Boot 3.x+
+  error:
+    whitelabel:
+      enabled: false
+      # Actuator:
+# Activar endpoints predefinidos: management.endpoints.web.exposure.include= .....
+# Desactivar un edpoint: management.endpoint.health.enable= false/true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, bean, info, auditevents, env, sessions, shutdown, metrics, prometheus, logfile, loggers, configprops, conditions
+  endpoint:
+    health:
+      enabled: false
+
+logging:
+  level:
+    org:
+      h2: DEBUG
+      hibernate: DEBUG
+      springframework:
+        security: DEBUG
+        web: DEBUG
+#logging.level.org.hibernate.SQL=DEBUG
+#logging.level.org.hibernate.transaction=TRACE
+
+# Clave secreta del servidor que Spring Security usa para firmar y validar la cookie remember-me
+# si cambia, invalida todas las cookies remember-me
+security:
+  remember-me:
+    key: e2d453aa-909d-4f3e-8b20-b33c5177fb9c
+
+  # Store client id and secret
+  # Store
+application:
+  # Store
+  store:
+    base-url: http://localhost:9091
+    # User in memory
+    login:
+      users:
+        - username: user
+          # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
+          # "password" in base64:: cGFzc3dvcmQ=
+          password: cGFzc3dvcmQ=
+        - username: admin
+          # password = "password", https://bcrypt-generator.com/ {bcrypt}$2a$15$gOuw1rrOG3J4GzXnfqHo5uxG2E5dDgAyJFpB4B.PA8VL9nxjA6n9m
+          # "password" in base64:: cGFzc3dvcmQ=
+          password: cGFzc3dvcmQ=

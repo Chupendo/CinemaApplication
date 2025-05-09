@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      class="bg-light text-dark"
+>
+<!-- @thymesVar id="user" type="com.tokioschool.filmapp.dto.user.UserFormDto" -->
+
+
+<head th:replace="~{/fragments/common/head :: head(#{form.user.label.edit})}"></head>
+<body>
+<!-- Define una variable en thymeleaf a partir de un parámetro recibido del controlador -->
+<!-- Evita usar reiteradamente: th:attr="${profileMode} ? 'disabled' : null" -->
+
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col min-vh-100 py-3">
+            <!-- toggler -->
+            <button class="btn float-end d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+            </button>
+
+            <div class="row my-4">
+                <!-- Filtro de Búsqueda -->
+                <div class="col-lg-3 mb-4">
+                    <div class="form-section">
+                        <h5 class="mb-4" th:text="#{user.search.title}">Buscar Usuario</h5>
+                        <form th:action="@{/web/users/list}" th:object="${searchUserRecord}" method="get">
+                            <div class="mb-3">
+                                <label for="name" class="form-label" th:text="#{user.label.name}">Nombre</label>
+                                <input type="text" id="name" class="form-control" th:field="*{name}" placeholder="Nombre">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="surname" class="form-label" th:text="#{user.label.surname}">Apellido</label>
+                                <input type="text" id="surname" class="form-control" th:field="*{surname}" placeholder="Apellido">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label" th:text="#{user.label.username}">Usuario</label>
+                                <input type="text" id="username" class="form-control" th:field="*{username}" placeholder="Usuario">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label" th:text="#{user.label.email}">Email</label>
+                                <input type="text" id="email" class="form-control" th:field="*{email}" placeholder="Email">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="pageSize" class="form-label" th:text="#{user.label.pageSize}">Usuarios por pagina</label>
+                                <input type="number" step="1" id="pageSize" class="form-control" name="pageSize" placeholder="10">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary" th:text="#{item.label.search}">Buscar</button>
+                                <a th:href="@{/web/users/list}" class="btn btn-secondary" th:text="#{item.label.clean}">Limpiar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabla de Usuarios -->
+                <div class="col-lg-9">
+                    <div class="table-section">
+                        <h2 class="mb-4 text-center" th:text="#{user.list.title}">Listado de Usuarios</h2>
+
+                        <p th:if="${pageUserDto.getItems().isEmpty()}"
+                           class="mb-4 text-center" th:text="#{user.text.not-fount}">No se han encontrado usuarios en el sistema</p>
+
+                        <div th:unless="${pageUserDto.getItems().isEmpty()}"
+                             class="mb-4 text-center table-responsive">
+                            <table id="userTable" class="table  table-hover align-middle">
+                                <thead class="table-warning">
+                                <tr>
+                                    <th th:text="#{user.label.name}">Nombre</th>
+                                    <th th:text="#{user.label.surname}">Apellido</th>
+                                    <th th:text="#{user.label.username}">Usuario</th>
+                                    <th th:text="#{user.label.email}">Email</th>
+                                    <th th:text="#{item.label.edit}">Editar</th>
+                                    <th th:text="#{item.label.profile}">Perfil</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="user : ${pageUserDto.items}">
+                                    <td th:text="${user.name}">Name</td>
+                                    <td th:text="${user.surname}">Surname</td>
+
+                                    <td th:text="${user.username}">Username</td>
+                                    <td th:text="${user.email}">email@example.com</td>
+                                    <td>
+                                        <a th:href="@{/web/users/edit/{userId}(userId=${user.id})}"
+                                           th:if="${!user.admin || (user.admin && user.id == userAuth.id)}"
+                                           class="btn btn-sm btn-warning" th:text="#{item.label.edit}">Editar</a>
+                                        <span th:unless="${!user.admin || (user.admin && user.id == userAuth.id)}"
+                                              class="disabled-link" th:text="#{item.label.edit}">Perfil</span>
+                                    </td>
+
+                                    <td>
+                                        <a th:href="@{/web/users/profile/{userId}(userId=${user.id})}"
+                                           th:if="${!user.admin || (user.admin && user.id == userAuth.id)}"
+                                           class="btn btn-sm btn-info text-white" th:text="#{item.label.profile}">Perfil</a>
+                                        <span th:unless="${!user.admin || (user.admin && user.id == userAuth.id)}"
+                                              class="disabled-link" th:text="#{item.label.profile}">Perfil</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${pageUserDto.pageNumber == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|/web/users/list?page=${pageUserDto.pageNumber - 1}&pageSize=${pageUserDto.pageSize}|}" th:text="#{pagination.preview}">Anterior</a>
+                                </li>
+
+                                <li class="page-item disabled">
+                                    <span class="page-link" th:text="#{pagination.page(${pageUserDto.pageNumber + 1}, ${pageUserDto.totalPages})}"></span>
+                                </li>
+
+                                <li class="page-item" th:classappend="${pageUserDto.pageNumber + 1 == pageUserDto.totalPages} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|/web/users/list?page=${pageUserDto.pageNumber + 1}&pageSize=${pageUserDto.pageSize}|}" th:text="#{pagination.next}">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Footer -->
+        <footer th:replace="~{/fragments/common/footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{/fragments/common/scripts}"></div>
+</body>
+</html>

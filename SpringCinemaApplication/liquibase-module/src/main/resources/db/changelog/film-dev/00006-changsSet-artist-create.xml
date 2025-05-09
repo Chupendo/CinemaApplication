@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ChangeSet to create the users_roles table -->
+    <changeSet id="create-artist-table" author="andres.rpenuela" context="dev">
+        <comment>Created table user_roles for relationship to users with roles</comment>
+
+        <createTable tableName="artists">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SURNAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TYPE_ARTIST" type="VARCHAR(255)">
+                <constraints nullable="false" checkConstraint="CHECK( TYPE_ARTIST = UPPER(TYPE_ARTIST) )"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+<!--    <changeSet id="insert-artist-table" author="andres.rpenuela" context="dev">-->
+<!--        &lt;!&ndash; privileges values &ndash;&gt;-->
+<!--        <insert tableName="artists">-->
+<!--            <column name="ID" value="1" />-->
+<!--            <column name="NAME" value="John" />-->
+<!--            <column name="SURNAME" value="Smith" />-->
+<!--            <column name="TYPE_ARTIST" value="ACTOR" />-->
+<!--        </insert>-->
+<!--        <insert tableName="artists">-->
+<!--            <column name="ID" value="2" />-->
+<!--            <column name="NAME" value="William" />-->
+<!--            <column name="SURNAME" value="Smith" />-->
+<!--            <column name="TYPE_ARTIST" value="DIRECTOR" />-->
+<!--        </insert>-->
+<!--    </changeSet>-->
+</databaseChangeLog>

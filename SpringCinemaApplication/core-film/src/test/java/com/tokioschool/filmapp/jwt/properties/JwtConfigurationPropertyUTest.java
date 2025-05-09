@@ -1,5 +1,6 @@
 package com.tokioschool.filmapp.jwt.properties;
 
+import com.tokioschool.jwt.properties.JwtProperty;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -14,15 +15,15 @@ public class JwtConfigurationPropertyUTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withPropertyValues(
-                    "application.jwt.secret=test-secret",
-                    "application.jwt.expiration=PT30M"
+                    "jwt.secret=test-secret",
+                    "jwt.expiration=PT30M"
             )
             .withUserConfiguration(TestConfig.class);
 
     @Test
     void givenJwtProperties_whenLoadJwtConfigurationProperties_thenReturnOk() {
         contextRunner.run(context -> {
-            JwtConfigurationProperty jwtConfigurationProperty = context.getBean(JwtConfigurationProperty.class);
+            JwtProperty jwtConfigurationProperty = context.getBean(JwtProperty.class);
 
             // Assert
             Assertions.assertEquals("test-secret", jwtConfigurationProperty.secret());
@@ -31,7 +32,7 @@ public class JwtConfigurationPropertyUTest {
     }
 
     @Configuration
-    @EnableConfigurationProperties(JwtConfigurationProperty.class)
+    @EnableConfigurationProperties(JwtProperty.class)
     static class TestConfig {
         // Configuración básica para habilitar las propiedades
     }

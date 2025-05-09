@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      class="bg-light text-dark"
+>
+<!-- @thymesVar id="user" type="com.tokioschool.filmapp.dto.user.UserFormDto" -->
+
+
+<head th:replace="~{/fragments/common/head :: head(#{form.user.label.edit})}"></head>
+<body>
+<!-- Define una variable en thymeleaf a partir de un parámetro recibido del controlador -->
+<!-- Evita usar reiteradamente: th:attr="${profileMode} ? 'disabled' : null" -->
+
+<header>
+    <nav th:replace="~{/fragments/common/nav}"></nav>
+</header>
+
+<div class="container">
+    <div class="row">
+        <div class="col min-vh-100 py-3">
+            <!-- toggler -->
+            <button class="btn float-end d-block d-md-none" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" role="button">
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-light" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+                <i class="bi bi-layout-sidebar-inset fs-3 sidebar-icon-dark" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
+            </button>
+
+            <div class="row my-4">
+                <!-- Filtro de Búsqueda -->
+                <div class=" d-flex flex-column">
+                    <div class="form-section">
+                        <h5 class="mb-4" th:text="#{artist.register.title}" th:if="${isRegister}">Nuevo Artista</h5>
+                        <h5 class="mb-4" th:text="#{artist.edit.title}" th:if="${!isRegister && !profileMode }">Editar Artista</h5>
+                        <h5 class="mb-4" th:text="#{artist.profile.title}" th:if="${!isRegister && profileMode }">Perfil Artista</h5>
+
+                        <th:block th:with="disabledAttr=${profileMode} ? 'disabled' : null">
+                            <form th:action="@{/web/artists/form/{artistId}(artistId=*{id})}"
+                                  th:object="${artist}"
+                                  method="post">
+                                <div>   <input type="hidden" th:field="*{id}"/> </div>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label" th:text="#{artist.label.name}">Nombre</label>
+                                    <input type="text" id="name" class="form-control" th:field="*{name}" placeholder="Nombre" th:attrappend="disabled=${disabledAttr}">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="surname" class="form-label" th:text="#{artist.label.surname}">Apellido</label>
+                                    <input type="text"  id="surname" class="form-control" th:field="*{surname}" placeholder="Apellido" th:attrappend="disabled=${disabledAttr}">
+                                    <div class="text-danger" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></div>
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="typeArtist" class="form-label" th:text="#{artist.label.type}">Tipo</label>
+                                    <!--                                <input type="text"   id="typeArtist" class="form-control" th:field="*{type}" placeholder="Usuario">-->
+                                    <select  class="form-select" th:field="*{typeArtist}" size="4" id="typeArtist" th:attrappend="disabled=${disabledAttr}">
+                                        <option th:each="artistType : ${T(com.tokioschool.filmapp.enums.TYPE_ARTIS_DTO).values()}"
+                                                th:value="${artistType}"
+                                                th:text="${artistType}">
+                                        </option>
+                                    </select>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('typeArtist')}" th:errors="*{typeArtist}"></div>
+                                </div>
+
+                                <div class="d-flex justify-content-between" th:if="${!profileMode}">
+                                    <button type="submit" class="btn btn-primary" th:text="#{artist.register.register}" th:if="${isRegister}">Registrar</button>
+                                    <button type="submit" class="btn btn-primary" th:text="#{artist.register.edit}" th:if="${!isRegister }">Editar</button>
+                                </div>
+                                <div class="d-flex justify-content-between" th:if="${profileMode}">
+                                    <a th:href="@{/web/artists/form/{artistId}(artistId=*{id})}" class="btn btn-sm btn-warning" th:text="#{item.label.edit}">Editar</a>
+                                </div>
+
+                            </form>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Footer -->
+        <footer th:replace="~{/fragments/common/footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{/fragments/common/scripts}"></div>
+</body>
+</html>

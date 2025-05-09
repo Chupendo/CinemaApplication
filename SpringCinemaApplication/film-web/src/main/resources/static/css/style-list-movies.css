@@ -1,0 +1,4 @@
+#toggleViewBtn:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* leve sombreado al pasar el ratón */
+    border-radius: 4px;
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ChangeSet to create the users_roles table -->
+    <changeSet id="create-roles-scope-table" author="andres.rpenuela" context="dev">
+        <comment>Created table user_roles for relationship to users with roles</comment>
+
+        <createTable tableName="scopes">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+        </createTable>
+
+        <createTable tableName="roles_scopes">
+            <column name="ROLE_ID" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+            <column name="SCOPE_ID" type="BIGINT">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <!-- Agregar clave foránea user_id que referencia a la tabla users -->
+        <addForeignKeyConstraint
+                baseTableName="roles_scopes"
+                baseColumnNames="ROLE_ID"
+                referencedTableName="roles"
+                referencedColumnNames="ID"
+                constraintName="fk_roles_scopes_role_id" />
+
+        <!-- Agregar clave foránea role_id que referencia a la tabla roles -->
+        <addForeignKeyConstraint
+                baseTableName="roles_scopes"
+                baseColumnNames="SCOPE_ID"
+                referencedTableName="SCOPES"
+                referencedColumnNames="ID"
+                constraintName="fk_roles_scopes_scope_id" />
+    </changeSet>
+
+    <!-- ChangeSet to insert data for the table SCOPES -->
+    <changeSet id="insert-scopes-data" author="andres.rpenuela" context="dev">
+        <insert tableName="scopes">
+            <column name="ID" value="1"/>
+            <column name="NAME" value="OPENID"/>
+        </insert>
+        <insert tableName="scopes">
+            <column name="ID" value="2"/>
+            <column name="NAME" value="PROFILE"/>
+        </insert>
+        <insert tableName="scopes">
+            <column name="ID" value="3"/>
+            <column name="NAME" value="READ"/>
+        </insert>
+        <insert tableName="scopes">
+            <column name="ID" value="4"/>
+            <column name="NAME" value="WRITER"/>
+        </insert>
+    </changeSet>
+
+    <!-- ChangeSet to insert data for the relationship N:N of roles-authorities  -->
+    <changeSet id="insert-roles-scopes-data" author="andres.rpenuela" context="dev">
+        <!-- user role -->
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="1"/>
+            <column name="scope_id" value="1"/>
+        </insert>
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="1"/>
+            <column name="scope_id" value="2"/>
+        </insert>
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="1"/>
+            <column name="scope_id" value="3"/>
+        </insert>
+
+        <!-- admin role -->
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="2"/>
+            <column name="scope_id" value="1"/>
+        </insert>
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="2"/>
+            <column name="scope_id" value="2"/>
+        </insert>
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="2"/>
+            <column name="scope_id" value="3"/>
+        </insert>
+        <insert tableName="roles_scopes">
+            <column name="role_id" value="2"/>
+            <column name="scope_id" value="4"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

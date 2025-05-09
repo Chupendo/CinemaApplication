@@ -16,7 +16,7 @@ class RolesSetToStringListConverterUTest {
     private final RolesSetToStringListConverter converter = new RolesSetToStringListConverter();
 
     @Test
-    void givenSetRoles_wneConvert_tenReturnListNameRoles() {
+    void convert_withValidARoleSet_shouldReturnStringList() {
         // Arrange
         Set<Role> roleSet = Set.of(
                 Role.builder().id(1L).name("USER").build(),
@@ -35,5 +35,29 @@ class RolesSetToStringListConverterUTest {
                 .hasSize(3)
                 .isEqualTo(roleSet.stream().map(Role::getName).toList());
 
+    }
+    @Test
+    void convert_withNullRoleSet_shouldReturnListEmpty() {
+
+        MappingContext<Set<Role>, List<String>> context = Mockito.mock(MappingContext.class);
+        Mockito.when(context.getSource()).thenReturn(null);
+
+        // Act
+        List<String> rolesList = converter.convert(context);
+
+        // Assertions
+        Assertions.assertThat(rolesList)
+                .isEmpty();
+    }
+
+    @Test
+    void convert_withNull_shouldReturnListEmpty() {
+
+        // Act
+        List<String> rolesList = converter.convert(null);
+
+        // Assertions
+        Assertions.assertThat(rolesList)
+                .isEmpty();
     }
 }

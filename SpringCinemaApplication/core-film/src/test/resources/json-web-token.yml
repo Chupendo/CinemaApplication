@@ -1,0 +1,4 @@
+# JWT Token
+jwt:
+  secret: secretTest
+  expiration: PT1H

@@ -3,10 +3,12 @@ package com.tokioschool.filmapp.repositories;
 import com.github.javafaker.Faker;
 import com.tokioschool.filmapp.domain.User;
 import com.tokioschool.filmapp.repositories.configuration.TestConfig;
+import com.tokioschool.filmapp.specifications.UserSpecification;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -16,6 +18,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @DataJpaTest
 @ContextConfiguration(classes = {TestConfig.class,UserDao.class})
@@ -37,13 +43,14 @@ class UserDaoUTest {
             return User.builder()
                     .email("%s@.%s.com".formatted(name,faker.company().suffix()))
                     .name(name)
-                    .surname(faker.name().lastName())
+                    .surname(faker.name().lastName()+i)
                     .username(faker.dragonBall().character())
                     .birthDate(LocalDate.now().minusYears(random.nextLong(10,40)))
                     .created(LocalDateTime.now())
                     .lastLoginAt(LocalDateTime.now())
                     .password("123")
                     .passwordBis("123")
+                    .image(null)
                     .build();
         }).toList();
 
@@ -97,5 +104,32 @@ class UserDaoUTest {
                 .get()
                 .returns(users.getFirst().getName(),User::getName)
                 .returns(users.getFirst().getSurname(),User::getSurname);
+    }
+
+    @Test
+    @Order(6)
+    void givenUsers_whenFindAllWithOutNotApplySpecification_thenRetunList() {
+        Specification<User> userSpecification = Specification.allOf();
+        List<User> users = userDao.findAll(userSpecification);
+
+        Assertions.assertThat(users).isNotEmpty();
+    }
+
+    @Test
+    @Order(7)
+    void givenUsers_whenFindAllWithApplyUserSpecificationName_thenReturnUser() {
+        Specification<User> userSpecification = Specification.where(UserSpecification.hasName(users.getFirst().getName()));
+        List<User> users = userDao.findAll(userSpecification);
+
+        Assertions.assertThat(users).isNotEmpty().hasSize(1);
+    }
+
+    @Test
+    @Order(8)
+    void givenUsers_whenFindAllWithApplyUserSpecificationNameUnknown_thenReturnListEmpty() {
+        Specification<User> userSpecification = Specification.where(UserSpecification.hasName("unknown-name"));
+        List<User> users = userDao.findAll(userSpecification);
+
+        Assertions.assertThat(users).isEmpty();
     }
 }

@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: rating-api
+  # Liguibase
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    contexts: dev,rating-dev
+    label-filter: rating-dev
+    # maria db docker
+  datasource:
+    url: jdbc:mariadb://localhost:3307/film?createDatabaseIfNotExist=true
+    username: root
+    password: dbpw
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+        transaction:
+          jta:
+            platform: org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform
+    #validate, none, update, create-drop
+    hibernate:
+      ddl-auto: validate
+  security:
+    user:
+      name: user
+      password: $2a$12$UibaueeyGF36H2gHMDStEO/us3nEhtepGjF5FIlE76c7okmqgyTQW
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:9095
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:9095
+#      client:
+#        registration:
+#          oauth-client:
+#            client-id: your-client-id
+#            client-secret: your-client-secret
+#            authorization-grant-type: authorization_code
+#            scope: openid, profile, email
+#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#            authorization-uri: https://authorization-server.com/oauth2/authorize
+#            secret-uri: https://authorization-server.com/oauth2/token
+#            client-name: OAuth Client
+#            client-alias: oauth-client
+#        provider:
+#          authorization-server:
+#            authorization-uri: https://authorization-server.com/oauth2/authorize
+#            secret-uri: https://authorization-server.com/oauth2/token
+  sql:
+    init:
+      platform: h2
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  httpexchanges:
+    recording:
+      enabled: true
+server:
+  port: 9095
+
+logging:
+  level:
+    org:
+      h2: DEBUG
+      hibernate: DEBUG
+      springframework:
+        security: TRACE
+        web: DEBUG

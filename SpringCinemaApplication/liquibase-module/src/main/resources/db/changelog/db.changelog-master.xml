@@ -5,8 +5,17 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-
+    <!-- films -->
     <includeAll path="db/changelog/film" context="production"  contextFilter="production"/>
     <includeAll path="db/changelog/film-dev" context="dev" contextFilter="dev"/>
     <includeAll path="db/changelog/film-test" context="test" contextFilter="test"/>
+
+    <!-- ratings -->
+    <includeAll path="db/changelog/rating/rating-pro" context="test" contextFilter="rating-pro"/>
+    <includeAll path="db/changelog/rating/rating-dev" context="test" contextFilter="rating-dev"/>
+
+    <!-- export bath -->
+    <includeAll path="db/changelog/export-batch/pro" context="export-batch-pro" contextFilter="export-batch"/>
+    <includeAll path="db/changelog/export-batch/dev" context="export-batch-dev" contextFilter="export-batch"/>
+    <includeAll path="db/changelog/export-batch/test" context="export-batch-test" contextFilter="export-batch"/>
 </databaseChangeLog>

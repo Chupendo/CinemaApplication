@@ -7,7 +7,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <!-- ChangeSet to create the USER table -->
-    <changeSet id="1" author="andres.rpenuela" context="dev">
+    <changeSet id="users-created-table" author="andres.rpenuela" context="dev">
         <createTable tableName="users">
             <column name="ID" type="VARCHAR(13)">
                 <constraints nullable="false" unique="true" />
@@ -52,7 +52,7 @@
         </comment>
     </changeSet>
 
-    <changeSet id="2" author="andres.rpenuela" context="dev">
+    <changeSet id="user-insert-data" author="andres.rpenuela" context="dev">
         <insert tableName="users">
             <column name="ID" value="0AVRSA787897A" />
             <column name="USERNAME" value="user" />
