@@ -3,16 +3,15 @@ package com.tokioschool.filmweb.controllers.mvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tokioschool.filmapp.dto.artist.ArtistDto;
 import com.tokioschool.filmapp.dto.common.PageDTO;
-import com.tokioschool.filmapp.enums.TYPE_ARTIS_DTO;
 import com.tokioschool.filmapp.services.artist.ArtistService;
+import com.tokioschool.filmapp.services.user.UserService;
+import com.tokioschool.securities.filters.LogRequestFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,6 +34,9 @@ class ArtistMvcControllerITest {
 
     @MockitoBean
     private ArtistService artistService;
+
+    @MockitoBean
+    private UserService userService;
 
     private ArtistDto artistDto;
 

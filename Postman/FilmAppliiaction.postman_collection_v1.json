@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dd315ce4-013d-447f-ac44-c5129f12c39f",
+		"_postman_id": "0a2bf78f-966b-415b-8d24-988e44c96fea",
 		"name": "FilmAppliiaction",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "6232761"
@@ -16,8 +16,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"let localVar = pm.variables.get(\"localVar\");\r",
+									"\r",
 									"// other perfom\r",
-									"var data = JSON.parse(pm.response.text());\r",
+									"var data2 = JSON.parse(pm.response.text());\r",
 									"\r",
 									"//pm.setGlobalVariable(\"jwt_token\", data2.access_token);\r",
 									"//pm.environment.set(\"local\", data2.access_token);\r",
@@ -80,7 +82,7 @@
 						"auth": {
 							"type": "bearer",
 							"bearer": {
-								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3Mzc2NzQ2NTksInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.5LqdQrw7S0MLCy86Ro6E3_FQCdhS4jhdCFf2SL0dPFI"
+								"token": "{{store_jwt_token}}"
 							}
 						},
 						"method": "GET",
@@ -95,7 +97,7 @@
 						"auth": {
 							"type": "bearer",
 							"bearer": {
-								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3Mzg2MDczNTcsInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.L5XEKMFv5rIsVuc0Jx0gCezxYyUDRe4z0GA3OcGUt6Q"
+								"token": "{{store_jwt_token}}"
 							}
 						},
 						"method": "POST",
@@ -128,7 +130,7 @@
 						"auth": {
 							"type": "bearer",
 							"bearer": {
-								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzgxMDYzMDQsInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.t61QXw3GLiqoedcsaJ3p0hToPLFOMCUtgxk-XB3sRsg"
+								"token": "{{store_jwt_token}}"
 							}
 						},
 						"method": "GET",
@@ -143,7 +145,7 @@
 						"auth": {
 							"type": "bearer",
 							"bearer": {
-								"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MzgxMDYzMDQsInN1YiI6InByb2R1Y2VyIiwiYXV0aG9yaXRpZXMiOlsiUkVBRC1SRVNPVVJDRSIsIlJPTEVfQURNSU4iLCJST0xFX1VTRVIiLCJXUklURS1SRVNPVVJDRSJdfQ.t61QXw3GLiqoedcsaJ3p0hToPLFOMCUtgxk-XB3sRsg"
+								"token": "{{store_jwt_token}}"
 							}
 						},
 						"method": "DELETE",

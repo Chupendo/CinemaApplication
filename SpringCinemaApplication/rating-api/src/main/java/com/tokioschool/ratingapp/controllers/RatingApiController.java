@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,7 @@ public class RatingApiController {
     )
     @GetMapping("/register/films")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<List<RatingFilmDto>> recoverRatingHandler() {
         return ResponseEntity.ok(ratingFilmService.recoverRatingFilms());
     }
@@ -89,6 +91,7 @@ public class RatingApiController {
     )
     @PostMapping("/register/films")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<RatingResponseFilmDto> registerARatingHandler(@Valid @RequestBody RequestRatingFilmDto requestRatingFilmDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = bindingResult.getFieldErrors().stream()
@@ -128,6 +131,7 @@ public class RatingApiController {
     )
     @PutMapping("/updated/films/{filmId}/users/{userId}")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<RatingFilmDto> updatedARatingHandler(@PathVariable(value = "filmId") Long filmId,
                                                                @PathVariable(value = "userId") String userId,
                                                                @Valid @RequestBody RequestRatingFilmDto requestRatingFilmDto, BindingResult bindingResult) {
@@ -162,6 +166,7 @@ public class RatingApiController {
     )
     @DeleteMapping("/deleted/films/{filmId}/users/{userId}")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<Void> deletedRatingHandler(@PathVariable(value = "filmId") Long filmId,
                                                      @PathVariable(name = "userId") String userId) {
         ratingFilmService.deleteByFilmIdAndUserId(filmId, userId);
@@ -188,6 +193,7 @@ public class RatingApiController {
     )
     @GetMapping("/films/{filmId}/users/{userId}")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<RatingFilmDto> findRatingByFilmAndUserHandler(@PathVariable(name = "filmId") Long filmId,
                                                                         @PathVariable(name = "userId") String userId) {
         RatingFilmDto requestRatingFilmDto = ratingFilmService.findRatingByFilmAndUserHandler(filmId, userId);
@@ -219,6 +225,7 @@ public class RatingApiController {
     )
     @GetMapping("/ratings-average/films/{filmId}")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "auth-openapi")
     public ResponseEntity<AverageRating> averageRatingsHandler(@PathVariable(name = "filmId") Long filmId) throws NotFoundException {
         return ResponseEntity.ok(ratingFilmService.averageRatings(filmId));
     }

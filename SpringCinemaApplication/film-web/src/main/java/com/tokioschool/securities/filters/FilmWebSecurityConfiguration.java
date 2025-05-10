@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Configuración de seguridad para la aplicación web de FilmWeb.
@@ -35,6 +36,14 @@ public class FilmWebSecurityConfiguration {
     /** Clave utilizada para la funcionalidad de "recordar sesión". */
     @Value("${security.remember-me.key}")
     private String rememberMeKey;
+
+    /**
+     * Filtro para registrar información de las solicitudes HTTP.
+     *
+     * Este filtro se encarga de registrar información relevante de cada solicitud
+     * y actualizar el último tiempo de inicio de sesión del usuario autenticado.
+     */
+    private final LogRequestFilter logRequestFilter;
 
     /**
      * Servicio para cargar los detalles del usuario.
@@ -108,6 +117,7 @@ public class FilmWebSecurityConfiguration {
                         .tokenValiditySeconds(7 * 24 * 60 * 60)
                         .userDetailsService(userDetailsService))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .addFilterAfter(logRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
